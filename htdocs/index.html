@@ -70,6 +70,7 @@
             <input type="text" class="form-control" placeholder="Search">
           </div>
         </form>
+
       </div><!--/.nav-collapse -->
     </div>
   </div>
@@ -78,8 +79,9 @@
     <div class="row">
 
       <div class="col-md-10 col-xs-12">
+
         <div class="notifications top-right"></div>
-        
+
         <div class="panel panel-primary">
           <!-- Default panel contents -->
           <div class="panel-heading"><b id="panel-heading">Queue</b></div>
@@ -124,33 +126,19 @@
 
       <div class="col-md-2 col-xs-12" >
         <div class="btn-toolbar">
-          <div class="btn-group-vertical btn-block btn-group-lg" data-toggle="buttons">
-            <button id="btnrandom" type="button" class="btn btn-default">
-              <span class="glyphicon glyphicon-random"></span> Random
-            </button>
-            <button id="btnconsume" type="button" class="btn btn-default">
-              <span class="glyphicon glyphicon-fire"></span> Consume
-            </button>
-            <button id="btnsingle" type="button" class="btn btn-default">
-              <span class="glyphicon glyphicon-star"></span> Single
-            </button>
-            <button id="btnrepeat" type="button" class="btn btn-default">
-              <span class="glyphicon glyphicon-repeat"></span> Repeat
-            </button>
-          </div>
 
           <div id="btn-responsive-block" class="btn-group-vertical btn-block btn-group-lg">
             <button type="button" class="btn btn-default" onclick="updateDB();">
-              <span class="glyphicon glyphicon-refresh"></span> Update DB
+              <span class="glyphicon glyphicon-refresh"></span>
             </button>
             <button type="button" class="btn btn-default" onclick="socket.send('MPD_API_RM_ALL');">
-              <span class="glyphicon glyphicon-trash"></span> Clear queue
+              <span class="glyphicon glyphicon-trash"></span>
             </button>
           </div>
 
   	      <div id="btn-responsive-block" class="btn-group-vertical btn-block btn-group-lg" data-toggle="buttons">
   	        <button type="button" class="btn btn-default" id="btnnotify">
-  		     <span class="glyphicon glyphicon-comment"></span> Notifications
+  		     <span class="glyphicon glyphicon-comment"></span>
   	        </button>
   	      </div>
         </div>
@@ -231,6 +219,25 @@
     </div>
   </div>
 
+  <div class="navbar navbar-inverse navbar-fixed-bottom" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <div class="btn-toolbar navbar-btn navbar-left" data-toggle="buttons">
+           <button id="btnrandom" type="button" class="btn btn-default">
+             <span class="glyphicon glyphicon-random"></span>
+           </button>
+           <button id="btnconsume" type="button" class="btn btn-default">
+             <span class="glyphicon glyphicon-fire"></span>
+           </button>
+           <button id="btnsingle" type="button" class="btn btn-default">
+             <span class="glyphicon glyphicon-star"></span>
+           </button>
+           <button id="btnrepeat" type="button" class="btn btn-default">
+             <span class="glyphicon glyphicon-repeat"></span>
+           </button>
+        </div>
+      </div>
+  </div>
 
   <!-- Bootstrap core JavaScript
   ================================================== -->
