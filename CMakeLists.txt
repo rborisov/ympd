@@ -43,6 +43,7 @@ set(SOURCES
     src/mpd_client.c
     src/mongoose.c
     src/json_encode.c
+    src/fswatch.c
     assets.c
 )
 

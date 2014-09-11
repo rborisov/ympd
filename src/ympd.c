@@ -28,6 +28,7 @@
 #include "http_server.h"
 #include "mpd_client.h"
 #include "config.h"
+#include "fswatch.h"
 
 extern char *optarg;
 
@@ -114,6 +115,8 @@ int main(int argc, char **argv)
         free(run_as_user);
     }
 
+    init_fswatch("~/Music/radio/Radio Paradise - DJ-mixed modern & classic rock, world, electronica & more - info- radioparadise.com");
+
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
     while (!force_exit) {
@@ -122,6 +125,8 @@ int main(int argc, char **argv)
         {
             last_timer = current_timer;
             mpd_poll(server);
+//            read_events();
+            printf("%i\n", current_timer);
         }
     }
 
