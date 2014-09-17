@@ -28,7 +28,7 @@
 #include "http_server.h"
 #include "mpd_client.h"
 #include "config.h"
-#include "fswatch.h"
+#include "radio.h"
 
 extern char *optarg;
 
@@ -58,6 +58,7 @@ int main(int argc, char **argv)
     struct mg_server *server = mg_create_server(NULL);
     unsigned int current_timer = 0, last_timer = 0;
     char *run_as_user = NULL;
+    char *radio_song_name = NULL;
 
     atexit(bye);
     mg_set_option(server, "listening_port", "8080");
@@ -115,7 +116,8 @@ int main(int argc, char **argv)
         free(run_as_user);
     }
 
-    init_fswatch("~/Music/radio/Radio Paradise - DJ-mixed modern & classic rock, world, electronica & more - info- radioparadise.com");
+    init_watch_radio();
+    add_watch_radio("/home/ruinrobo/Music/radio/Radio Paradise - DJ-mixed modern & classic rock, world, electronica & more - info- radioparadise.com/");
 
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
@@ -125,11 +127,13 @@ int main(int argc, char **argv)
         {
             last_timer = current_timer;
             mpd_poll(server);
-//            read_events();
-            printf("%i\n", current_timer);
+/*            radio_song_name = poll_radio();
+            if (radio_song_name != NULL)
+                printf("%i %s\n", current_timer, radio_song_name);*/
         }
     }
 
+    close_watch_radio();
     mpd_disconnect();
     mg_destroy_server(&server);
 
