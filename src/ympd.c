@@ -30,6 +30,8 @@
 #include "config.h"
 #include "radio.h"
 
+#include <mpd/client.h>
+
 extern char *optarg;
 
 int force_exit = 0;
@@ -58,7 +60,9 @@ int main(int argc, char **argv)
     struct mg_server *server = mg_create_server(NULL);
     unsigned int current_timer = 0, last_timer = 0;
     char *run_as_user = NULL;
-    char *radio_song_name = NULL;
+    char radio_song_name[512];
+    char radio_path[512] = "/home/ruinrobo/Music/radio/";
+    char radio_added_song[512];
 
     atexit(bye);
     mg_set_option(server, "listening_port", "8080");
@@ -117,7 +121,7 @@ int main(int argc, char **argv)
     }
 
     init_watch_radio();
-    add_watch_radio("/home/ruinrobo/Music/radio/Radio Paradise - DJ-mixed modern & classic rock, world, electronica & more - info- radioparadise.com/");
+    add_watch_radio(radio_path);
 
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
@@ -130,6 +134,15 @@ int main(int argc, char **argv)
 /*            radio_song_name = poll_radio();
             if (radio_song_name != NULL)
                 printf("%i %s\n", current_timer, radio_song_name);*/
+            if (radio_poll(radio_song_name))
+            {
+                printf("%s\n", radio_song_name);
+                sprintf(radio_added_song, "%s%s", "radio/", radio_song_name);
+                printf("%s\n", radio_added_song);
+                mpd_run_update(mpd.conn, radio_added_song);
+                sleep(1);
+                mpd_run_add(mpd.conn, radio_added_song);
+            }
         }
     }
 
