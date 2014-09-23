@@ -310,6 +310,11 @@ function webSocketConnect() {
                     $('#salamisandwich > tbody > tr').removeClass('active').css("font-weight", "");
                     $('#salamisandwich > tbody > tr[trackid='+obj.data.currentsongid+']').addClass('active').css("font-weight", "bold");
 
+                    if(obj.data.radio)
+                        $('#btnradio').addClass("active")
+                    else
+                        $('#btnradio').removeClass("active");
+
                     if(obj.data.random)
                         $('#btnrandom').addClass("active")
                     else
@@ -477,6 +482,10 @@ function basename(path) {
     return path.split('/').reverse()[0];
 }
 
+$('#btnradio').on('click', function (e) {
+    socket.send("RADIO_TOGGLE_RADIO," + ($(this).hasClass('active') ? 0 : 1));
+
+});
 $('#btnrandom').on('click', function (e) {
     socket.send("MPD_API_TOGGLE_RANDOM," + ($(this).hasClass('active') ? 0 : 1));
 

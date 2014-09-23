@@ -131,9 +131,6 @@ int main(int argc, char **argv)
         {
             last_timer = current_timer;
             mpd_poll(server);
-/*            radio_song_name = poll_radio();
-            if (radio_song_name != NULL)
-                printf("%i %s\n", current_timer, radio_song_name);*/
             if (radio_poll(radio_song_name))
             {
                 printf("%s\n", radio_song_name);

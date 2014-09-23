@@ -26,10 +26,16 @@
 #include "mpd_client.h"
 #include "config.h"
 #include "json_encode.h"
+#include "radio.h"
 
 const char * mpd_cmd_strs[] = {
     MPD_CMDS(GEN_STR)
 };
+
+bool radio_run(struct mpd_connection *connection, bool mode)
+{
+    return true;
+}
 
 static inline enum mpd_cmd_ids get_cmd_id(char *cmd)
 {
@@ -58,6 +64,11 @@ int callback_mpd(struct mg_connection *c)
     mpd_connection_set_timeout(mpd.conn, 10000);
     switch(cmd_id)
     {
+        case RADIO_TOGGLE_RADIO:
+            printf("RADIO_TOGGLE_RADIO\n");
+            if(sscanf(c->content, "RADIO_TOGGLE_RADIO,%u", &uint_buf))
+                radio_run(mpd.conn, uint_buf);
+            break;
         case MPD_API_UPDATE_DB:
             mpd_run_update(mpd.conn, NULL);
             break;

@@ -13,42 +13,42 @@ pthread_mutex_t radio_lock = PTHREAD_MUTEX_INITIALIZER;
 
 int init_watch_radio()
 {
-    memset(&poll_fs, 0, sizeof(poll_fs));
-    poll_fs.notify_fd = inotify_init1 (IN_NONBLOCK);
-    if (poll_fs.notify_fd == -1)
+    memset(&radio_cx, 0, sizeof(radio_cx));
+    radio_cx.notify_fd = inotify_init1 (IN_NONBLOCK);
+    if (radio_cx.notify_fd == -1)
     {
         perror ("inotify_init1");
         return EXIT_FAILURE;
     }
-    poll_fs.event_mask = IN_MOVED_TO;
+    radio_cx.event_mask = IN_MOVED_TO;
 
     /* Inotify input */
-    poll_fs.fds.fd = poll_fs.notify_fd;
-    poll_fs.fds.events = POLLIN;
-    poll_fs.nfds = 1;
+    radio_cx.fds.fd = radio_cx.notify_fd;
+    radio_cx.fds.events = POLLIN;
+    radio_cx.nfds = 1;
 
     return EXIT_SUCCESS;
 }
 
 int add_watch_radio(char *path_to_watch)
 {
-    printf("add_watch_radio: %i %s\n", poll_fs.notify_fd, path_to_watch);
-    if (poll_fs.wd != 0)
+    printf("add_watch_radio: %i %s\n", radio_cx.notify_fd, path_to_watch);
+    if (radio_cx.wd != 0)
     {
         //TODO: 
         fprintf (stderr, "Cannot add more watches\n");
         perror ("inotify_add_watch");
         return EXIT_FAILURE;
     }
-    poll_fs.wd = inotify_add_watch (poll_fs.notify_fd, path_to_watch, poll_fs.event_mask);
-    if (poll_fs.wd == -1)
+    radio_cx.wd = inotify_add_watch (radio_cx.notify_fd, path_to_watch, radio_cx.event_mask);
+    if (radio_cx.wd == -1)
     {
         fprintf (stderr, "Cannot watch '%s'\n", path_to_watch);
         perror ("inotify_add_watch");
         return EXIT_FAILURE;
     }
 
-    if (pthread_create(&poll_fs.tid, NULL, &radio_thread, NULL) != 0)
+    if (pthread_create(&radio_cx.tid, NULL, &radio_thread, NULL) != 0)
     {
         perror("can't create thread");
         return EXIT_FAILURE;
@@ -63,7 +63,7 @@ void* radio_thread(void *arg)
     ssize_t len;
 
     while (1) {
-        poll_num = poll (&poll_fs.fds, poll_fs.nfds, -1);
+        poll_num = poll (&radio_cx.fds, radio_cx.nfds, -1);
         if (poll_num == -1)
         {
             printf("poll error\n");
@@ -73,7 +73,7 @@ void* radio_thread(void *arg)
 
         if (poll_num > 0)
         {
-            if (poll_fs.fds.revents & POLLIN)
+            if (radio_cx.fds.revents & POLLIN)
             {
                 printf("Inotify events are available\n");
 
@@ -81,7 +81,7 @@ void* radio_thread(void *arg)
                 for (;;)
                 {
                     /* Read some events. */
-                    len = read (poll_fs.notify_fd, poll_fs.buf, sizeof poll_fs.buf);
+                    len = read (radio_cx.notify_fd, radio_cx.buf, sizeof radio_cx.buf);
                     if (len == -1 && errno != EAGAIN)
                     {
                         printf("read error\n");
@@ -97,19 +97,19 @@ void* radio_thread(void *arg)
 #if 0
 TODO:
                     /* Loop over all events in the buffer */
-                    for (ptr = poll_fs.buf; ptr < poll_fs.buf + len;
-                            ptr += sizeof (struct inotify_event) + poll_fs.event->len)
+                    for (ptr = radio_cx.buf; ptr < radio_cx.buf + len;
+                            ptr += sizeof (struct inotify_event) + radio_cx.event->len)
                     {
-                        poll_fs.event = (const struct inotify_event *) ptr;
+                        radio_cx.event = (const struct inotify_event *) ptr;
                         /* Print event type */
-                        if (poll_fs.event->mask & poll_fs.event_mask)
-                            printf("event! %s\n", poll_fs.event->name);
+                        if (radio_cx.event->mask & radio_cx.event_mask)
+                            printf("event! %s\n", radio_cx.event->name);
                     }
 #else
                     /* Only one event we can process */
                     pthread_mutex_lock(&radio_lock);
-                    poll_fs.event = (struct inotify_event *) poll_fs.buf;
-                    printf("event! %s\n", poll_fs.event->name);
+                    radio_cx.event = (struct inotify_event *) radio_cx.buf;
+                    printf("event! %s\n", radio_cx.event->name);
                     pthread_mutex_unlock(&radio_lock);
 #endif
                 }
@@ -121,12 +121,12 @@ TODO:
 
 int radio_poll(char *outbuf)
 {
-    if (poll_fs.event)
+    if (radio_cx.event)
     {
         printf("event!\n");
         pthread_mutex_lock(&radio_lock);
-        memcpy(outbuf, poll_fs.event->name, strlen(poll_fs.event->name)+1);
-        poll_fs.event = NULL;
+        memcpy(outbuf, radio_cx.event->name, strlen(radio_cx.event->name)+1);
+        radio_cx.event = NULL;
         pthread_mutex_unlock(&radio_lock);
         return RADIO_TRUE;
     }
@@ -135,5 +135,5 @@ int radio_poll(char *outbuf)
 
 void close_watch_radio()
 {
-    close (poll_fs.notify_fd);
+    close (radio_cx.notify_fd);
 }

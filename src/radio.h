@@ -1,5 +1,5 @@
-#ifndef __POLL_FS_H__
-#define __POLL_FS_H__
+#ifndef __RADIO_H__
+#define __RADIO_H__
 
 #include <poll.h>
 #include <sys/inotify.h>
@@ -8,7 +8,7 @@
 #define RADIO_TRUE 1
 #define RADIO_FALSE 0
 
-struct t_poll_fs {
+struct t_radio_cx {
         int notify_fd;
         int wd;
         char buf[4096]
@@ -18,7 +18,7 @@ struct t_poll_fs {
         nfds_t nfds;
         struct inotify_event *event;
         pthread_t tid;
-} poll_fs;
+} radio_cx;
 
 int init_watch_radio();
 int add_watch_radio(char *path_to_watch);
