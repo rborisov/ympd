@@ -87,6 +87,11 @@ var app = $.sammy(function() {
         $('#panel-heading').text("Search: "+searchstr);
     });
 
+    this.get(/\#\/nextsong\/(.*)/, function() {
+        console.log("nextsong");
+        current_app = 'nextsong';
+    });
+
     this.get("/", function(context) {
         context.redirect("#/0");
     });
@@ -137,22 +142,24 @@ function webSocketConnect() {
                 return;
 
             var obj = JSON.parse(msg.data);
-
+            console.log(obj.type); 
             switch (obj.type) {
                 case "queue":
                     if(current_app !== 'queue')
                         break;
-
+                    
                     $('#salamisandwich > tbody').empty();
                     for (var song in obj.data) {
-                        var minutes = Math.floor(obj.data[song].duration / 60);
-                        var seconds = obj.data[song].duration - minutes * 60;
+                        if (obj.data[song].id > current_song.currentSongId || obj.data.random) {
+                            var minutes = Math.floor(obj.data[song].duration / 60);
+                            var seconds = obj.data[song].duration - minutes * 60;
 
-                        $('#salamisandwich > tbody').append(
-                            "<tr trackid=\"" + obj.data[song].id + "\"><td>" + (obj.data[song].pos + 1) + "</td>" +
-                                "<td>"+ obj.data[song].title +"</td>" + 
-                                "<td>"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
-                        "</td><td></td></tr>");
+                            $('#salamisandwich > tbody').append(
+                                    "<tr trackid=\"" + obj.data[song].id + "\"><td>" + (obj.data[song].pos + 1) + "</td>" +
+                                    "<td>"+ obj.data[song].title +"</td>" + 
+                                    "<td>"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
+                                    "</td><td></td></tr>");
+                        }
                     }
 
                     if(obj.data[obj.data.length-1].pos + 1 >= pagination + MAX_ELEMENTS_PER_PAGE)
@@ -369,6 +376,9 @@ function webSocketConnect() {
                             message:{html: notification},
                             type: "info",
                         }).show();
+                    
+                        socket.send('MPD_API_GET_QUEUE,'+pagination);
+
                         
                     break;
                 case "mpdhost":
