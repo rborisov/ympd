@@ -11,6 +11,19 @@
 
 pthread_mutex_t radio_lock = PTHREAD_MUTEX_INITIALIZER;
 
+int exec_streamripper()
+{
+    int ret = 0;
+    if (fork() == 0)
+    {
+        ret = system("streamripper http://stream-ru1.radioparadise.com:9000/mp3-192 -d /home/ruinrobo/Music/radio/ -o always -s");
+        if (ret < 0)
+            fprintf(stderr, "Cannot exec streamripper\n");
+        exit(0);
+    }
+
+    return EXIT_SUCCESS;
+}
 int init_watch_radio()
 {
     memset(&radio_cx, 0, sizeof(radio_cx));
@@ -26,6 +39,8 @@ int init_watch_radio()
     radio_cx.fds.fd = radio_cx.notify_fd;
     radio_cx.fds.events = POLLIN;
     radio_cx.nfds = 1;
+
+    exec_streamripper();
 
     return EXIT_SUCCESS;
 }

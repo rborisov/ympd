@@ -87,11 +87,6 @@ var app = $.sammy(function() {
         $('#panel-heading').text("Search: "+searchstr);
     });
 
-    this.get(/\#\/nextsong\/(.*)/, function() {
-        console.log("nextsong");
-        current_app = 'nextsong';
-    });
-
     this.get("/", function(context) {
         context.redirect("#/0");
     });
@@ -154,20 +149,25 @@ function webSocketConnect() {
                             var minutes = Math.floor(obj.data[song].duration / 60);
                             var seconds = obj.data[song].duration - minutes * 60;
 
-                            $('#salamisandwich > tbody').append(
+/*                            $('#salamisandwich > tbody').append(
                                     "<tr trackid=\"" + obj.data[song].id + "\"><td>" + (obj.data[song].pos + 1) + "</td>" +
                                     "<td>"+ obj.data[song].title +"</td>" + 
                                     "<td>"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
-                                    "</td><td></td></tr>");
+                                    "</td><td></td></tr>");*/
+                            $('#salamisandwich > tbody').append(
+                                    "<p>"+
+                                    "<span class=\"label label-default\">" + obj.data[song].id + "</span>"+
+                                   "<span class=\"label label-primary\">" + obj.data[song].title + "</span></p>"
+                                    );
                         }
                     }
 
-                    if(obj.data[obj.data.length-1].pos + 1 >= pagination + MAX_ELEMENTS_PER_PAGE)
+/*                    if(obj.data[obj.data.length-1].pos + 1 >= pagination + MAX_ELEMENTS_PER_PAGE)
                         $('#next').removeClass('hide');
                     if(pagination > 0)
-                        $('#prev').removeClass('hide');
+                        $('#prev').removeClass('hide');*/
 
-                    $('#salamisandwich > tbody > tr').on({
+/*                    $('#salamisandwich > tbody > tr').on({
                         mouseover: function(){
                             if($(this).children().last().has("a").length == 0)
                                 $(this).children().last().append(
@@ -184,7 +184,7 @@ function webSocketConnect() {
                         mouseleave: function(){
                             $(this).children().last().find("a").stop().remove();
                         }
-                    });
+                    });*/
                     break;
                 case "search":
                     $('#wait').modal('hide');
