@@ -22,136 +22,92 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
+        <style>
+            html { overflow: hidden; }
+        </style>
     </head>
     <body>
         <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <div class="navbar-brand">
-                    <span id="track-icon" class="glyphicon glyphicon-play"></span>
-                    <span id="volume-icon" class="glyphicon glyphicon-volume-down"></span>
-                    <!-- span id="signal-icon" class="glyphicon glyphicon-signal"></span>
-                    <span id="transfer-icon" class="glyphicon glyphicon-transfer"></span>
-                    <span id="gps-icon" class="glyphicon glyphicon-map-marker"></span>
-                    <span id="random-icon" class="glyphicon glyphicon-random"></span -->
-                </div>
-
+            <div class="container-fluid">
+                <!-- div class="navbar-header">
+                    <div class="navbar-brand" -->
+                        <a href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#control" onclick="getHost();">
+                            <span id="track-icon" class="glyphicon glyphicon-play"></span>
+                            <span id="volume-icon" class="glyphicon glyphicon-volume-down"></span>
+                        </a>
+                    <!-- /div -->
+                    <span id="currenttrack" class="label label-primary pull-right"></span>
+                    <span id="album" class="label label-success pull-right"></span>
+                    <span id="artist" class="label label-info pull-right"></span>
+                    <br><span id="counter" class="label label-warning pull-right"></span>
+                <!-- /div -->
             </div>
-            <div class="collapse navbar-collapse">
-                <div class="btn-toolbar navbar-btn navbar-right" role="toolbar">
-                    <div class="btn-group">
-                        <a href="#/" class="btn btn-default">
-                            <span class="glyphicon glyphicon-list"></span>
-                        </a>
-                        <a href="#/browse/0/" class="btn btn-default">
-                            <span class="glyphicon glyphicon-book"></span>
-                        </a>
-                        <a href="#/nextsong/0/" class="btn btn-default">
-                            <span class="glyphicon glyphicon-tag"></span>
-                        </a>
-                        <a href="#" class="btn btn-default" data-toggle="modal" data-target="#settings" onclick="getHost();">
-                            <span class="glyphicon glyphicon-cog"></span>
-                        </a>
-                    </div>
-                    <div class="btn-group">
-                        <button id="btnrandom" type="button" class="btn btn-default">
-                            <span class="glyphicon glyphicon-random"></span>
-                        </button>
-                        <button id="btnconsume" type="button" class="btn btn-default">
-                            <span class="glyphicon glyphicon-fire"></span>
-                        </button>
-                        <button id="btnsingle" type="button" class="btn btn-default">
-                            <span class="glyphicon glyphicon-star"></span>
-                        </button>
-                        <button id="btnrepeat" type="button" class="btn btn-default">
-                            <span class="glyphicon glyphicon-repeat"></span>
-                        </button>
-                    </div>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default" onclick="updateDB();">
-                            <span class="glyphicon glyphicon-refresh"></span>
-                        </button>
-                        <button type="button" class="btn btn-default" onclick="socket.send('MPD_API_RM_ALL');">
-                            <span class="glyphicon glyphicon-trash"></span>
-                        </button>
-                        <button type="button" class="btn btn-default" id="btnnotify">
-                            <span class="glyphicon glyphicon-comment"></span>
-                        </button>
-                    </div>
-                    <div class="btn-group">
-                        <div class="btn btn-toolbar btn-default">
-                            <span id="volume-icon" class="glyphicon glyphicon-volume-up"></span>
-                            <div id="volumeslider"></div>
-                        </div>
-                    </div>
-                    <!-- form id="search" class="navbar-form" role="search">
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="Search">
-                        </div>
-                    </form -->
-                </div>
-            </div><!--/.nav-collapse -->
         </div>
+        <!-- div class="container starter-template" -->
+            <!-- div class="btn-group">
+                <button type="button" class="btn btn-success btn-sm" onclick="socket.send('MPD_API_SET_PREV');">
+                    <span class="glyphicon glyphicon-step-backward"></span>
+                </button>
+                <button type="button" class="btn btn-warning btn-sm" onclick="clickPlay();">
+                    <span id="play-icon" class="glyphicon glyphicon-pause"></span>
+                </button>
+                <button type="button" class="btn btn-success btn-sm" onclick="socket.send('MPD_API_SET_NEXT');">
+                    <span class="glyphicon glyphicon-step-forward"></span>
+                </button>
+            </div>
+            <div class="btn-group">
+                <button id="btnradio" type="button" class="btn btn-info btn-sm">
+                    <span class="glyphicon glyphicon-cloud"></span>
+                </button>
+            </div -->
 
-        <div class="container starter-template">
-            <div class="row">
-                <div class="col-md-12 col-xs-12">
-                    <div class="notifications top-right"></div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            <h2><span id="currenttrack" class="label label-primary"></span></h2>
-                            <span id="counter" class="label label-default pull-right"></span>
-                            <h4><span id="album" class="label label-success"></span></h4>
-                            <h3><span id="artist" class="label label-info"></span></h3>
-                            <div class="panel-footer">
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-success btn-sm" onclick="socket.send('MPD_API_SET_PREV');">
-                                        <span class="glyphicon glyphicon-step-backward"></span>
-                                    </button>
-                                    <!-- button type="button" class="btn btn-default" onclick="socket.send('MPD_API_SET_STOP');">
-                                    <span id="stop-icon" class="glyphicon glyphicon-stop"></span>
-                                    </button -->
-                                    <button type="button" class="btn btn-warning btn-sm" onclick="clickPlay();">
-                                        <span id="play-icon" class="glyphicon glyphicon-pause"></span>
-                                    </button>
-                                    <button type="button" class="btn btn-success btn-sm" onclick="socket.send('MPD_API_SET_NEXT');">
-                                        <span class="glyphicon glyphicon-step-forward"></span>
-                                    </button>
-                                </div>
-                                <div class="btn-group">
-                                    <button id="btnradio" type="button" class="btn btn-info btn-sm">
-                                        <span class="glyphicon glyphicon-cloud"></span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Default panel contents -->
-                    <ol id="breadcrump" class="breadcrumb"></ol>
+            <div class="notifications top-right"></div>
+            
+            <!-- Table -->
+            <table id="salamisandwich" class="table table-hover">
+                <thead>
+                    <tr>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
 
-                    <!-- Table -->
-                    <table id="salamisandwich" class="table table-hover">
-                        <thead>
-                            <tr>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                        
-                    <ul class="pager">
-                        <li id="prev" class="page-btn hide"><a href="">Previous</a></li>
-                        <li id="next" class="page-btn"><a href="">Next</a></li>
-                    </ul>
-                </div><!-- /.col-md-10 -->
-            </div><!-- /.row -->
-        </div><!-- /.container -->
+            <!-- ul class="pager">
+                <li id="prev" class="page-btn hide"><a href="">Previous</a></li>
+                <li id="next" class="page-btn"><a href="">Next</a></li>
+            </ul -->
+        <!-- /div --><!-- /.container -->
 
         <!-- Modal -->
+        <div class="modal fade" id="control" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-success btn-sm" onclick="socket.send('MPD_API_SET_PREV');">
+                                <span class="glyphicon glyphicon-step-backward"></span>
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm" onclick="clickPlay();">
+                                <span id="play-icon" class="glyphicon glyphicon-pause"></span>
+                            </button>
+                            <button type="button" class="btn btn-success btn-sm" onclick="socket.send('MPD_API_SET_NEXT');">
+                                <span class="glyphicon glyphicon-step-forward"></span>
+                            </button>
+                        </div>
+                        <div class="btn-group">
+                            <button id="btnradio" type="button" class="btn btn-info btn-sm">
+                                <span class="glyphicon glyphicon-cloud"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="modal fade" id="settings" tabindex="-1" role="dialog" aria-labelledby="settingsLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

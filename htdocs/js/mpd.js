@@ -157,7 +157,8 @@ function webSocketConnect() {
                             $('#salamisandwich > tbody').append(
                                     "<p>"+
                                     "<span class=\"label label-default\">" + obj.data[song].id + "</span>"+
-                                   "<span class=\"label label-primary\">" + obj.data[song].title + "</span></p>"
+                                   "<span class=\"label label-primary\">" + obj.data[song].title + "</span>" +
+                                   "<span class=\"label label-info\">" + obj.data[song].artist + "</span></p>"
                                     );
                         }
                     }
