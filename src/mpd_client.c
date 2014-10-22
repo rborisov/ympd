@@ -32,9 +32,20 @@ const char * mpd_cmd_strs[] = {
     MPD_CMDS(GEN_STR)
 };
 
-bool radio_run(struct mpd_connection *connection, bool mode)
+int radio_status = 0;
+
+int radio_toggle()
 {
-    return true;
+    if (radio_status == 0)
+        radio_status = 1;
+    else
+        radio_status = 0;
+    return radio_status;
+}
+
+int radio_get_status()
+{
+    return radio_status;
 }
 
 static inline enum mpd_cmd_ids get_cmd_id(char *cmd)
@@ -65,9 +76,8 @@ int callback_mpd(struct mg_connection *c)
     switch(cmd_id)
     {
         case RADIO_TOGGLE_RADIO:
-            printf("RADIO_TOGGLE_RADIO\n");
-            if(sscanf(c->content, "RADIO_TOGGLE_RADIO,%u", &uint_buf))
-                radio_run(mpd.conn, uint_buf);
+            printf("RADIO_TOGGLE_RADIO %i\n", radio_get_status());
+            radio_toggle();
             break;
         case MPD_API_UPDATE_DB:
             mpd_run_update(mpd.conn, NULL);
@@ -316,6 +326,8 @@ void mpd_poll(struct mg_server *s)
             mpd.buf_size = mpd_put_state(mpd.buf, &mpd.song_id, &mpd.queue_version);
             mg_iterate_over_connections(s, mpd_notify_callback, NULL);
             break;
+        default:
+            fprintf(stderr, "mpd.conn_state %i\n", mpd.conn_state);
     }
 }
 
@@ -374,7 +386,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
         " \"state\":%d, \"volume\":%d, \"repeat\":%d,"
         " \"single\":%d, \"consume\":%d, \"random\":%d, "
         " \"songpos\": %d, \"elapsedTime\": %d, \"totalTime\":%d, "
-        " \"currentsongid\": %d"
+        " \"currentsongid\": %d, \"radio_status\": %d"
         "}}", 
         mpd_status_get_state(status),
         mpd_status_get_volume(status), 
@@ -385,7 +397,8 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
         mpd_status_get_song_pos(status),
         mpd_status_get_elapsed_time(status),
         mpd_status_get_total_time(status),
-        mpd_status_get_song_id(status));
+        mpd_status_get_song_id(status),
+        radio_get_status());
 
     *current_song_id = mpd_status_get_song_id(status);
     *queue_version = mpd_status_get_queue_version(status);

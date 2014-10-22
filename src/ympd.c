@@ -23,6 +23,8 @@
 #include <getopt.h>
 #include <sys/time.h>
 #include <pthread.h>
+#include <libconfig.h>
+#include <pwd.h>
 
 #include "mongoose.h"
 #include "http_server.h"
@@ -31,6 +33,9 @@
 #include "radio.h"
 
 #include <mpd/client.h>
+
+#define project_name "rcarmedia"
+#define ympd_conf_file "ympd.conf"
 
 extern char *optarg;
 
@@ -61,56 +66,34 @@ int main(int argc, char **argv)
     unsigned int current_timer = 0, last_timer = 0;
     char *run_as_user = NULL;
     char radio_song_name[512];
-    char radio_path[512] = "/home/ruinrobo/Music/radio/";
+    const char *radio_path = NULL;
+    char *radio_url = NULL;
     char radio_added_song[512];
+    config_t cfg;
+    config_setting_t *settings;
+    char config_file_name[512];
+    struct passwd *pw = getpwuid(getuid());
+    char *homedir = pw->pw_dir;
+
+    sprintf(config_file_name, "%s/%s/%s", homedir, project_name, ympd_conf_file);
+    printf("conf = %s\n", config_file_name);
 
     atexit(bye);
     mg_set_option(server, "listening_port", "8080");
     mpd.port = 6600;
     strcpy(mpd.host, "127.0.0.1");
 
-    static struct option long_options[] = {
-        {"host",         required_argument, 0, 'h'},
-        {"port",         required_argument, 0, 'p'},
-        {"webport",      required_argument, 0, 'w'},
-        {"user",         required_argument, 0, 'u'},
-        {"version",      no_argument,       0, 'v'},
-        {"help",         no_argument,       0,  0 },
-        {0,              0,                 0,  0 }
-    };
-
-    while((n = getopt_long(argc, argv, "h:p:w:u:v",
-                long_options, &option_index)) != -1) {
-        switch (n) {
-            case 'h':
-                strncpy(mpd.host, optarg, sizeof(mpd.host));
-                break;
-            case 'p':
-                mpd.port = atoi(optarg);
-            case 'w':
-                mg_set_option(server, "listening_port", optarg);
-                break;
-            case 'u':
-                run_as_user = strdup(optarg);
-                break;
-            case 'v':
-                fprintf(stdout, "ympd  %d.%d.%d\n"
-                        "Copyright (C) 2014 Andrew Karpow <andy@ndyk.de>\n"
-                        "built " __DATE__ " "__TIME__ " ("__VERSION__")\n",
-                        YMPD_VERSION_MAJOR, YMPD_VERSION_MINOR, YMPD_VERSION_PATCH);
-                return EXIT_SUCCESS;
-                break;
-            default:
-                fprintf(stderr, "Usage: %s [OPTION]...\n\n"
-                        " -h, --host <host>\t\tconnect to mpd at host [localhost]\n"
-                        " -p, --port <port>\t\tconnect to mpd at port [6600]\n"
-                        " -w, --webport [ip:]<port>\tlisten interface/port for webserver [8080]\n"
-                        " -u, --user <username>\t\tdrop priviliges to user after socket bind\n"
-                        " -V, --version\t\t\tget version\n"
-                        " --help\t\t\t\tthis help\n"
-                        , argv[0]);
-                return EXIT_FAILURE;
-        }
+    config_init(&cfg);
+    if(! config_read_file(&cfg, config_file_name))
+    {
+        printf("config file error %s:%d - %s\n", config_error_file(&cfg),
+                config_error_line(&cfg), config_error_text(&cfg));
+        config_destroy(&cfg);
+        return(EXIT_FAILURE);
+    }
+    if (!config_lookup_string(&cfg, "application.radio_path", &radio_path))
+    {
+        fprintf(stderr, "No 'radio_path' setting in configuration file.\n");
     }
 
     /* drop privilges at last to ensure proper port binding */
@@ -120,7 +103,13 @@ int main(int argc, char **argv)
         free(run_as_user);
     }
 
-    init_watch_radio();
+    if (!config_lookup_string(&cfg, "streamripper.url", &radio_url))
+    {
+        fprintf(stderr, "No 'radio_url' setting in configuration file.\n");
+    }
+    printf("url = %s\n", radio_url);
+
+    init_watch_radio(radio_url);
     add_watch_radio(radio_path);
 
     mg_set_http_close_handler(server, mpd_close_handler);
@@ -133,7 +122,6 @@ int main(int argc, char **argv)
             mpd_poll(server);
             if (radio_poll(radio_song_name))
             {
-                printf("%s\n", radio_song_name);
                 sprintf(radio_added_song, "%s%s", "radio/", radio_song_name);
                 printf("%s\n", radio_added_song);
                 mpd_run_update(mpd.conn, radio_added_song);
@@ -146,6 +134,8 @@ int main(int argc, char **argv)
     close_watch_radio();
     mpd_disconnect();
     mg_destroy_server(&server);
+
+    config_destroy(&cfg);
 
     return EXIT_SUCCESS;
 }

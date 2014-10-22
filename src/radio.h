@@ -20,7 +20,7 @@ struct t_radio_cx {
         pthread_t tid;
 } radio_cx;
 
-int init_watch_radio();
+int init_watch_radio(char* url);
 int add_watch_radio(char *path_to_watch);
 void *radio_thread(void* arg);
 int radio_poll(char* outbuf);

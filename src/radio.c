@@ -8,10 +8,11 @@
 #include <pthread.h>
 
 #include "radio.h"
+#include "streamripper.h"
 
 pthread_mutex_t radio_lock = PTHREAD_MUTEX_INITIALIZER;
 
-int exec_streamripper()
+/*int exec_streamripper()
 {
     int ret = 0;
     if (fork() == 0)
@@ -23,8 +24,9 @@ int exec_streamripper()
     }
 
     return EXIT_SUCCESS;
-}
-int init_watch_radio()
+}*/
+
+int init_watch_radio(char* url)
 {
     memset(&radio_cx, 0, sizeof(radio_cx));
     radio_cx.notify_fd = inotify_init1 (IN_NONBLOCK);
@@ -40,7 +42,20 @@ int init_watch_radio()
     radio_cx.fds.events = POLLIN;
     radio_cx.nfds = 1;
 
-    exec_streamripper();
+//    exec_streamripper();
+
+    printf("init_watch_radio url = %s\n", url);
+    if (sr_start())
+    {
+        printf("sr_start\n");
+    }
+    else
+    {
+        sr_stop();
+        printf("sr_stop\n");
+    }
+//    if (rmi == 0)
+//        printf("rip manager !!!\n");
 
     return EXIT_SUCCESS;
 }
