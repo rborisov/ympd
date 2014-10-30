@@ -1,0 +1,1 @@
+/usr/bin/gcc  -std=gnu99 -Wall -D__UNIX__    CMakeFiles/srtest.dir/src/ympd.c.o CMakeFiles/srtest.dir/src/streamripper.c.o  -o srtest -rdynamic -lpthread -lstreamripper -lmad -logg -lvorbis 

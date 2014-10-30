@@ -1,0 +1,1 @@
+/home/ruinrobo/work/ympd/streamripper-test/build/CMakeFiles/srtest.dir

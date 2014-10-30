@@ -1,0 +1,32 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ruinrobo/work/ympd/streamripper-test/src/streamripper.c
+unistd.h
+-
+signal.h
+-
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+math.h
+-
+time.h
+-
+libconfig.h
+-
+streamripper.h
+/home/ruinrobo/work/ympd/streamripper-test/src/streamripper.h
+
+/home/ruinrobo/work/ympd/streamripper-test/src/streamripper.h
+libstreamripper.h
+-
+
