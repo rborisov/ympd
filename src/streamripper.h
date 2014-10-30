@@ -3,7 +3,7 @@
 
 #include <libstreamripper.h>
 
-int sr_stop();
-pid_t sr_start();
+int stop_streamripper();
+int start_streamripper();
 
 #endif

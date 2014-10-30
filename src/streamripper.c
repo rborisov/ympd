@@ -9,7 +9,7 @@
 #include <libconfig.h>
 #include "streamripper.h"
 
-//static void catch_sig (int code);
+static void catch_sig (int code);
 static void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data);
 
 static BOOL         m_started = FALSE;
@@ -18,39 +18,39 @@ static BOOL         m_got_sig = FALSE;
 
 RIP_MANAGER_INFO *rmi = 0;
 
-pid_t sr_start()
+int start_streamripper()
 {
     int ret;
-    pid_t pid = fork();
     STREAM_PREFS prefs;
-
-    strncpy (prefs.url, "http://stream-ru1.radioparadise.com:9000/mp3-192", MAX_URL_LEN);
+    
+    debug_set_filename("streamripper.log");
+    debug_enable();
 
     // Load prefs
-//    prefs_load ();
-//    prefs_get_stream_prefs (&prefs, url);
-//    prefs_save ();
+    prefs_load ();
+    prefs_get_stream_prefs (&prefs, "http://stream-ru1.radioparadise.com:9000/mp3-192");
+    strncpy(prefs.output_directory, "/home/ruinrobo/Music/radio", SR_MAX_PATH);
+    OPT_FLAG_SET(prefs.flags, OPT_SEPARATE_DIRS, 0);
+    prefs.overwrite = OVERWRITE_ALWAYS;
+    prefs_save ();
 
 //    signal (SIGINT, catch_sig);
 //    signal (SIGTERM, catch_sig);
 
     rip_manager_init();
 
-    if (pid == 0) {
-        signal(SIGCHLD, SIG_DFL);
-        /* Launch the ripping thread */
-        if ((ret = rip_manager_start (&rmi, &prefs, rip_callback)) != SR_SUCCESS) {
-            fprintf(stderr, "Couldn't connect to %s\n", prefs.url);
-            exit(EXIT_FAILURE);
-        }
-        printf("rmi %d\n", rmi->started);
+    /* Launch the ripping thread */
+    if ((ret = rip_manager_start (&rmi, &prefs, rip_callback)) != SR_SUCCESS) {
+        fprintf(stderr, "Couldn't connect to %s\n", prefs.url);
+        exit(EXIT_FAILURE);
     }
-//    printf("rmi %d\n", rmi->started);
+    sleep(1);
+    printf("rmi %d\n", rmi->started);
 
-    return pid;
+    return 1; //pid;
 }
 
-int sr_stop()
+int stop_streamripper()
 {
     rip_manager_stop (rmi);
     rip_manager_cleanup ();
