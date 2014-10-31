@@ -5,5 +5,6 @@
 
 int stop_streamripper();
 int start_streamripper();
+int status_streamripper();
 
 #endif

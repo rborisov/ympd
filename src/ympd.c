@@ -30,7 +30,7 @@
 #include "http_server.h"
 #include "mpd_client.h"
 #include "config.h"
-#include "radio.h"
+//#include "radio.h"
 #include "streamripper.h"
 
 #include <mpd/client.h>
@@ -126,6 +126,15 @@ int main(int argc, char **argv)
         {
             last_timer = current_timer;
             mpd_poll(server);
+            if (poll_streamripper(radio_song_name))
+            {
+//                sleep(1);
+                sprintf(radio_added_song, "%s%s", "radio/", radio_song_name);
+                printf("%s\n", radio_added_song);
+                mpd_run_update(mpd.conn, radio_added_song);
+                sleep(1);
+                mpd_run_add(mpd.conn, radio_added_song);
+            }
 /*            if (radio_poll(radio_song_name))
             {
                 sprintf(radio_added_song, "%s%s", "radio/", radio_song_name);
@@ -138,7 +147,7 @@ int main(int argc, char **argv)
     }
 
     stop_streamripper();
-    close_watch_radio();
+//    close_watch_radio();
     mpd_disconnect();
     mg_destroy_server(&server);
 

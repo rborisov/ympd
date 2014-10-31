@@ -15,24 +15,29 @@ static void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data);
 static BOOL         m_started = FALSE;
 static BOOL         m_alldone = FALSE;
 static BOOL         m_got_sig = FALSE;
+static BOOL m_update = FALSE;
+static BOOL m_new_track = FALSE;
+static BOOL m_track_done = FALSE;
 
 RIP_MANAGER_INFO *rmi = 0;
+STREAM_PREFS prefs;
 
 int start_streamripper()
 {
     int ret;
-    STREAM_PREFS prefs;
     
     debug_set_filename("streamripper.log");
     debug_enable();
 
     // Load prefs
     prefs_load ();
-    prefs_get_stream_prefs (&prefs, "http://stream-ru1.radioparadise.com:9000/mp3-192");
+//    prefs_get_stream_prefs (&prefs, "http://stream-ru1.radioparadise.com:9000/mp3-192");
+    prefs_get_stream_prefs (&prefs, "http://stream-uk1.radioparadise.com/mp3-192");
     strncpy(prefs.output_directory, "/home/ruinrobo/Music/radio", SR_MAX_PATH);
-    OPT_FLAG_SET(prefs.flags, OPT_SEPARATE_DIRS, 0);
-    prefs.overwrite = OVERWRITE_ALWAYS;
     prefs_save ();
+    prefs.overwrite = OVERWRITE_ALWAYS;
+    OPT_FLAG_SET(prefs.flags, OPT_SEPARATE_DIRS, 0);
+    prefs.dropcount = 1;
 
 //    signal (SIGINT, catch_sig);
 //    signal (SIGTERM, catch_sig);
@@ -47,11 +52,64 @@ int start_streamripper()
     sleep(1);
     printf("rmi %d\n", rmi->started);
 
-    return 1; //pid;
+    return 1;
+}
+
+int status_streamripper()
+{
+    return rmi->status;
+}
+
+int poll_streamripper(char* newfilename)
+{
+//    STREAM_PREFS *prefs = rmi->prefs;
+    static char filename[MAX_TRACK_LEN];
+
+    if (m_update) {
+        switch (rmi->status)
+        {
+            case RM_STATUS_BUFFERING:
+                printf("stream ripper: buffering... %s\n", rmi->filename);
+                break;
+            case RM_STATUS_RIPPING:
+                if (rmi->track_count < rmi->prefs->dropcount) {
+//                    printf("%i (%i) skipping... %s %i\n", rmi->track_count, rmi->prefs->dropcount, rmi->filename, rmi->filesize);
+                }
+                else {
+//                    printf("ripping... %s %i\n", rmi->filename, rmi->filesize);
+                }
+                break;
+            case RM_STATUS_RECONNECTING:
+                printf("reconnecting...\n");
+                break;
+
+        }
+        m_update = FALSE;
+    }
+    if (m_track_done) {
+        if (newfilename == NULL)
+        {
+            fprintf(stderr, "BUG!\n");
+            return 0;
+        }
+//        mstrncpy(newfilename, filename, MAX_TRACK_LEN);
+        sprintf(newfilename, "%s", filename);
+        printf("track done %s\n", newfilename);
+        m_track_done = FALSE;
+        return 1;
+    }
+    if (m_new_track) {
+        printf("new track %s %i\n", rmi->filename, rmi->filesize);
+        sprintf(filename, "%s%s", rmi->filename, ".mp3");
+        m_new_track = FALSE;
+    }
+    
+    return 0;
 }
 
 int stop_streamripper()
 {
+    printf("stop_streamripper\n");
     rip_manager_stop (rmi);
     rip_manager_cleanup ();
 
@@ -80,7 +138,7 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
     switch(message)
     {
         case RM_UPDATE:
-//            print_status (rmi);
+            m_update = TRUE;            
             break;
         case RM_ERROR:
             err = (ERROR_INFO*)data;
@@ -88,14 +146,16 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
             m_alldone = TRUE;
             break;
         case RM_DONE:
-//            print_to_console ("bye..\n");
             m_alldone = TRUE;
             break;
         case RM_NEW_TRACK:
-//            print_to_console ("\n");
+            m_new_track = TRUE;            
             break;
         case RM_STARTED:
             m_started = TRUE;
+            break;
+        case RM_TRACK_DONE:
+            m_track_done = TRUE;
             break;
     }
 }
