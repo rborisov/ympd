@@ -38,10 +38,11 @@
                 </div>
             </div>
         </div>
-        <H2><span id="currenttrack" class="label label-primary pull-right"></span>
-        <span id="album" class="label label-success pull-right"></span>
+        <H2><span id="currenttrack" class="label label-primary pull-right" style="margin-right:5px; display:inline-block" ng-repeat="a in data.tags">
+        </span></H2>
+        <H3><span id="album" class="label label-success pull-right"></span>
         <span id="artist" class="label label-info pull-right"></span>
-        <span id="counter" class="label label-warning pull-right"></span></H2>
+        <span id="counter" class="label label-warning pull-right"></span></H3>
         <!-- div class="container starter-template" -->
             <!-- div class="btn-group">
                 <button type="button" class="btn btn-success btn-sm" onclick="socket.send('MPD_API_SET_PREV');">

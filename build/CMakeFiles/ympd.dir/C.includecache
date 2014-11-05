@@ -6,9 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/ruinrobo/work/ympd/src/http_server.h
-mongoose.h
-/home/ruinrobo/work/ympd/src/mongoose.h
+/home/ruinrobo/work/ympd/src/json_encode.h
 
 /home/ruinrobo/work/ympd/src/mongoose.h
 stdio.h
@@ -16,44 +14,38 @@ stdio.h
 stddef.h
 -
 
-/home/ruinrobo/work/ympd/src/mpd_client.h
-mongoose.h
-/home/ruinrobo/work/ympd/src/mongoose.h
-
-/home/ruinrobo/work/ympd/src/streamripper.h
-libstreamripper.h
--
-
-/home/ruinrobo/work/ympd/src/ympd.c
-stdlib.h
+/home/ruinrobo/work/ympd/src/mpd_client.c
+stdio.h
 -
 string.h
 -
-stdio.h
--
 unistd.h
 -
-getopt.h
+stdlib.h
 -
-sys/time.h
+libgen.h
 -
-pthread.h
+mpd/client.h
 -
-libconfig.h
--
-pwd.h
--
-mongoose.h
-/home/ruinrobo/work/ympd/src/mongoose.h
-http_server.h
-/home/ruinrobo/work/ympd/src/http_server.h
 mpd_client.h
 /home/ruinrobo/work/ympd/src/mpd_client.h
 config.h
 /home/ruinrobo/work/ympd/src/config.h
-streamripper.h
-/home/ruinrobo/work/ympd/src/streamripper.h
-mpd/client.h
+json_encode.h
+/home/ruinrobo/work/ympd/src/json_encode.h
+radio.h
+/home/ruinrobo/work/ympd/src/radio.h
+
+/home/ruinrobo/work/ympd/src/mpd_client.h
+mongoose.h
+/home/ruinrobo/work/ympd/src/mongoose.h
+
+/home/ruinrobo/work/ympd/src/radio.h
+poll.h
+-
+sys/inotify.h
+-
+pthread.h
 -
 
 config.h

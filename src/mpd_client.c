@@ -34,6 +34,8 @@ const char * mpd_cmd_strs[] = {
 
 int radio_status = 0;
 
+void mpd_check_queue();
+
 int radio_toggle()
 {
     if (radio_status == 0)
@@ -324,11 +326,35 @@ void mpd_poll(struct mg_server *s)
 
         case MPD_CONNECTED:
             mpd.buf_size = mpd_put_state(mpd.buf, &mpd.song_id, &mpd.queue_version);
+            mpd_check_queue();
             mg_iterate_over_connections(s, mpd_notify_callback, NULL);
             break;
         default:
             fprintf(stderr, "mpd.conn_state %i\n", mpd.conn_state);
     }
+}
+
+void mpd_check_queue()
+{
+    unsigned queue_len;
+    struct mpd_status *status;
+    int song_pos;
+
+    status = mpd_run_status(mpd.conn);
+    if (!status) {
+        fprintf(stderr, "MPD mpd_run_status: %s\n", mpd_connection_get_error_message(mpd.conn));
+        mpd.conn_state = MPD_FAILURE;
+        return;
+    }
+    queue_len = mpd_status_get_queue_length(status);
+    song_pos = mpd_status_get_song_pos(status);
+
+    if (song_pos+1 == queue_len)
+    {
+        printf("queue is empty\n");
+    }
+
+    mpd_status_free(status);
 }
 
 char* mpd_get_title(struct mpd_song const *song)
@@ -402,6 +428,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
 
     *current_song_id = mpd_status_get_song_id(status);
     *queue_version = mpd_status_get_queue_version(status);
+
     mpd_status_free(status);
     return len;
 }
