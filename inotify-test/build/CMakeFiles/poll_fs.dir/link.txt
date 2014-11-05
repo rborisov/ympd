@@ -1,0 +1,1 @@
+/usr/bin/gcc  -std=gnu99 -Wall    CMakeFiles/poll_fs.dir/src/poll_fs.c.o  -o poll_fs -rdynamic 

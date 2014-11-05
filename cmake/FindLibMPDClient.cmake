@@ -7,6 +7,7 @@
 #   LIBMPDCLIENT_DEFINITIONS - Compiler switches required for using LibMPDClient
 
 find_package(PkgConfig)
+#pkg_check_modules (GLIB2   glib-2.0)
 pkg_check_modules(PC_LIBMPDCLIENT QUIET libmpdclient)
 set(LIBMPDCLIENT_DEFINITIONS ${PC_LIBMPDCLIENT_CFLAGS_OTHER})
 
@@ -29,4 +30,3 @@ find_package_handle_standard_args(LibMPDClient DEFAULT_MSG
 )
 
 mark_as_advanced(LIBMPDCLIENT_LIBRARY LIBMPDCLIENT_INCLUDE_DIR)
-

@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ruinrobo/work/ympd/inotify-test/src/poll_fs.c
+errno.h
+-
+poll.h
+-
+stdio.h
+-
+stdlib.h
+-
+sys/inotify.h
+-
+unistd.h
+-
+string.h
+-
+poll_fs.h
+/home/ruinrobo/work/ympd/inotify-test/src/poll_fs.h
+
+/home/ruinrobo/work/ympd/inotify-test/src/poll_fs.h
+

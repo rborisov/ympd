@@ -29,20 +29,19 @@
     <body>
         <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="container-fluid">
-                <!-- div class="navbar-header">
-                    <div class="navbar-brand" -->
-                        <a href="#" class="btn btn-success btn-sm" data-toggle="modal" data-target="#control" onclick="getHost();">
-                            <span id="track-icon" class="glyphicon glyphicon-play"></span>
-                            <span id="volume-icon" class="glyphicon glyphicon-volume-down"></span>
-                        </a>
-                    <!-- /div -->
-                    <span id="currenttrack" class="label label-primary pull-right"></span>
-                    <span id="album" class="label label-success pull-right"></span>
-                    <span id="artist" class="label label-info pull-right"></span>
-                    <br><span id="counter" class="label label-warning pull-right"></span>
-                <!-- /div -->
+                <div class="navbar-header">
+                    <div class="navbar-brand" data-toggle="modal" data-target="#control" onclick="getHost();">
+                        <span id="track-icon" class="glyphicon glyphicon-play"></span>
+                        <span id="volume-icon" class="glyphicon glyphicon-volume-down"></span>
+                        <span id="radio-icon" class="glyphicon"></span>
+                    </div>
+                </div>
             </div>
         </div>
+        <H2><span id="currenttrack" class="label label-primary pull-right"></span>
+        <span id="album" class="label label-success pull-right"></span>
+        <span id="artist" class="label label-info pull-right"></span>
+        <span id="counter" class="label label-warning pull-right"></span></H2>
         <!-- div class="container starter-template" -->
             <!-- div class="btn-group">
                 <button type="button" class="btn btn-success btn-sm" onclick="socket.send('MPD_API_SET_PREV');">

@@ -137,7 +137,7 @@ function webSocketConnect() {
                 return;
 
             var obj = JSON.parse(msg.data);
-            console.log(obj.type); 
+//            console.log(obj.type); 
             switch (obj.type) {
                 case "queue":
                     if(current_app !== 'queue')
@@ -294,6 +294,8 @@ function webSocketConnect() {
                 case "state":
                     updatePlayIcon(obj.data.state);
                     updateVolumeIcon(obj.data.volume);
+                    updateRadioIcon(obj.data.radio_status);
+//                    console.log(obj.data.radio_status);
 
                     if(JSON.stringify(obj) === JSON.stringify(last_state))
                         break;
@@ -354,8 +356,13 @@ function webSocketConnect() {
                         }).show();
                     break;
                 case "update_queue":
-                    if(current_app === 'queue')
+                    if(current_app === 'queue') {
                         socket.send('MPD_API_GET_QUEUE,'+pagination);
+                        $('.top-right').notify({
+                            message:{html: "Update Queue"},
+                            type: "info",
+                        }).show();
+                    }
                     break;
                 case "song_change":
                     $('#currenttrack').text(" " + obj.data.title);
@@ -472,6 +479,14 @@ var updatePlayIcon = function(state)
     } else { // play
         $("#play-icon").addClass("glyphicon-play");
         $('#track-icon').addClass("glyphicon-pause");
+    }
+}
+
+var updateRadioIcon = function(radio_status)
+{
+    $('radio-icon').removeClass("glyphicon-cloud-download");
+    if (radio_status == 1) { //on
+        $('#radio-icon').addClass("glyphicon-cloud-download");
     }
 }
 
