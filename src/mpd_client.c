@@ -334,6 +334,18 @@ void mpd_poll(struct mg_server *s)
     }
 }
 
+void mpd_add_random_song()
+{
+    struct mpd_stats *stats;
+    int rnd;
+
+    stats = mpd_run_stats(mpd.conn);
+
+    rnd = (int)(rand() % mpd_stats_get_number_of_songs(stats));
+
+    mpd_stats_free(stats);
+}
+
 void mpd_check_queue()
 {
     unsigned queue_len;
