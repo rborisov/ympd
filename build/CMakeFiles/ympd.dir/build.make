@@ -215,8 +215,10 @@ assets.c: ../htdocs/js/bootstrap.js
 assets.c: ../htdocs/js/bootstrap-slider.js
 assets.c: ../htdocs/js/jquery-1.10.2.min.js
 assets.c: ../htdocs/js/bootstrap.min.js
+assets.c: ../htdocs/assets/art.jpg
 assets.c: ../htdocs/assets/favicon.ico
 assets.c: ../htdocs/css/bootstrap.min.css
+assets.c: ../htdocs/css/carradio.min.css
 assets.c: ../htdocs/css/mpd.min.css
 assets.c: ../htdocs/css/bootstrap-theme.min.css
 assets.c: ../htdocs/fonts/glyphicons-halflings-regular.eot
@@ -227,7 +229,7 @@ assets.c: ../htdocs/index.html
 assets.c: mkdata
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/ruinrobo/work/ympd/build/CMakeFiles $(CMAKE_PROGRESS_8)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold "Generating assets.c"
-	cd /home/ruinrobo/work/ympd && /home/ruinrobo/work/ympd/build/mkdata htdocs/js/bootstrap-notify.js htdocs/js/jquery.cookie.js htdocs/js/mpd.js htdocs/js/sammy.js htdocs/js/bootstrap.js htdocs/js/bootstrap-slider.js htdocs/js/jquery-1.10.2.min.js htdocs/js/bootstrap.min.js htdocs/assets/favicon.ico htdocs/css/bootstrap.min.css htdocs/css/mpd.min.css htdocs/css/bootstrap-theme.min.css htdocs/fonts/glyphicons-halflings-regular.eot htdocs/fonts/glyphicons-halflings-regular.svg htdocs/fonts/glyphicons-halflings-regular.ttf htdocs/fonts/glyphicons-halflings-regular.woff htdocs/index.html > /home/ruinrobo/work/ympd/build/assets.c
+	cd /home/ruinrobo/work/ympd && /home/ruinrobo/work/ympd/build/mkdata htdocs/js/bootstrap-notify.js htdocs/js/jquery.cookie.js htdocs/js/mpd.js htdocs/js/sammy.js htdocs/js/bootstrap.js htdocs/js/bootstrap-slider.js htdocs/js/jquery-1.10.2.min.js htdocs/js/bootstrap.min.js htdocs/assets/art.jpg htdocs/assets/favicon.ico htdocs/css/bootstrap.min.css htdocs/css/carradio.min.css htdocs/css/mpd.min.css htdocs/css/bootstrap-theme.min.css htdocs/fonts/glyphicons-halflings-regular.eot htdocs/fonts/glyphicons-halflings-regular.svg htdocs/fonts/glyphicons-halflings-regular.ttf htdocs/fonts/glyphicons-halflings-regular.woff htdocs/index.html > /home/ruinrobo/work/ympd/build/assets.c
 
 # Object files for target ympd
 ympd_OBJECTS = \

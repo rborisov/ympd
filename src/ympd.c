@@ -104,6 +104,9 @@ int main(int argc, char **argv)
         free(run_as_user);
     }
 
+//    mg_set_option(server, "document_root", "/home/ruinrobo/rcarmedia/");
+//    mg_set_option(server, "url_rewrites", "/images=/home/ruinrobo/rcarmedia");
+
     if (!config_lookup_string(&cfg, "streamripper.url", &radio_url))
     {
         fprintf(stderr, "No 'radio_url' setting in configuration file.\n");
@@ -115,6 +118,10 @@ int main(int argc, char **argv)
 
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
+
+//    printf("DOCUMENT_ROOT %s\n", mg_get_option(server, "document_root"));
+//    printf("url_rewrites %s\n", mg_get_option(server, "url_rewrites"));
+
     while (!force_exit) {
         current_timer = mg_poll_server(server, 200);
         if(current_timer - last_timer)

@@ -1,0 +1,1 @@
+/usr/bin/gcc  -std=gnu99 -Wall    CMakeFiles/mg-test.dir/src/mg-test.c.o CMakeFiles/mg-test.dir/home/ruinrobo/work/ympd/src/mongoose.c.o  -o mg-test -rdynamic -lpthread 

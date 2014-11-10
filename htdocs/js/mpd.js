@@ -386,7 +386,9 @@ function webSocketConnect() {
                         }).show();
                     
                         socket.send('MPD_API_GET_QUEUE,'+pagination);
-
+                       
+                        console.log("art");
+                        document.body.style.backgroundImage = "url('/images/radiohead.jpg')";
                         
                     break;
                 case "mpdhost":
