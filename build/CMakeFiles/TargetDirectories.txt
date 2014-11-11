@@ -1,2 +1,0 @@
-/home/ruinrobo/work/ympd/build/CMakeFiles/mkdata.dir
-/home/ruinrobo/work/ympd/build/CMakeFiles/ympd.dir
