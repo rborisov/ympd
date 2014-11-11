@@ -35,8 +35,8 @@
 
 #include <mpd/client.h>
 
-#define project_name "rcarmedia"
-#define ympd_conf_file "ympd.conf"
+//#define project_name "rcarmedia"
+//#define ympd_conf_file "ympd.conf"
 
 extern char *optarg;
 
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
     struct passwd *pw = getpwuid(getuid());
     char *homedir = pw->pw_dir;
 
-    sprintf(config_file_name, "%s/%s/%s", homedir, project_name, ympd_conf_file);
+    sprintf(config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
     printf("conf = %s\n", config_file_name);
 
     atexit(bye);

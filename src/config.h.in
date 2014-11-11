@@ -25,5 +25,6 @@
 #define DATADIR "${CMAKE_INSTALL_PREFIX}/share/${PROJECT_NAME}"
 #define LOCAL_RESOURCE_PATH DATADIR"/htdocs"
 #cmakedefine WITH_MPD_HOST_CHANGE
+#define RCM_DIR_STR "rcarmedia"
 #endif
 

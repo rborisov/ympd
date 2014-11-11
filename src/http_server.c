@@ -21,9 +21,10 @@
 #include <error.h>
 #include <errno.h>
 #include <string.h>
-//#include <string.h>
+#include <pwd.h>
 
 #include "http_server.h"
+#include "config.h"
 
 int callback_http(struct mg_connection *c)
 {
@@ -31,8 +32,10 @@ int callback_http(struct mg_connection *c)
     FILE *fd;
     int i = 0;
     unsigned char buf[500000];
-   char filename[256]; 
+    char filename[256]; 
     int tmp;
+    struct passwd *pw = getpwuid(getuid());
+    char *homedir = pw->pw_dir;
 
     if(!strcmp(c->uri, "/"))
         req_file = find_embedded_file("/index.html");
@@ -47,11 +50,11 @@ int callback_http(struct mg_connection *c)
         return MG_REQUEST_PROCESSED;
     }
 
-    printf("%s ", c->uri);
-    sprintf(filename, "/home/ruinrobo/rcarmedia/%s", c->uri);
+//    printf("%s ", c->uri);
+    sprintf(filename, "%s/%s/%s", homedir, RCM_DIR_STR, c->uri);
     fd = fopen(filename, "r");
     if(!fd)
-        printf("Failed open file\n");
+        printf("Failed open file %s\n", filename);
     else 
     {
         while ((tmp = fgetc(fd)) != EOF)
