@@ -1,5 +1,8 @@
 ympd
 ====
+
+sudo apt-get install libmpdclient-dev
+
 [![Build Status](http://ci.ympd.org/github.com/notandy/ympd/status.svg)](https://ci.ympd.org/github.com/notandy/ympd)
 
 Standalone MPD Web GUI written in C, utilizing Websockets and Bootstrap/JS
