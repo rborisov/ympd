@@ -26,5 +26,6 @@
 #define LOCAL_RESOURCE_PATH DATADIR"/htdocs"
 #cmakedefine WITH_MPD_HOST_CHANGE
 #define RCM_DIR_STR "rcarmedia"
+#define RCM_CONF_FILE_STR "ympd.conf"
 #endif
 
