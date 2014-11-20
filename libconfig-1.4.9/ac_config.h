@@ -75,7 +75,7 @@
 #define STDC_HEADERS 1
 
 /* Configured target name. */
-#define TARGET "i686-pc-linux-gnu"
+#define TARGET "x86_64-unknown-linux-gnu"
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE

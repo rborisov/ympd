@@ -1,4 +1,6 @@
-ripaac.lo: ripaac.c srconfig.h config.h
+ripaac.lo: ripaac.c /usr/include/stdc-predef.h srconfig.h config.h
+
+/usr/include/stdc-predef.h:
 
 srconfig.h:
 

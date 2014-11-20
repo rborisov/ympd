@@ -25,7 +25,9 @@ STREAM_PREFS prefs;
 int start_streamripper()
 {
     int ret;
-    
+ 
+    sr_set_locale ();
+   
     debug_set_filename("streamripper.log");
     debug_enable();
 
