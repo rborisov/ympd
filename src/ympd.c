@@ -30,13 +30,9 @@
 #include "http_server.h"
 #include "mpd_client.h"
 #include "config.h"
-//#include "radio.h"
 #include "streamripper.h"
 
 #include <mpd/client.h>
-
-//#define project_name "rcarmedia"
-//#define ympd_conf_file "ympd.conf"
 
 extern char *optarg;
 
@@ -104,23 +100,20 @@ int main(int argc, char **argv)
         free(run_as_user);
     }
 
-//    mg_set_option(server, "document_root", "/home/ruinrobo/rcarmedia/");
-//    mg_set_option(server, "url_rewrites", "/images=/home/ruinrobo/rcarmedia");
-
     if (!config_lookup_string(&cfg, "streamripper.url", &radio_url))
     {
         fprintf(stderr, "No 'radio_url' setting in configuration file.\n");
     }
     printf("url = %s\n", radio_url);
 
-    start_streamripper();
-    printf("start_streamripper\n");
-
+    setstream_streamripper(radio_url);
+    setpath_streamuri(radio_path);
+    init_streamripper();
+    printf("init_streamripper\n");
+//    start_streamripper();
+    
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
-
-//    printf("DOCUMENT_ROOT %s\n", mg_get_option(server, "document_root"));
-//    printf("url_rewrites %s\n", mg_get_option(server, "url_rewrites"));
 
     while (!force_exit) {
         current_timer = mg_poll_server(server, 200);

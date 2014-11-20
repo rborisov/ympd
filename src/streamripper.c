@@ -6,7 +6,6 @@
 #include <math.h>
 #include <time.h>
 
-#include <libconfig.h>
 #include "streamripper.h"
 
 static void catch_sig (int code);
@@ -22,11 +21,44 @@ static BOOL m_track_done = FALSE;
 RIP_MANAGER_INFO *rmi = 0;
 STREAM_PREFS prefs;
 
+void setstream_streamripper(char* streamuri)
+{
+//    prefs_get_stream_prefs (&prefs, "http://stream-ru1.radioparadise.com:9000/mp3-192");
+    prefs_load ();
+    prefs_get_stream_prefs (&prefs, streamuri);
+    prefs_save ();
+}
+
+void setpath_streamuri(char* outpath)
+{
+//    strncpy(prefs.output_directory, "/home/ruinrobo/Music/radio", SR_MAX_PATH);
+    prefs_load ();
+    strncpy(prefs.output_directory, outpath, SR_MAX_PATH);
+    prefs_save ();
+}
+
+void init_streamripper()
+{
+    sr_set_locale ();
+    debug_set_filename("streamripper.log");
+    debug_enable();
+    
+    prefs_load ();
+    prefs.overwrite = OVERWRITE_ALWAYS;
+    OPT_FLAG_SET(prefs.flags, OPT_SEPARATE_DIRS, 0);
+    prefs.dropcount = 1;
+    prefs_save ();
+    
+    rip_manager_init();
+
+    start_streamripper();
+}
+
 int start_streamripper()
 {
     int ret;
  
-    sr_set_locale ();
+/*    sr_set_locale ();
    
     debug_set_filename("streamripper.log");
     debug_enable();
@@ -34,27 +66,30 @@ int start_streamripper()
     // Load prefs
     prefs_load ();
 //    prefs_get_stream_prefs (&prefs, "http://stream-ru1.radioparadise.com:9000/mp3-192");
-    prefs_get_stream_prefs (&prefs, "http://stream-uk1.radioparadise.com/mp3-192");
-    strncpy(prefs.output_directory, "/home/ruinrobo/Music/radio", SR_MAX_PATH);
+//    prefs_get_stream_prefs (&prefs, "http://stream-uk1.radioparadise.com/mp3-192");
+//    strncpy(prefs.output_directory, "/home/ruinrobo/Music/radio", SR_MAX_PATH);
     prefs_save ();
     prefs.overwrite = OVERWRITE_ALWAYS;
     OPT_FLAG_SET(prefs.flags, OPT_SEPARATE_DIRS, 0);
     prefs.dropcount = 1;
 
-//    signal (SIGINT, catch_sig);
-//    signal (SIGTERM, catch_sig);
-
-    rip_manager_init();
+    rip_manager_init();*/
 
     /* Launch the ripping thread */
     if ((ret = rip_manager_start (&rmi, &prefs, rip_callback)) != SR_SUCCESS) {
         fprintf(stderr, "Couldn't connect to %s\n", prefs.url);
-        exit(EXIT_FAILURE);
+        rip_manager_stop(rmi);
+//        rip_manager_cleanup();
     }
     sleep(1);
     printf("rmi %d\n", rmi->started);
 
-    return 1;
+    return ret;
+}
+
+int streamripper_exists()
+{
+    return rmi->started;
 }
 
 int status_streamripper()
@@ -64,8 +99,12 @@ int status_streamripper()
 
 int poll_streamripper(char* newfilename)
 {
-//    STREAM_PREFS *prefs = rmi->prefs;
     static char filename[MAX_TRACK_LEN];
+
+    if (!rmi->started) {
+        start_streamripper();
+        return 0;
+    }
 
     if (m_update) {
         switch (rmi->status)
