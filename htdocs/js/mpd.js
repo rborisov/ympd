@@ -388,7 +388,18 @@ function webSocketConnect() {
                         socket.send('MPD_API_GET_QUEUE,'+pagination);
                        
                         console.log("art");
-                        document.body.style.backgroundImage = "url('/images/radiohead.jpg')";
+                        $.get("http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=" + 
+                                obj.data.artist + 
+                                "&autocorrect=1&api_key=ecb4076a85c81aae38a7e8f11e42a0b1&format=json&callback=", 
+                                function(data)
+                                {
+                                    var art_url = data.artist.image[3]['#text'];
+                                    console.log(art_url);
+//                                    $('#art-img').css("background", "url(" + art_url + ")");
+//                                    $('#art-img').background = "url(" + data.artist.image[3]['#text'] + ") no-repeat center center fixed";
+//                                    background: url(/images/art.jpg) no-repeat center center fixed
+                                    document.body.style.backgroundImage = "url(" + art_url + ")";
+                                });
                         
                     break;
                 case "mpdhost":

@@ -37,6 +37,8 @@ int callback_http(struct mg_connection *c)
     struct passwd *pw = getpwuid(getuid());
     char *homedir = pw->pw_dir;
 
+    printf("http: %s\n", c->uri);
+
     if(!strcmp(c->uri, "/"))
         req_file = find_embedded_file("/index.html");
     else
@@ -46,7 +48,7 @@ int callback_http(struct mg_connection *c)
     {
         mg_send_header(c, "Content-Type", req_file->mimetype);
         mg_send_data(c, req_file->data, req_file->size);
-        printf("%s %i\n", c->uri, req_file->size);    
+//        printf("%s %i\n", c->uri, req_file->size);    
         return MG_REQUEST_PROCESSED;
     }
 
@@ -63,7 +65,7 @@ int callback_http(struct mg_connection *c)
             i++;
         }
         buf[i] = 0;
-        printf(" i %i\n", i);
+//        printf(" i %i\n", i);
         fclose(fd);
         mg_send_header(c, "Content-Type", "image/jpeg");
         mg_send_data(c, buf, i);
