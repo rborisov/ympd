@@ -2,6 +2,7 @@ ympd
 ====
 
 sudo apt-get install libmpdclient-dev
+sudo apt-get install libmysqlclient-dev
 
 [![Build Status](http://ci.ympd.org/github.com/notandy/ympd/status.svg)](https://ci.ympd.org/github.com/notandy/ympd)
 
