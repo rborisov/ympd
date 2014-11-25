@@ -393,7 +393,7 @@ function webSocketConnect() {
                                 "&autocorrect=1&api_key=ecb4076a85c81aae38a7e8f11e42a0b1&format=json&callback=", 
                                 function(data)
                                 {
-                                    var art_url = data.track.album.image[3]['#text'];
+                                    var art_url = data.track.album.image[2]['#text'];
                                     console.log(art_url);
                                     document.body.style.backgroundImage = "url(" + art_url + ")";
                                 });
