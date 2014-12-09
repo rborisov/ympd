@@ -15,7 +15,7 @@ include(CheckCSourceCompiles)
 
 set(CMAKE_C_FLAGS "-std=gnu99 -Wall -D__UNIX__") 
 set(CMAKE_C_FLAGS_DEBUG "-ggdb -pedantic")
-
+set(CMAKE_BUILD_TYPE debug)
 get_target_property(MKDATA_EXE mkdata LOCATION)
 
 set(SOURCES

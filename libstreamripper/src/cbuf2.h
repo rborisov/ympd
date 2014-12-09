@@ -29,7 +29,7 @@ struct METADATA_LIST_struct
     unsigned long m_chunk;
     /* m_composed_metadata includes 1 byte for size*16 */
     char m_composed_metadata[MAX_METADATA_LEN+1];
-    LIST m_list;
+    SRLIST m_list;
 };
 
 #define OGG_PAGE_BOS        0x01

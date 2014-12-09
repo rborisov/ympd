@@ -47,7 +47,7 @@ struct FRAME_LIST_struct
     const unsigned char* m_framepos;
     long m_samples;
     long m_pcmpos;
-    LIST m_list;
+    SRLIST m_list;
 };
 
 typedef struct SILENCETRACKERst
@@ -73,7 +73,7 @@ typedef struct DECODE_STRUCTst
     long  samplerate;
     short prev_sample;
     SILENCETRACKER siltrackers[NUM_SILTRACKERS];
-    LIST frame_list;
+    SRLIST frame_list;
 } DECODE_STRUCT;
 
 typedef struct GET_BITRATE_STRUCTst

@@ -31,6 +31,7 @@
 #include "mpd_client.h"
 #include "config.h"
 #include "streamripper.h"
+#include "rcar_db.h"
 
 #include <mpd/client.h>
 
@@ -106,6 +107,8 @@ int main(int argc, char **argv)
     }
     printf("url = %s\n", radio_url);
 
+    db_init();
+
     setstream_streamripper(radio_url);
     setpath_streamuri(radio_path);
     init_streamripper();
@@ -133,6 +136,7 @@ int main(int argc, char **argv)
     }
 
     stop_streamripper();
+    db_close();
     mpd_disconnect();
     mg_destroy_server(&server);
 

@@ -12,6 +12,7 @@ option(WITH_MPD_HOST_CHANGE "Let users of the web frontend change the MPD Host" 
 find_package(LibMPDClient REQUIRED)
 find_package(Threads REQUIRED)
 find_package(GLIB2 REQUIRED)
+find_package(MySQL REQUIRED)
 
 configure_file(src/config.h.in ${PROJECT_BINARY_DIR}/config.h)
 include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR} ${STREAMRIPPER_LIB_PATH} ${GLIB2_INCLUDE_DIRS})
@@ -46,11 +47,12 @@ set(SOURCES
     src/mongoose.c
     src/json_encode.c
     src/streamripper.c
+    src/rcar_db.c
     assets.c
 )
 
 add_executable(ympd ${SOURCES})
-target_link_libraries(ympd ${LIBMPDCLIENT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} streamripper mad ogg vorbis config id3tag)
+target_link_libraries(ympd ${LIBMPDCLIENT_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} streamripper mad ogg vorbis config id3tag mysqlclient)
 #-logg -lvorbis -lmad -lid3tag -lz -lglib-2.0
 install(TARGETS ympd DESTINATION bin)
 install(FILES ympd.1 DESTINATION ${CMAKE_INSTALL_PREFIX}/share/man/man1)

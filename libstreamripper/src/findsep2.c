@@ -45,7 +45,7 @@ struct FRAME_LIST_struct
     const unsigned char* m_framepos;
     long m_samples;
     long m_pcmpos;
-    LIST m_list;
+    SRLIST m_list;
 };
 
 typedef struct MIN_POSst
@@ -68,7 +68,7 @@ typedef struct DECODE_STRUCTst
     unsigned long  pcmpos;
     long  samplerate;
     short prev_sample;
-    LIST frame_list;
+    SRLIST frame_list;
     unsigned short* maxvolume_buffer;
     unsigned long maxvolume_buffer_offs;
     int maxvolume_buffer_depth;

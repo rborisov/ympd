@@ -27,6 +27,7 @@
 #include "config.h"
 #include "json_encode.h"
 #include "radio.h"
+#include "rcar_db.h"
 
 const char * mpd_cmd_strs[] = {
     MPD_CMDS(GEN_STR)
@@ -457,6 +458,11 @@ int mpd_put_current_song(char *buffer)
     }
 
     cur += json_emit_raw_str(cur, end - cur, "}}");
+
+    db_listen_song(mpd_get_title(song), 
+            mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) ? mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) : "", 
+            mpd_song_get_tag(song, MPD_TAG_ALBUM, 0) ? mpd_song_get_tag(song, MPD_TAG_ALBUM, 0) : "");
+
     mpd_song_free(song);
     mpd_response_finish(mpd.conn);
 
@@ -520,14 +526,20 @@ void get_random_song(char *str, char *path)
         if (mpd_entity_get_type(entity) == MPD_ENTITY_TYPE_SONG) 
         {
             unsigned int rnd = (unsigned int)(rand() % 2);
+            int listened;
             song = mpd_entity_get_song(entity);
             //TODO: make a criteria and pick the song with it
-            if (rnd) {
+            listened = db_get_song_listened(mpd_get_title(song),
+                        mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) ? mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) : "");
+            printf("%i ", listened);
+
+            if (rnd && listened == 0) {
                 sprintf(str, "%s", mpd_song_get_uri(song)); 
             }
         }
         mpd_entity_free(entity);
     }
+    printf("/n");
 }
 
 int mpd_put_browse(char *buffer, char *path, unsigned int offset)

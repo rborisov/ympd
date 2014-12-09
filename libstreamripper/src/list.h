@@ -23,7 +23,7 @@
 struct list_head {
 	struct list_head *next, *prev;
 };
-typedef struct list_head LIST;
+typedef struct list_head SRLIST;
 
 
 #define LIST_HEAD_INIT(name) { &(name), &(name) }

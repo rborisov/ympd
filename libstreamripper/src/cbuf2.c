@@ -130,7 +130,7 @@ cbuf2_advance_metadata_list (RIP_MANAGER_INFO* rmi, CBUF2* cbuf2)
     u_long frag1, frag2;
     u_long metadata_pos;
     u_long chunk_no;
-    LIST *p;
+    SRLIST *p;
     METADATA_LIST *tmp;
 
     cbuf2_get_used_fragments (cbuf2, &frag1, &frag2);
@@ -157,7 +157,7 @@ cbuf2_advance_metadata_list (RIP_MANAGER_INFO* rmi, CBUF2* cbuf2)
 	debug_printf ("CE4: %d %d\n", tmp->m_chunk, chunk_no);
 	if (tmp->m_chunk == chunk_no) {
 	    while (p->prev != &cbuf2->metadata_list) {
-		LIST* pp = p->prev;
+		SRLIST* pp = p->prev;
 		list_del (p->prev);
 		free (list_entry (pp,METADATA_LIST,m_list));
 	    }
@@ -207,7 +207,7 @@ error_code
 cbuf2_advance_ogg (RIP_MANAGER_INFO* rmi, CBUF2 *cbuf2, int requested_free_size)
 {
     u_long count;
-    LIST *p, *n;
+    SRLIST *p, *n;
     OGG_PAGE_LIST *tmp;
 
     if (cbuf2->item_count + requested_free_size <= cbuf2->size) {
@@ -352,7 +352,7 @@ cbuf2_insert_chunk (RIP_MANAGER_INFO* rmi,
 		    CBUF2 *cbuf2, const char *data, u_long count,
 		    int content_type, TRACK_INFO* ti)
 {
-    LIST this_page_list;
+    SRLIST this_page_list;
     int chunk_no;
     error_code rc;
 
@@ -361,7 +361,7 @@ cbuf2_insert_chunk (RIP_MANAGER_INFO* rmi,
        concurrency with relay threads. */
     if (content_type == CONTENT_TYPE_OGG) {
 	OGG_PAGE_LIST* tmp;
-	LIST *p;
+	SRLIST *p;
 	unsigned long page_loc;
 
 	rip_ogg_process_chunk (rmi, &this_page_list, data, count, ti);
@@ -516,7 +516,7 @@ cbuf2_extract_relay_mp3 (CBUF2 *cbuf2, RELAY_LIST* ptr)
     debug_printf ("RELAY_DEBUG Changed to: offset=%d\n", *offset);
     if (icy_metadata) {
 	int have_metadata = 0;
-	LIST *p = cbuf2->metadata_list.next;
+	SRLIST *p = cbuf2->metadata_list.next;
 	METADATA_LIST *tmp;
 	list_for_each (p, &(cbuf2->metadata_list)) {
 	    tmp = list_entry(p, METADATA_LIST, m_list);
@@ -546,7 +546,7 @@ cbuf2_extract_relay_mp3 (CBUF2 *cbuf2, RELAY_LIST* ptr)
 void
 cbuf2_debug_lists (RIP_MANAGER_INFO* rmi, CBUF2 *cbuf2)
 {
-    LIST *p;
+    SRLIST *p;
 
     if (rmi->http_info.content_type != CONTENT_TYPE_OGG) {
 	debug_printf ("---CBUF_DEBUG_META_LIST---\n");
@@ -765,7 +765,7 @@ error_code
 cbuf2_init_relay_entry (CBUF2 *cbuf2, RELAY_LIST* ptr, u_long burst_request)
 {
     int buffer_size;
-    LIST *p;
+    SRLIST *p;
     OGG_PAGE_LIST *tmp;
 
     threadlib_waitfor_sem (&cbuf2->cbuf_sem);

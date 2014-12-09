@@ -1,21 +1,3 @@
-/* ympd
-   (c) 2013-2014 Andrew Karpow <andy@ndyk.de>
-   This project's homepage is: http://www.ympd.org
-   
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; version 2 of the License.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License along
-   with this program; if not, write to the Free Software Foundation, Inc.,
-   Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -27,10 +9,45 @@
 #include <pwd.h>
 
 #include "rcar_db.h"
+#include <mysql.h>
 
 int main(int argc, char **argv)
 {
-    db_create();
+/*    db_init();
+
+    db_put_song("song name", "artist name", "album name");
+
+    db_close();*/
+
+    char strr[] = "test string ' with '";
+    char *ptr = strr;
+    char chrr = 'i';
+    int len;
+    char out[128] = "";
+    char *outptr = out;
+
+    MYSQL *con;
+
+    len = strlen(ptr);
+    printf("%s %i\n", ptr, len);
+/*    strcpy(out, strr);
+    while (ptr) {
+        ptr = strchr(ptr, chrr);
+        if (ptr) {
+            strncmp(outptr + (ptr-strr+1), "ji", 2);
+            printf("%s %i\n%s %i\n", ptr, ptr-strr, out, strlen(out));
+            outptr = outptr + (ptr-strr) + 1;
+           printf("%s\n", outptr); 
+            ptr++;
+        }
+    }
+*/
+    con = mysql_init(NULL);
+    outptr = mysql_real_escape_string(con, out, strr, 20);
+    mysql_close(con);
+
+
+    printf("%s %i %i\n", out, outptr, strlen(out));
 
     return EXIT_SUCCESS;
 }

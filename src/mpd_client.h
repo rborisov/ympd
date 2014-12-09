@@ -19,6 +19,7 @@
 #ifndef __MPD_CLIENT_H__
 #define __MPD_CLIENT_H__
 
+#include "rcar_db.h"
 #include "mongoose.h"
 
 #define RETURN_ERROR_AND_RECOVER(X) do { \
@@ -89,6 +90,8 @@ struct t_mpd {
 
     int song_id;
     unsigned queue_version;
+
+    //MYSQL db_conn;
 } mpd;
 
 struct t_mpd_client_session {

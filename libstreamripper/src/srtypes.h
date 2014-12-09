@@ -318,7 +318,7 @@ struct OGG_PAGE_LIST_struct
     unsigned long m_page_flags;
     char *m_header_buf_ptr;
     unsigned long m_header_buf_len;
-    LIST m_list;
+    SRLIST m_list;
 };
 
 typedef struct CBUF2_struct
@@ -337,9 +337,9 @@ typedef struct CBUF2_struct
 
     HSEM        cbuf_sem;
 
-    LIST        metadata_list;
-    LIST        ogg_page_list;
-    LIST        frame_list;
+    SRLIST        metadata_list;
+    SRLIST        ogg_page_list;
+    SRLIST        frame_list;
 } CBUF2;
 
 

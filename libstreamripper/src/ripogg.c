@@ -451,7 +451,7 @@ vorbis_start(stream_processor *stream)
 
 void
 rip_ogg_process_chunk (RIP_MANAGER_INFO* rmi, 
-		       LIST* page_list, const char* buf, u_long size,
+		       SRLIST* page_list, const char* buf, u_long size,
 		       TRACK_INFO* ti)
 {
     OGG_PAGE_LIST* ol;
@@ -615,7 +615,7 @@ rip_ogg_init (RIP_MANAGER_INFO* rmi)
 
 void
 rip_ogg_process_chunk (RIP_MANAGER_INFO* rmi, 
-		       LIST* page_list, const char* buf, u_long size,
+		       SRLIST* page_list, const char* buf, u_long size,
 		       TRACK_INFO* ti)
 {
     INIT_LIST_HEAD (page_list);
