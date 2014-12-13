@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <string.h>
 #include <pwd.h>
+#include <curl/curl.h>
 
 #include "http_server.h"
 #include "config.h"
@@ -77,3 +78,28 @@ int callback_http(struct mg_connection *c)
     mg_printf_data(c, "Not Found");
     return MG_REQUEST_PROCESSED;
 }
+/*
+char* download_file(char* url)
+{
+    CURL *curl;
+    FILE *fp;
+    CURLcode res;
+    char outfn[254] = "page.html";
+    curl = curl_easy_init();                                                                                                                              
+    if (curl)
+    {
+        fp = fopen(outfn,"wb");
+        if (fp) {
+            curl_easy_setopt(curl, CURLOPT_URL, url);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+            res = curl_easy_perform(curl);
+            fclose(fp);
+            if (res != 0)
+                outfn = "";
+        }
+        curl_easy_cleanup(curl);
+    }
+    return outfn;
+}
+*/

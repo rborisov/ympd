@@ -8,8 +8,11 @@
 #include <libconfig.h>
 #include <pwd.h>
 
-#include "rcar_db.h"
-#include <mysql.h>
+//#include "rcar_db.h"
+//#include <mysql.h>
+
+
+#include <curl/curl.h>
 
 int main(int argc, char **argv)
 {
@@ -19,7 +22,7 @@ int main(int argc, char **argv)
 
     db_close();*/
 
-    char strr[] = "test string ' with '";
+/*    char strr[] = "test string ' with '";
     char *ptr = strr;
     char chrr = 'i';
     int len;
@@ -29,7 +32,7 @@ int main(int argc, char **argv)
     MYSQL *con;
 
     len = strlen(ptr);
-    printf("%s %i\n", ptr, len);
+    printf("%s %i\n", ptr, len);*/
 /*    strcpy(out, strr);
     while (ptr) {
         ptr = strchr(ptr, chrr);
@@ -42,12 +45,25 @@ int main(int argc, char **argv)
         }
     }
 */
-    con = mysql_init(NULL);
-    outptr = mysql_real_escape_string(con, out, strr, 20);
-    mysql_close(con);
 
+    CURL *curl;
+    FILE *fp;
+    CURLcode res;
+    char *url = "http://userserve-ak.last.fm/serve/300x300/75576296.jpg";//"http://stackoverflow.com";
+    char outfilename[254] = "75576296.jpg";
+    curl = curl_easy_init();                                                                                                                                                                                                                                                           
+    if (curl)
+    {   
+        fp = fopen(outfilename,"wb");
+        curl_easy_setopt(curl, CURLOPT_URL, url);
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+        res = curl_easy_perform(curl);
+        curl_easy_cleanup(curl);
+        fclose(fp);
+    }
 
-    printf("%s %i %i\n", out, outptr, strlen(out));
+    //printf("%s %i %i\n", out, outptr, strlen(out));
 
     return EXIT_SUCCESS;
 }

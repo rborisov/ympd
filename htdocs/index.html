@@ -27,6 +27,36 @@
             html { 
                 overflow: hidden;
             }
+            #floatingBtnLeft
+            {
+                  position: fixed;
+                  z-index: 10000;
+                  top: 50%;
+                  left: 4px;
+                  background: rgba(0,0,0,0.5);
+            }
+            #floatingBtnRight
+            {
+                  position: fixed;
+                  z-index: 10000;
+                  top: 50%;
+                  left: 400px;
+                  background: rgba(0,0,0,0.6);
+            }
+            #floatingBtnCenter
+            {
+                position: fixed;
+                z-index: 10000;
+                top: 50%;
+                left: 230px;
+                background: rgba(0,0,0,0.7);
+            }
+            .btn-circle.btn-lg
+            {
+                height: 45px; width: 45px;
+                padding-left: 0; padding-right: 0;
+                border-radius: 50%;
+            }
         </style>
     </head>
     <body class="art-img">
@@ -37,18 +67,28 @@
                         <span id="track-icon" class="glyphicon glyphicon-play"></span>
                         <span id="volume-icon" class="glyphicon glyphicon-volume-down"></span>
                         <span id="radio-icon" class="glyphicon"></span>
-                        <span id="counter" class="label label-warning"></span>
+                        <span id="counter" class="label label-warning">
+                        </span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="container">
             <div>
-                <H3><span id="currenttrack" class="label label-primary pull-right">
-                </span></H3>
-                <H4><span id="album" class="label label-info pull-right"></span>
-                    <span id="artist" class="label label-warning pull-right"></span>
-                    <!-- span id="counter" class="label label-warning"></span --></H4>
+                <H2><span id="currenttrack" class="label label-primary">
+                </span></H2>
+                <H3><span id="album" class="label label-info"></span>
+                    <span id="artist" class="label label-warning"></span>
+                    <!-- span id="counter" class="label label-warning"></span --></H3>
+                    <button id="floatingBtnLeft" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
+                        <span class="glyphicon glyphicon-step-backward"></span>
+                    </button>
+                    <button id="floatingBtnRight" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_NEXT');">
+                        <span class="glyphicon glyphicon-step-forward"></span>
+                    </button>
+                    <button id="floatingBtnCenter" class="btn btn-circle btn-lg" onclick="clickPlay();">
+                        <span id="play-icon" class="glyphicon glyphicon-pause"></span>
+                    </button>
             <!-- Table -->
             <table id="salamisandwich" class="table table-hover">
                 <thead>

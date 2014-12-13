@@ -1,1 +1,1 @@
-/usr/bin/cc  -std=gnu99 -Wall -D__UNIX__ -ggdb -pedantic    CMakeFiles/dbtest.dir/src/ympd.c.o CMakeFiles/dbtest.dir/home/ruinrobo/work/ympd/src/rcar_db.c.o  -o dbtest -rdynamic -lpthread -lmysqlclient 
+/usr/bin/cc  -std=gnu99 -Wall -D__UNIX__ -ggdb -pedantic    CMakeFiles/dbtest.dir/src/ympd.c.o CMakeFiles/dbtest.dir/home/ruinrobo/work/ympd/src/rcar_db.c.o  -o dbtest -rdynamic -lpthread -lmysqlclient -lcurl 

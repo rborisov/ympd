@@ -7,6 +7,8 @@ set(CPACK_PACKAGE_VERSION_MINOR "2")
 set(CPACK_PACKAGE_VERSION_PATCH "2")
 set(STREAMRIPPER_LIB_PATH "${PROJECT_SOURCE_DIR}/libstreamripper/")
 
+SET(CMAKE_BUILD_TYPE debug)
+
 option(WITH_MPD_HOST_CHANGE "Let users of the web frontend change the MPD Host" ON)
 
 find_package(LibMPDClient REQUIRED)
@@ -48,6 +50,7 @@ set(SOURCES
     src/json_encode.c
     src/streamripper.c
     src/rcar_db.c
+    src/ydebug.c
     assets.c
 )
 

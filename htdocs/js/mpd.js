@@ -156,9 +156,9 @@ function webSocketConnect() {
                                     "</td><td></td></tr>");*/
                             $('#salamisandwich > tbody').append(
                                     "<p>"+
-                                    "<span class=\"label label-default\">" + obj.data[song].id + "</span>"+
                                    "<span class=\"label label-primary\">" + obj.data[song].title + "</span>" +
-                                   "<span class=\"label label-warning\">" + obj.data[song].artist + "</span></p>"
+                                    "<span class=\"label label-warning\">" + obj.data[song].artist + "</span>"+
+                                   "<span class=\"label label-info\">" + obj.data[song].album + "</span></p>"
                                     );
                         }
                     }
@@ -364,25 +364,26 @@ function webSocketConnect() {
                         }).show();
                     }
                     break;
-                case "song_change":
-                    $('#currenttrack').text(" " + obj.data.title);
-                    var notification = "<strong><h4>" + obj.data.title + "</h4></strong>";
-                    
+                case "track_info":
                     if (obj.data.title && obj.data.artist) {
                         $.get("http://ws.audioscrobbler.com/2.0/?method=track.getinfo&artist=" +
                                 obj.data.artist + "&track=" + obj.data.title +
                                 "&autocorrect=1&api_key=ecb4076a85c81aae38a7e8f11e42a0b1&format=json&callback=",
                                 function(lastfm)
                                 {
-                                    var art_url = lastfm.track.album.image[2]['#text'];
+                                    var art_url = lastfm.track.album.image[3]['#text'];
                                     console.log(art_url);
                                     document.body.style.backgroundImage = "url(" + art_url + ")";
-                                    if (!obj.data.album) {
-                                        $('#album').text(lastfm.track.album.title);
-                                    }
+                                    $('#album').text(lastfm.track.album.title);
+                                    socket.send('MPD_API_DB_ALBUM,'+obj.data.title+'*'+obj.data.artist+'*'+
+                                        lastfm.track.album.title+'*'+art_url);
                                 });
                     }
-
+                    break;
+                case "song_change":
+                    $('#currenttrack').text(" " + obj.data.title);
+                    var notification = "<strong><h4>" + obj.data.title + "</h4></strong>";
+                    
                     if(obj.data.album) {
                         $('#album').text(obj.data.album);
                         notification += obj.data.album + "<br />";

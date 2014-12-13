@@ -47,6 +47,9 @@ void init_streamripper()
     prefs.overwrite = OVERWRITE_ALWAYS;
     OPT_FLAG_SET(prefs.flags, OPT_SEPARATE_DIRS, 0);
     prefs.dropcount = 1;
+/*    strncpy (prefs.cs_opt.codeset_filesys, "UTF-8", MAX_CODESET_STRING);
+    strncpy (prefs.cs_opt.codeset_id3, "UTF-8", MAX_CODESET_STRING);
+    strncpy (prefs.cs_opt.codeset_metadata, "UTF-8", MAX_CODESET_STRING);*/
     prefs_save ();
     
     rip_manager_init();

@@ -24,6 +24,6 @@ set(SOURCES
 )
 
 add_executable(dbtest ${SOURCES})
-target_link_libraries(dbtest ${CMAKE_THREAD_LIBS_INIT} mysqlclient)
+target_link_libraries(dbtest ${CMAKE_THREAD_LIBS_INIT} mysqlclient curl)
 
 install(TARGETS dbtest DESTINATION bin)

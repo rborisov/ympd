@@ -29,6 +29,8 @@
 #include "radio.h"
 #include "rcar_db.h"
 
+#include "ydebug.h"
+
 const char * mpd_cmd_strs[] = {
     MPD_CMDS(GEN_STR)
 };
@@ -38,6 +40,7 @@ static int queue_is_empty = 0;
 
 int mpd_search_one(char *buffer, char *searchstr);
 void get_random_song(char *str, char *path);
+int mpd_get_track_info(char *buffer);
 
 int radio_toggle()
 {
@@ -80,8 +83,16 @@ int callback_mpd(struct mg_connection *c)
     mpd_connection_set_timeout(mpd.conn, 10000);
     switch(cmd_id)
     {
+        case MPD_API_DB_ALBUM:
+            if(sscanf(c->content, "MPD_API_DB_ALBUM,%m[^\t\n]", 
+                        &p_charbuf) && p_charbuf != NULL)
+            {
+                db_put_album1(p_charbuf);
+                free(p_charbuf);
+            }
+            break;
         case RADIO_TOGGLE_RADIO:
-            printf("RADIO_TOGGLE_RADIO %i\n", radio_get_status());
+            ydebug_printf("RADIO_TOGGLE_RADIO %i\n", radio_get_status());
             radio_toggle();
             break;
         case MPD_API_UPDATE_DB:
@@ -269,6 +280,9 @@ static int mpd_notify_callback(struct mg_connection *c) {
             n = mpd_put_current_song(mpd.buf);
             mg_websocket_write(c, 1, mpd.buf, n);
             s->song_id = mpd.song_id;
+
+            n = mpd_get_track_info(mpd.buf);
+            mg_websocket_write(c, 1, mpd.buf, n);
         }
 
         if(s->queue_version != mpd.queue_version)
@@ -332,8 +346,9 @@ void mpd_poll(struct mg_server *s)
             mpd.buf_size = mpd_put_state(mpd.buf, &mpd.song_id, &mpd.queue_version);
             mg_iterate_over_connections(s, mpd_notify_callback, NULL);
             if (queue_is_empty) {
+                ydebug_printf("get random song\n");
                 get_random_song(str, "radio");
-                printf("add random song %s\n", str);
+                ydebug_printf("add random song %s\n", str);
                 mpd_run_add(mpd.conn, str);
                 queue_is_empty = 0;
             }
@@ -358,13 +373,9 @@ char* mpd_get_title(struct mpd_song const *song)
 char* mpd_get_artist(struct mpd_song const *song)
 {
     char *str;
-
     str = (char *)mpd_song_get_tag(song, MPD_TAG_ARTIST, 0);
-    if(str == NULL){
+    if(str == NULL)
         str = basename((char *)mpd_song_get_uri(song));
-    }
-//    printf("%s\n", str);
-
     return str;
 }
 
@@ -374,10 +385,13 @@ char* mpd_get_album(struct mpd_song const *song)
 
     str = (char *)mpd_song_get_tag(song, MPD_TAG_ALBUM, 0);
     if(str == NULL){
-        str = basename((char *)mpd_song_get_uri(song));
+        str = db_get_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
+                mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
+/*        if(str == NULL)
+            str = basename((char *)mpd_song_get_uri(song));*/
     }
-//    printf("%s\n", str);
-
+    if (str)
+        ydebug_printf("%s\n", str);
     return str;
 }
 
@@ -396,6 +410,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     }
 
     song_pos = mpd_status_get_song_pos(status);
+    
     len = snprintf(buffer, MAX_SIZE,
         "{\"type\":\"state\", \"data\":{"
         " \"state\":%d, \"volume\":%d, \"repeat\":%d,"
@@ -423,7 +438,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     if (song_pos+1 == queue_len)
     {
         queue_is_empty = 1;
-        printf("queue is empty\n");
+        ydebug_printf("queue is empty\n");
     }
 
     mpd_status_free(status);
@@ -451,18 +466,49 @@ int mpd_put_current_song(char *buffer)
         cur += json_emit_quoted_str(cur, end - cur, mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
     }
 
-    if(mpd_song_get_tag(song, MPD_TAG_ALBUM, 0) != NULL)
+    if(mpd_get_album(song) != NULL)
     {
         cur += json_emit_raw_str(cur, end - cur, ",\"album\":");
-        cur += json_emit_quoted_str(cur, end - cur, mpd_song_get_tag(song, MPD_TAG_ALBUM, 0));
+        cur += json_emit_quoted_str(cur, end - cur, mpd_get_album(song));
     }
 
     cur += json_emit_raw_str(cur, end - cur, "}}");
 
     db_listen_song(mpd_get_title(song), 
             mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) ? mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) : "", 
-            mpd_song_get_tag(song, MPD_TAG_ALBUM, 0) ? mpd_song_get_tag(song, MPD_TAG_ALBUM, 0) : "");
+            mpd_get_album(song) ? mpd_get_album(song) : "");
 
+    mpd_song_free(song);
+    mpd_response_finish(mpd.conn);
+
+    return cur - buffer;
+}
+
+int mpd_get_track_info(char *buffer)
+{
+    char *cur = buffer;
+    const char *end = buffer + MAX_SIZE;
+    struct mpd_song *song;
+
+    song = mpd_run_current_song(mpd.conn);
+    if(song == NULL)
+        return 0;
+    //TODO: find better criteria to get track info
+    ydebug_printf("get_track_info\n");
+    if(mpd_get_album(song) != NULL)
+        return 0;
+    ydebug_printf("do get_track_info\n");
+    cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"track_info\", \"data\":{\"pos\":");
+    cur += json_emit_int(cur, end - cur, mpd_song_get_pos(song));
+    cur += json_emit_raw_str(cur, end - cur, ",\"title\":");
+    cur += json_emit_quoted_str(cur, end - cur, mpd_get_title(song));
+
+    if(mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) != NULL)
+    {
+        cur += json_emit_raw_str(cur, end - cur, ",\"artist\":");
+        cur += json_emit_quoted_str(cur, end - cur, mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
+    }
+    cur += json_emit_raw_str(cur, end - cur, "}}");
     mpd_song_free(song);
     mpd_response_finish(mpd.conn);
 
@@ -496,8 +542,8 @@ int mpd_put_queue(char *buffer, unsigned int offset)
             cur += json_emit_quoted_str(cur, end - cur, mpd_get_title(song));
             cur += json_emit_raw_str(cur, end - cur, ",\"artist\":");
             cur += json_emit_quoted_str(cur, end - cur, mpd_get_artist(song));
-            cur += json_emit_raw_str(cur, end - cur, ",\"album\":");
-            cur += json_emit_quoted_str(cur, end - cur, mpd_get_album(song));
+//            cur += json_emit_raw_str(cur, end - cur, ",\"album\":");
+//            cur += json_emit_quoted_str(cur, end - cur, mpd_get_album(song)?mpd_get_album(song):"");
             cur += json_emit_raw_str(cur, end - cur, "},");
         }
         mpd_entity_free(entity);
@@ -513,10 +559,11 @@ int mpd_put_queue(char *buffer, unsigned int offset)
 void get_random_song(char *str, char *path)
 {
     struct mpd_entity *entity;
+    int listened0 = 65000;
 
     if (!mpd_send_list_meta(mpd.conn, path))
     {
-        printf("error: mpd_send_list_meta\n");
+        ydebug_printf("error: mpd_send_list_meta\n");
         return;
     }
 
@@ -531,15 +578,16 @@ void get_random_song(char *str, char *path)
             //TODO: make a criteria and pick the song with it
             listened = db_get_song_listened(mpd_get_title(song),
                         mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) ? mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) : "");
-            printf("%i ", listened);
-
-            if (rnd && listened == 0) {
-                sprintf(str, "%s", mpd_song_get_uri(song)); 
+            ydebug_printf("%i", listened);
+            if (rnd && listened < listened0) {
+                sprintf(str, "%s", mpd_song_get_uri(song));
+                ydebug_printf("%i ", listened);
+                listened0 = listened;
             }
         }
         mpd_entity_free(entity);
     }
-    printf("/n");
+    ydebug_printf("\n");
 }
 
 int mpd_put_browse(char *buffer, char *path, unsigned int offset)
@@ -632,7 +680,7 @@ int mpd_random_song()
 
     num_songs = mpd_stats_get_number_of_songs(stats);
     rnd = (int)(rand() % num_songs);
-    printf("num_songs = %i; add %i\n", num_songs, rnd);
+    ydebug_printf("num_songs = %i; add %i\n", num_songs, rnd);
 
     mpd_stats_free(stats);
 
@@ -651,7 +699,7 @@ int mpd_search_one(char *buffer, char *searchstr)
 //        return 0;
 
     rnd = mpd_random_song();
-    printf("%i\n", rnd);
+    ydebug_printf("%i\n", rnd);
 
     if(mpd_search_db_songs(mpd.conn, false) == false)
         return 0; //RETURN_ERROR_AND_RECOVER("mpd_search_db_songs");
@@ -661,12 +709,12 @@ int mpd_search_one(char *buffer, char *searchstr)
         return 0; //RETURN_ERROR_AND_RECOVER("mpd_search_commit");
     else {
         while((song = mpd_recv_song(mpd.conn)) != NULL) {
-            printf("%i ", i);
+            ydebug_printf("%i ", i);
             if (i++ > rnd) {
                 n = snprintf(cur, end - cur, mpd_song_get_uri(song));
                 //mpd_song_free(song);
                 mpd_search_cancel(mpd.conn);
-                printf("add %s\n", cur);
+                ydebug_printf("add %s\n", cur);
                 break;
             }
             mpd_song_free(song);
