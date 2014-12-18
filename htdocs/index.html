@@ -57,6 +57,10 @@
                 padding-left: 0; padding-right: 0;
                 border-radius: 50%;
             }
+            .panel-transparent.panel-default
+            {
+                background: rgba(0,0,0,0.7);
+            }
         </style>
     </head>
     <body class="art-img">
@@ -74,12 +78,14 @@
             </div>
         </div>
         <div class="container">
-            <div>
-                <H2><span id="currenttrack" class="label label-primary">
-                </span></H2>
+            <div class="panel panel-transparent panel-default">
+                <div class="panel-body">
+                    <H2><span id="currenttrack" class="label label-success"></span></H2>
                 <H3><span id="album" class="label label-info"></span>
-                    <span id="artist" class="label label-warning"></span>
-                    <!-- span id="counter" class="label label-warning"></span --></H3>
+                    <span id="artist" class="label label-warning"></span></H3>
+                </div>
+            </div>
+            <div>
                     <button id="floatingBtnLeft" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
                         <span class="glyphicon glyphicon-step-backward"></span>
                     </button>

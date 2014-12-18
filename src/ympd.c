@@ -31,7 +31,7 @@
 #include "mpd_client.h"
 #include "config.h"
 #include "streamripper.h"
-#include "rcar_db.h"
+#include "sqlitedb.h"
 
 #include <mpd/client.h>
 #include "ydebug.h"

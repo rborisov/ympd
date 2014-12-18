@@ -19,7 +19,7 @@
 #ifndef __MPD_CLIENT_H__
 #define __MPD_CLIENT_H__
 
-#include "rcar_db.h"
+//#include "rcar_db.h"
 #include "mongoose.h"
 
 #define RETURN_ERROR_AND_RECOVER(X) do { \

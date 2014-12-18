@@ -373,8 +373,12 @@ function webSocketConnect() {
                                 {
                                     var art_url = lastfm.track.album.image[3]['#text'];
                                     console.log(art_url);
-                                    document.body.style.backgroundImage = "url(" + art_url + ")";
-                                    $('#album').text(lastfm.track.album.title);
+                                    if (art_url) {
+                                        document.body.style.backgroundImage = "url(" + art_url + ")";
+                                    }
+                                    if (lastfm.track.album.title) {
+                                        $('#album').text(lastfm.track.album.title);
+                                    }
                                     socket.send('MPD_API_DB_ALBUM,'+obj.data.title+'*'+obj.data.artist+'*'+
                                         lastfm.track.album.title+'*'+art_url);
                                 });
@@ -392,6 +396,11 @@ function webSocketConnect() {
                     if(obj.data.artist) {
                         $('#artist').text(obj.data.artist);
                         notification += obj.data.artist + "<br />";
+                    }
+
+                    if(obj.data.art) {
+                        console.log(obj.data.art);
+                        document.body.style.backgroundImage = "url(/images/" + obj.data.art + ")";
                     }
 
                     if ($.cookie("notification") === "true")

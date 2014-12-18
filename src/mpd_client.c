@@ -22,12 +22,14 @@
 #include <stdlib.h>
 #include <libgen.h>
 #include <mpd/client.h>
+#include <pwd.h>
+#include <curl/curl.h>
 
 #include "mpd_client.h"
 #include "config.h"
 #include "json_encode.h"
 #include "radio.h"
-#include "rcar_db.h"
+#include "sqlitedb.h"
 
 #include "ydebug.h"
 
@@ -37,6 +39,7 @@ const char * mpd_cmd_strs[] = {
 
 int radio_status = 0;
 static int queue_is_empty = 0;
+char outfn[128];
 
 int mpd_search_one(char *buffer, char *searchstr);
 void get_random_song(char *str, char *path);
@@ -65,6 +68,67 @@ static inline enum mpd_cmd_ids get_cmd_id(char *cmd)
     return -1;
 }
 
+char* download_file(char* url)
+{
+    CURL *curl;
+    FILE *fp;
+    CURLcode res;
+    struct passwd *pw = getpwuid(getuid());
+    char *out, *homedir = pw->pw_dir;
+    curl = curl_easy_init();                                                                                                                              
+    if (curl)
+    {
+        sprintf(outfn, "%s/%s/images/%s", homedir, RCM_DIR_STR, strrchr(url, '/' ));
+        ydebug_printf("%s out_filename: %s\n", __func__, outfn);
+        fp = fopen(outfn,"wb");
+        if (fp) {
+            curl_easy_setopt(curl, CURLOPT_URL, url);
+            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
+            curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+            res = curl_easy_perform(curl);
+            fclose(fp);
+            curl_easy_cleanup(curl);
+            if (res != 0) {
+                ydebug_printf("%s error!\n", __func__);
+                return NULL;
+            }
+        }
+    }
+    out = strrchr(outfn, '/' )+1;
+    ydebug_printf("%s downloaded %s\n", __func__, out);
+
+    return out;
+}
+
+void db_put_album(char* charbuf)
+{
+    char song[128] = "", album[128] = "", artist[128] = "", *art;
+    char *token, *art_str;
+    char *str_copy = strdup(charbuf);
+    
+    token = strsep(&str_copy, "*");
+    if (token)
+        strncpy(song, token, strlen(token));
+    else return; 
+    token = strsep(&str_copy, "*");
+    if (token)
+        strncpy(artist, token, strlen(token));
+    else return;
+    token = strsep(&str_copy, "*");
+    if (token)
+        strncpy(album, token, strlen(token));
+    else return;
+    db_update_song_album(song, artist, album);
+
+    token = strsep(&str_copy, "*");
+    if (token) {
+        art_str = download_file(token);
+        db_update_album_art(artist, album, art_str);
+    }
+
+    free(str_copy);
+}
+
 int callback_mpd(struct mg_connection *c)
 {
     enum mpd_cmd_ids cmd_id = get_cmd_id(c->content);
@@ -87,7 +151,7 @@ int callback_mpd(struct mg_connection *c)
             if(sscanf(c->content, "MPD_API_DB_ALBUM,%m[^\t\n]", 
                         &p_charbuf) && p_charbuf != NULL)
             {
-                db_put_album1(p_charbuf);
+                db_put_album(p_charbuf);
                 free(p_charbuf);
             }
             break;
@@ -346,9 +410,8 @@ void mpd_poll(struct mg_server *s)
             mpd.buf_size = mpd_put_state(mpd.buf, &mpd.song_id, &mpd.queue_version);
             mg_iterate_over_connections(s, mpd_notify_callback, NULL);
             if (queue_is_empty) {
-                ydebug_printf("get random song\n");
                 get_random_song(str, "radio");
-                ydebug_printf("add random song %s\n", str);
+                ydebug_printf("%s: add random song %s\n", __func__, str);
                 mpd_run_add(mpd.conn, str);
                 queue_is_empty = 0;
             }
@@ -385,13 +448,26 @@ char* mpd_get_album(struct mpd_song const *song)
 
     str = (char *)mpd_song_get_tag(song, MPD_TAG_ALBUM, 0);
     if(str == NULL){
-        str = db_get_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
+        ydebug_printf("%s: song %s; artist %s\n", __func__,
+                mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
+                mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
+        str = db_get_song_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
                 mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
 /*        if(str == NULL)
             str = basename((char *)mpd_song_get_uri(song));*/
     }
     if (str)
-        ydebug_printf("%s\n", str);
+        ydebug_printf("%s: %s\n", __func__, str);
+    return str;
+}
+
+char* mpd_get_art(struct mpd_song const *song)
+{
+    char *str = db_get_album_art(mpd_song_get_tag(song, MPD_TAG_ARTIST, 0), 
+            db_get_song_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0), 
+                mpd_song_get_tag(song, MPD_TAG_ARTIST, 0)));
+    if (str)
+        ydebug_printf("%s: %s\n", __func__, str);
     return str;
 }
 
@@ -438,7 +514,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     if (song_pos+1 == queue_len)
     {
         queue_is_empty = 1;
-        ydebug_printf("queue is empty\n");
+        ydebug_printf("%s: queue is empty\n", __func__);
     }
 
     mpd_status_free(status);
@@ -472,11 +548,18 @@ int mpd_put_current_song(char *buffer)
         cur += json_emit_quoted_str(cur, end - cur, mpd_get_album(song));
     }
 
+    if (mpd_get_art(song) != NULL)
+    {
+        printf("%s ART\n", __func__);
+        cur += json_emit_raw_str(cur, end - cur, ",\"art\":");
+        cur += json_emit_quoted_str(cur, end - cur, mpd_get_art(song));
+    }
+
     cur += json_emit_raw_str(cur, end - cur, "}}");
 
     db_listen_song(mpd_get_title(song), 
-            mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) ? mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) : "", 
-            mpd_get_album(song) ? mpd_get_album(song) : "");
+            mpd_song_get_tag(song, MPD_TAG_ARTIST, 0), 
+            mpd_get_album(song));
 
     mpd_song_free(song);
     mpd_response_finish(mpd.conn);
@@ -576,8 +659,8 @@ void get_random_song(char *str, char *path)
             int listened;
             song = mpd_entity_get_song(entity);
             //TODO: make a criteria and pick the song with it
-            listened = db_get_song_listened(mpd_get_title(song),
-                        mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) ? mpd_song_get_tag(song, MPD_TAG_ARTIST, 0) : "");
+            listened = db_get_song_numplayed(mpd_get_title(song),
+                        mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
             ydebug_printf("%i", listened);
             if (rnd && listened < listened0) {
                 sprintf(str, "%s", mpd_song_get_uri(song));
