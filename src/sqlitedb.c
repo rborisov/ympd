@@ -1,8 +1,10 @@
 #include <string.h>
 #include <sqlite3.h>
 #include "sqlitedb.h"
-#include "ydebug.h"
+//#include "ydebug.h"
 #include "sql.h"
+
+#define ydebug_printf printf
 
 sqlite3 *conn;
 char *sqlchar0, *sqlchar1;

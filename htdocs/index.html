@@ -31,24 +31,24 @@
             {
                   position: fixed;
                   z-index: 10000;
-                  top: 50%;
+                  bottom: 49px;
                   left: 4px;
-                  background: rgba(0,0,0,0.5);
+                  background: rgba(0,0,0,0.7);
             }
             #floatingBtnRight
             {
                   position: fixed;
                   z-index: 10000;
-                  top: 50%;
-                  left: 400px;
-                  background: rgba(0,0,0,0.6);
+                  bottom: 4px;
+                  left: 49px;
+                  background: rgba(0,0,0,0.7);
             }
             #floatingBtnCenter
             {
                 position: fixed;
                 z-index: 10000;
-                top: 50%;
-                left: 230px;
+                bottom: 4px;
+                left: 4px;
                 background: rgba(0,0,0,0.7);
             }
             .btn-circle.btn-lg
@@ -59,12 +59,12 @@
             }
             .panel-transparent.panel-default
             {
-                background: rgba(0,0,0,0.7);
+                background: rgba(0,0,0,0.4);
             }
         </style>
     </head>
     <body class="art-img">
-        <div class="navbar navbar-transparent navbar-inverse navbar-fixed-top" role="navigation">
+        <!-- div class="navbar navbar-transparent navbar-inverse navbar-fixed-top" role="navigation">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <div class="navbar-brand" data-toggle="modal" data-target="#control" onclick="getHost();">
@@ -76,25 +76,28 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div -->
         <div class="container">
             <div class="panel panel-transparent panel-default">
                 <div class="panel-body">
-                    <H2><span id="currenttrack" class="label label-success"></span></H2>
-                <H3><span id="album" class="label label-info"></span>
-                    <span id="artist" class="label label-warning"></span></H3>
+                    <H2><span id="currenttrack" class="label label-success pull-right"></span></H2>
+                    <H3><span id="album" class="label label-info pull-right"></span>
+                        <span id="artist" class="label label-warning pull-right"></span>
+                        <span id="counter" class="label label-warning pull-right"></span>
+                    </H3>
                 </div>
             </div>
             <div>
-                    <button id="floatingBtnLeft" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
-                        <span class="glyphicon glyphicon-step-backward"></span>
-                    </button>
-                    <button id="floatingBtnRight" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_NEXT');">
-                        <span class="glyphicon glyphicon-step-forward"></span>
-                    </button>
-                    <button id="floatingBtnCenter" class="btn btn-circle btn-lg" onclick="clickPlay();">
-                        <span id="play-icon" class="glyphicon glyphicon-pause"></span>
-                    </button>
+                <button id="floatingBtnLeft" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
+                    <span class="glyphicon glyphicon-step-backward"></span>
+                </button>
+                <button id="floatingBtnRight" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_NEXT');">
+                    <span class="glyphicon glyphicon-step-forward"></span>
+                </button>
+                <button id="floatingBtnCenter" class="btn btn-circle btn-lg" onclick="clickPlay();">
+                    <span id="play-icon" class="glyphicon glyphicon-pause"></span>
+                </button>
+            </div>
             <!-- Table -->
             <table id="salamisandwich" class="table table-hover">
                 <thead>
@@ -104,7 +107,7 @@
                 <tbody>
                 </tbody>
             </table>
-            <div class="notifications top-right"></div>
+            <div class="notifications top-right panel-transparent"></div>
             </div>
         </div>
 

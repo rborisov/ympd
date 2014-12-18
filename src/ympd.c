@@ -34,7 +34,7 @@
 #include "sqlitedb.h"
 
 #include <mpd/client.h>
-#include "ydebug.h"
+//#include "ydebug.h"
 
 extern char *optarg;
 
@@ -74,7 +74,7 @@ int main(int argc, char **argv)
     struct passwd *pw = getpwuid(getuid());
     char *homedir = pw->pw_dir;
 
-    ydebug_enable();
+    //ydebug_enable();
 
     sprintf(config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
     printf("conf = %s\n", config_file_name);

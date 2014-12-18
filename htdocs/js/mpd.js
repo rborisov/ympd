@@ -371,16 +371,23 @@ function webSocketConnect() {
                                 "&autocorrect=1&api_key=ecb4076a85c81aae38a7e8f11e42a0b1&format=json&callback=",
                                 function(lastfm)
                                 {
-                                    var art_url = lastfm.track.album.image[3]['#text'];
-                                    console.log(art_url);
-                                    if (art_url) {
-                                        document.body.style.backgroundImage = "url(" + art_url + ")";
+                                    var art_url;
+                                    if (lastfm && lastfm.track && lastfm.track.album) {
+                                        if (lastfm.track.album.image) {
+                                            art_url = lastfm.track.album.image[3]['#text'];
+                                            console.log(art_url);
+                                            document.body.style.backgroundImage = "url(" + art_url + ")";
+                                            socket.send('MPD_API_DB_ALBUM,'+obj.data.title+'*'+obj.data.artist+'*'+
+                                                lastfm.track.album.title+'*'+art_url);
+                                        } else {
+                                            document.body.style.backgroundImage = "url(images/art.jpg)"
+                                        }
+                                        if (lastfm.track.album.title) {
+                                            $('#album').text(lastfm.track.album.title);
+                                        } else {
+                                            $('#album').text("");
+                                        }
                                     }
-                                    if (lastfm.track.album.title) {
-                                        $('#album').text(lastfm.track.album.title);
-                                    }
-                                    socket.send('MPD_API_DB_ALBUM,'+obj.data.title+'*'+obj.data.artist+'*'+
-                                        lastfm.track.album.title+'*'+art_url);
                                 });
                     }
                     break;

@@ -22,7 +22,9 @@
 #include "sql.h"
 //#include "upnpglobalvars.h"
 //#include "log.h"
-#include "ydebug.h"
+//#include "ydebug.h"
+
+#define ydebug_printf printf
 
 int
 sql_exec(sqlite3 *db, const char *fmt, ...)

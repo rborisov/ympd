@@ -31,7 +31,9 @@
 #include "radio.h"
 #include "sqlitedb.h"
 
-#include "ydebug.h"
+//#include "ydebug.h"
+
+#define ydebug_printf printf
 
 const char * mpd_cmd_strs[] = {
     MPD_CMDS(GEN_STR)
@@ -511,7 +513,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
 
     queue_len = mpd_status_get_queue_length(status);
 
-    if (song_pos+1 == queue_len)
+    if (song_pos+1 >= queue_len)
     {
         queue_is_empty = 1;
         ydebug_printf("%s: queue is empty\n", __func__);
