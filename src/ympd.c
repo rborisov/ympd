@@ -115,6 +115,7 @@ int main(int argc, char **argv)
     setstream_streamripper(radio_url);
     setpath_streamuri(radio_path);
     init_streamripper();
+    mpd.radio_status = 1;
     printf("init_streamripper\n");
 //    start_streamripper();
     
@@ -127,14 +128,15 @@ int main(int argc, char **argv)
         {
             last_timer = current_timer;
             mpd_poll(server);
-            if (poll_streamripper(radio_song_name))
-            {
-                sprintf(radio_added_song, "%s%s", "radio/", radio_song_name);
-                printf("%s\n", radio_added_song);
-                mpd_run_update(mpd.conn, radio_added_song);
-                sleep(1);
-                mpd_run_add(mpd.conn, radio_added_song);
-            }
+            if (mpd.radio_status == 1)
+                if (poll_streamripper(radio_song_name))
+                {
+                    sprintf(radio_added_song, "%s%s", "radio/", radio_song_name);
+                    printf("%s\n", radio_added_song);
+                    mpd_run_update(mpd.conn, radio_added_song);
+                    sleep(1);
+                    mpd_run_add(mpd.conn, radio_added_song);
+                }
         }
     }
 

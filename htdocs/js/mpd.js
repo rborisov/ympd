@@ -295,7 +295,8 @@ function webSocketConnect() {
                     updatePlayIcon(obj.data.state);
                     updateVolumeIcon(obj.data.volume);
                     updateRadioIcon(obj.data.radio_status);
-//                    console.log(obj.data.radio_status);
+                    updateRandomIcon(obj.data.random);
+                    //console.log(obj.data.radio_status);
 
                     if(JSON.stringify(obj) === JSON.stringify(last_state))
                         break;
@@ -319,11 +320,6 @@ function webSocketConnect() {
 
                     $('#salamisandwich > tbody > tr').removeClass('active').css("font-weight", "");
                     $('#salamisandwich > tbody > tr[trackid='+obj.data.currentsongid+']').addClass('active').css("font-weight", "bold");
-
-                    if(obj.data.radio)
-                        $('#btnradio').addClass("active")
-                    else
-                        $('#btnradio').removeClass("active");
 
                     if(obj.data.random)
                         $('#btnrandom').addClass("active")
@@ -372,21 +368,26 @@ function webSocketConnect() {
                                 function(lastfm)
                                 {
                                     var art_url;
+                                    var artimage = document.getElementById("artimage");
                                     if (lastfm && lastfm.track && lastfm.track.album) {
                                         if (lastfm.track.album.image) {
-                                            art_url = lastfm.track.album.image[3]['#text'];
+                                            art_url = lastfm.track.album.image[1]['#text'];
                                             console.log(art_url);
-                                            document.body.style.backgroundImage = "url(" + art_url + ")";
-                                            socket.send('MPD_API_DB_ALBUM,'+obj.data.title+'*'+obj.data.artist+'*'+
-                                                lastfm.track.album.title+'*'+art_url);
+                                            artimage.src = art_url;
                                         } else {
-                                            document.body.style.backgroundImage = "url(images/art.jpg)"
+                                            artimage.src = "/images/art.jpg";
                                         }
                                         if (lastfm.track.album.title) {
                                             $('#album').text(lastfm.track.album.title);
                                         } else {
                                             $('#album').text("");
                                         }
+                                        if (lastfm.track.album) {
+                                            socket.send('MPD_API_DB_ALBUM,'+obj.data.title+'*'+obj.data.artist+'*'+
+                                                    lastfm.track.album.title+'*'+art_url);
+                                        }
+                                    } else {
+                                        console.log("there is no track info");
                                     }
                                 });
                     }
@@ -398,16 +399,19 @@ function webSocketConnect() {
                     if(obj.data.album) {
                         $('#album').text(obj.data.album);
                         notification += obj.data.album + "<br />";
-                    } 
+                    } else
+                       $('#album').text(""); 
 
                     if(obj.data.artist) {
                         $('#artist').text(obj.data.artist);
                         notification += obj.data.artist + "<br />";
-                    }
+                    } else
+                        $('#artist').text("");
 
                     if(obj.data.art) {
                         console.log(obj.data.art);
-                        document.body.style.backgroundImage = "url(/images/" + obj.data.art + ")";
+                        var art_url = "/images/"+obj.data.art;
+                        document.getElementById("artimage").src = art_url;
                     }
 
                     if ($.cookie("notification") === "true")
@@ -516,9 +520,22 @@ var updatePlayIcon = function(state)
 
 var updateRadioIcon = function(radio_status)
 {
-    $('radio-icon').removeClass("glyphicon-cloud-download");
+    $("#radio-icon").removeClass("glyphicon-cloud-download")
+    .removeClass("glyphicon-hdd");
     if (radio_status == 1) { //on
-        $('#radio-icon').addClass("glyphicon-cloud-download");
+        $("#radio-icon").addClass("glyphicon-cloud-download");
+    } else
+    {
+        $("#radio-icon").addClass("glyphicon-hdd");
+    }
+}
+
+var updateRandomIcon = function(random)
+{
+    if (random == 1) {
+        $("#random-icon").addClass('active');
+    } else {
+        $("#random-icon").removeClass('active');
     }
 }
 
@@ -534,6 +551,10 @@ function clickPlay() {
         socket.send('MPD_API_SET_PLAY');
     else
         socket.send('MPD_API_SET_PAUSE');
+}
+
+function clickRandom() {
+    socket.send("MPD_API_TOGGLE_RANDOM," + ($("#random-icon").hasClass('active') ? 0 : 1));
 }
 
 function basename(path) {

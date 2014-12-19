@@ -62,7 +62,7 @@
     X(MPD_API_TOGGLE_CONSUME) \
     X(MPD_API_TOGGLE_SINGLE) \
     X(MPD_API_TOGGLE_REPEAT) \
-    X(RADIO_TOGGLE_RADIO) \
+    X(MPD_API_TOGGLE_RADIO) \
     X(MPD_API_DB_ALBUM) \
     X(MPD_API_DB_ALBUM_ART)
 
@@ -93,7 +93,7 @@ struct t_mpd {
     int song_id;
     unsigned queue_version;
 
-    //MYSQL db_conn;
+    int radio_status;
 } mpd;
 
 struct t_mpd_client_session {

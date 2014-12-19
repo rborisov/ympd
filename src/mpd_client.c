@@ -30,6 +30,7 @@
 #include "json_encode.h"
 #include "radio.h"
 #include "sqlitedb.h"
+#include "streamripper.h"
 
 //#include "ydebug.h"
 
@@ -39,7 +40,7 @@ const char * mpd_cmd_strs[] = {
     MPD_CMDS(GEN_STR)
 };
 
-int radio_status = 0;
+//int radio_status = 0;
 static int queue_is_empty = 0;
 char outfn[128];
 
@@ -47,18 +48,30 @@ int mpd_search_one(char *buffer, char *searchstr);
 void get_random_song(char *str, char *path);
 int mpd_get_track_info(char *buffer);
 
+void start_radio()
+{
+    init_streamripper();
+    mpd.radio_status = 1;
+}
+
+void stop_radio()
+{
+    stop_streamripper();
+    mpd.radio_status = 0;
+}
+
 int radio_toggle()
 {
-    if (radio_status == 0)
-        radio_status = 1;
+    if (mpd.radio_status == 0)
+        start_radio();
     else
-        radio_status = 0;
-    return radio_status;
+        stop_radio();
+    return mpd.radio_status;
 }
 
 int radio_get_status()
 {
-    return radio_status;
+    return mpd.radio_status;
 }
 
 static inline enum mpd_cmd_ids get_cmd_id(char *cmd)
@@ -157,7 +170,7 @@ int callback_mpd(struct mg_connection *c)
                 free(p_charbuf);
             }
             break;
-        case RADIO_TOGGLE_RADIO:
+        case MPD_API_TOGGLE_RADIO:
             ydebug_printf("RADIO_TOGGLE_RADIO %i\n", radio_get_status());
             radio_toggle();
             break;

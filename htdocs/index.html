@@ -27,33 +27,73 @@
             html { 
                 overflow: hidden;
             }
-            #floatingBtnLeft
+            #floatingTop1Left
             {
                   position: fixed;
                   z-index: 10000;
-                  bottom: 49px;
+                  top: 59px;
                   left: 4px;
                   background: rgba(0,0,0,0.7);
             }
-            #floatingBtnRight
+            #floatingTopLeft1
             {
                   position: fixed;
                   z-index: 10000;
-                  bottom: 4px;
+                  top: 4px;
                   left: 49px;
                   background: rgba(0,0,0,0.7);
             }
-            #floatingBtnCenter
+            #floatingTopLeft2
+            {
+                position: fixed;
+                z-index: 10000;
+                top: 4px;
+                left: 104px;
+                background: rgba(0,0,0,0.7);
+            }
+
+            #floatingTopLeft
+            {
+                position: fixed;
+                z-index: 10000;
+                top: 4px;
+                left: 4px;
+                background: rgba(0,0,0,0.7);
+            }
+            #floatingBottomRight
             {
                 position: fixed;
                 z-index: 10000;
                 bottom: 4px;
-                left: 4px;
+                right: 4px;
                 background: rgba(0,0,0,0.7);
             }
+            #floatingBottomRight1
+            {
+                position: fixed;
+                z-index: 10000;
+                bottom: 4px;
+                right: 59px;
+                background: rgba(0,0,0,0.7);
+            }
+            #floatingBottom1Right
+            {
+                position: fixed;
+                z-index: 10000;
+                bottom: 59px;
+                right: 4px;
+                background: rgba(0,0,0,0.7);
+            }
+
             .btn-circle.btn-lg
             {
                 height: 45px; width: 45px;
+                padding-left: 0; padding-right: 0;
+                border-radius: 50%;
+            }
+            .btn-play.btn-lg
+            {
+                height: 65px; width: 65px;
                 padding-left: 0; padding-right: 0;
                 border-radius: 50%;
             }
@@ -64,38 +104,37 @@
         </style>
     </head>
     <body class="art-img">
-        <!-- div class="navbar navbar-transparent navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <div class="navbar-brand" data-toggle="modal" data-target="#control" onclick="getHost();">
-                        <span id="track-icon" class="glyphicon glyphicon-play"></span>
-                        <span id="volume-icon" class="glyphicon glyphicon-volume-down"></span>
-                        <span id="radio-icon" class="glyphicon"></span>
-                        <span id="counter" class="label label-warning">
-                        </span>
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-4">
+                    <div class="thumbnail">
+                        <img src="/images/art.jpg" width="100" height="100" id="artimage"></img>
                     </div>
                 </div>
-            </div>
-        </div -->
-        <div class="container">
-            <div class="panel panel-transparent panel-default">
-                <div class="panel-body">
-                    <H2><span id="currenttrack" class="label label-success pull-right"></span></H2>
-                    <H3><span id="album" class="label label-info pull-right"></span>
-                        <span id="artist" class="label label-warning pull-right"></span>
-                        <span id="counter" class="label label-warning pull-right"></span>
+                <div class="col-xs-8">
+                    <H3><span id="counter" class="badge"></span>
+                        <span id="currenttrack" class="label label-success"></span>
                     </H3>
+                    <H4><span id="artist" class="label label-warning"></span>
+                        <span id="album" class="label label-info"></span>
+                    </H4>
                 </div>
             </div>
             <div>
-                <button id="floatingBtnLeft" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
+                <button id="floatingBottomRight1" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
                     <span class="glyphicon glyphicon-step-backward"></span>
                 </button>
-                <button id="floatingBtnRight" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_NEXT');">
+                <button id="floatingBottom1Right" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_SET_NEXT');">
                     <span class="glyphicon glyphicon-step-forward"></span>
                 </button>
-                <button id="floatingBtnCenter" class="btn btn-circle btn-lg" onclick="clickPlay();">
+                <button id="floatingBottomRight" class="btn btn-play btn-lg" onclick="clickPlay();">
                     <span id="play-icon" class="glyphicon glyphicon-pause"></span>
+                </button>
+                <button id="floatingTopLeft" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
+                    <span id="radio-icon" class="glyphicon glyphicon-cloud-download"></span>
+                </button>
+                <button id="floatingTopLeft1" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_TOGGLE_RANDOM');">
+                    <span id="random-icon" class="glyphicon glyphicon-random"></span>
                 </button>
             </div>
             <!-- Table -->
