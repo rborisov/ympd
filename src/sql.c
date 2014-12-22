@@ -38,7 +38,7 @@ sql_exec(sqlite3 *db, const char *fmt, ...)
 	va_start(ap, fmt);
 	sql = sqlite3_vmprintf(fmt, ap);
 	va_end(ap);
-    ydebug_printf("%s SQL: %s\n", __func__, sql);
+//    ydebug_printf("%s SQL: %s\n", __func__, sql);
 	
     ret = sqlite3_exec(db, sql, 0, 0, &errMsg);
 	if( ret != SQLITE_OK )
@@ -59,7 +59,7 @@ sql_get_table(sqlite3 *db, const char *sql, char ***pazResult, int *pnRow, int *
 	int ret;
 	char *errMsg = NULL;
 	//DPRINTF(E_DEBUG, L_DB_SQL, "SQL: %s\n", sql);
-    ydebug_printf("%s SQL: %s\n", __func__, sql);
+//    ydebug_printf("%s SQL: %s\n", __func__, sql);
 	
 	ret = sqlite3_get_table(db, sql, pazResult, pnRow, pnColumn, &errMsg);
 	if( ret != SQLITE_OK )
@@ -87,7 +87,7 @@ sql_get_int_field(sqlite3 *db, const char *fmt, ...)
 	va_end(ap);
 
 	//DPRINTF(E_DEBUG, L_DB_SQL, "sql: %s\n", sql);
-    ydebug_printf("%s sql: %s\n", __func__, sql);
+//    ydebug_printf("%s sql: %s\n", __func__, sql);
 
 	switch (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL))
 	{
@@ -149,7 +149,7 @@ sql_get_int64_field(sqlite3 *db, const char *fmt, ...)
 	va_end(ap);
 
 	//DPRINTF(E_DEBUG, L_DB_SQL, "sql: %s\n", sql);
-    ydebug_printf("%s sql: %s\n", __func__, sql);
+//    ydebug_printf("%s sql: %s\n", __func__, sql);
 
 	switch (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL))
 	{
@@ -218,7 +218,7 @@ sql_get_text_field(sqlite3 *db, const char *fmt, ...)
 	va_end(ap);
 
 	//DPRINTF(E_DEBUG, L_DB_SQL, "sql: %s\n", sql);
-    ydebug_printf("%s sql: %s\n", __func__, sql);
+//    ydebug_printf("%s sql: %s\n", __func__, sql);
 
 	switch (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL))
 	{

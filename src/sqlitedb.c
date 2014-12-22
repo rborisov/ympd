@@ -16,7 +16,6 @@ void convert_str(char *instr)
 
     if (!instr)
         return;
-//    printf("%s\n", instr);
 
     while (*out) {
         if (*out == '\'')
@@ -24,9 +23,6 @@ void convert_str(char *instr)
         out++;
     }
     *out = '\0';
-
-//    printf("%s\n", instr);
-
 }
 
 int db_init()
@@ -87,8 +83,8 @@ int db_get_album_id(char* artist, char* album)
  */
 char* db_get_song_album(char* song, char* artist)
 {
-        convert_str(song);
-            convert_str(artist);
+    convert_str(song);
+    convert_str(artist);
 
     sqlite3_free(sqlchar0);
     sqlchar0 = sql_get_text_field(conn, "SELECT album FROM Songs WHERE "
@@ -120,13 +116,13 @@ int db_update_song_album(char* song, char* artist, char* album)
     int rc = 0;
     if (album)
     {
-    convert_str(artist);
-    convert_str(song);
-    convert_str(album);
-    ydebug_printf("%s update %s album...\n", __func__, album);
+        convert_str(artist);
+        convert_str(song);
+        convert_str(album);
+        ydebug_printf("%s update %s album...\n", __func__, album);
         if (sql_exec(conn, "UPDATE Songs SET album = '%s' WHERE song = '%s' AND artist = '%s'", 
                     album, song, artist) == SQLITE_OK)
-                        rc = 1;
+            rc = 1;
     }
     return rc;
 }

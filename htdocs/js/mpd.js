@@ -19,19 +19,18 @@
 var socket;
 var last_state;
 var current_app;
-var pagination = 0;
+var pagination = 0; //TODO: differnet pagination for different lists
 var browsepath;
 var lastSongTitle = "";
 var current_song = new Object();
-var MAX_ELEMENTS_PER_PAGE = 512;
+var MAX_ELEMENTS_PER_PAGE = 5;
 
 var app = $.sammy(function() {
-
     function runBrowse() {
         current_app = 'queue';
 
         $('#breadcrump').addClass('hide');
-        $('#salamisandwich').find("tr:gt(0)").remove();
+        $('#cocacola').find("tr:gt(0)").remove();
         socket.send('MPD_API_GET_QUEUE,'+pagination);
 
         $('#panel-heading').text("Queue");
@@ -75,7 +74,7 @@ var app = $.sammy(function() {
         });
         $('#browse').addClass('active');
     });
-
+/*
     this.get(/\#\/search\/(.*)/, function() {
         current_app = 'search';
         $('#salamisandwich').find("tr:gt(0)").remove();
@@ -86,7 +85,7 @@ var app = $.sammy(function() {
 
         $('#panel-heading').text("Search: "+searchstr);
     });
-
+*/
     this.get("/", function(context) {
         context.redirect("#/0");
     });
@@ -137,69 +136,67 @@ function webSocketConnect() {
                 return;
 
             var obj = JSON.parse(msg.data);
-//            console.log(obj.type); 
+//            console.log(obj.type);
+//            console.log(current_app);
             switch (obj.type) {
+                case "radio":
+                    if(current_app !== 'radio')
+                        break;
+
+                    break;
                 case "queue":
                     if(current_app !== 'queue')
                         break;
-                    
-                    $('#salamisandwich > tbody').empty();
-                    for (var song in obj.data) {
-                        if (obj.data[song].id > current_song.currentSongId || obj.data.random) {
-                            var minutes = Math.floor(obj.data[song].duration / 60);
-                            var seconds = obj.data[song].duration - minutes * 60;
 
-/*                            $('#salamisandwich > tbody').append(
-                                    "<tr trackid=\"" + obj.data[song].id + "\"><td>" + (obj.data[song].pos + 1) + "</td>" +
-                                    "<td>"+ obj.data[song].title +"</td>" + 
-                                    "<td>"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
-                                    "</td><td></td></tr>");*/
-                            $('#salamisandwich > tbody').append(
-                                    "<p>"+
-                                   "<span class=\"label label-primary\">" + obj.data[song].title + "</span>" +
-                                    "<span class=\"label label-warning\">" + obj.data[song].artist + "</span>"+
-                                   "<span class=\"label label-info\">" + obj.data[song].album + "</span></p>"
-                                    );
-                        }
+                    $('#cocacola > tbody').empty();
+                    for (var song in obj.data) {
+                        var minutes = Math.floor(obj.data[song].duration / 60);
+                        var seconds = obj.data[song].duration - minutes * 60;
+
+                        $('#cocacola > tbody').append(
+                                "<tr trackid=\"" + obj.data[song].id + "\"><td><span class=\"badge\">" + (obj.data[song].pos + 1) + "</span></td>" +
+                                "<td><span class=\"label label-success\">"+ obj.data[song].title +"</span></td>" + 
+                                "<td><span class=\"badge\">"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
+                                "</span></td><td></td></tr>");
                     }
 
-/*                    if(obj.data[obj.data.length-1].pos + 1 >= pagination + MAX_ELEMENTS_PER_PAGE)
+                    if(obj.data[obj.data.length-1].pos + 1 >= pagination + MAX_ELEMENTS_PER_PAGE)
                         $('#next').removeClass('hide');
                     if(pagination > 0)
-                        $('#prev').removeClass('hide');*/
+                        $('#prev').removeClass('hide');
 
-/*                    $('#salamisandwich > tbody > tr').on({
+                    $('#cocacola > tbody > tr').on({
                         mouseover: function(){
                             if($(this).children().last().has("a").length == 0)
-                                $(this).children().last().append(
-                                    "<a class=\"pull-right btn-group-hover\" href=\"#/\" " +
-                                        "onclick=\"socket.send('MPD_API_RM_TRACK," + $(this).attr("trackid") +"'); $(this).parents('tr').remove();\">" +
-                                "<span class=\"glyphicon glyphicon-trash\"></span></a>")
-                            .find('a').fadeTo('fast',1);
+                        $(this).children().last().append(
+                            "<a class=\"pull-right btn-group-hover\" href=\"#/\" " +
+                            "onclick=\"socket.send('MPD_API_RM_TRACK," + $(this).attr("trackid") +"'); $(this).parents('tr').remove();\">" +
+                            "<span class=\"glyphicon glyphicon-trash\"></span></a>")
+                        .find('a').fadeTo('fast',1);
                         },
                         click: function() {
-                            $('#salamisandwich > tbody > tr').removeClass('active');
+                            $('#cocacola > tbody > tr').removeClass('active');
                             socket.send('MPD_API_PLAY_TRACK,'+$(this).attr('trackid'));
                             $(this).addClass('active');
                         },
                         mouseleave: function(){
                             $(this).children().last().find("a").stop().remove();
                         }
-                    });*/
+                    });
                     break;
                 case "search":
                     $('#wait').modal('hide');
                 case "browse":
                     if(current_app !== 'browse' && current_app !== 'search')
                         break;
-
+                    console.log('browse');
                     for (var item in obj.data) {
                         switch(obj.data[item].type) {
                             case "directory":
                                 $('#salamisandwich > tbody').append(
                                     "<tr uri=\"" + obj.data[item].dir + "\" class=\"dir\">" +
                                     "<td><span class=\"glyphicon glyphicon-folder-open\"></span></td>" + 
-                                    "<td><a>" + basename(obj.data[item].dir) + "</a></td>" + 
+                                    "<td><a><span class=\"label label-default\">" + basename(obj.data[item].dir) + "</span></a></td>" + 
                                     "<td></td><td></td></tr>"
                                 );
                                 break;
@@ -217,10 +214,11 @@ function webSocketConnect() {
 
                                 $('#salamisandwich > tbody').append(
                                     "<tr uri=\"" + obj.data[item].uri + "\" class=\"song\">" +
-                                    "<td><span class=\"glyphicon glyphicon-music\"></span></td>" + 
-                                    "<td>" + obj.data[item].title +"</td>" + 
-                                    "<td>"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
-                                    "</td><td></td></tr>"
+                            //        "<td><span class=\"glyphicon glyphicon-music\"></span></td>" + 
+                                    //"<td><span class=\"label label-success\">" + obj.data[item].title +"</span></td>" + 
+                                    "<td><button type=\"button\" class=\"btn btn-default\">" + obj.data[item].title +"</button></td>" +
+                                    "<td><span class=\"badge\">"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
+                                    "</span></td><td></td></tr>"
                                 );
                                 break;
                             case "wrap":
@@ -354,10 +352,10 @@ function webSocketConnect() {
                 case "update_queue":
                     if(current_app === 'queue') {
                         socket.send('MPD_API_GET_QUEUE,'+pagination);
-                        $('.top-right').notify({
+                        /*$('.top-right').notify({
                             message:{html: "Update Queue"},
                             type: "info",
-                        }).show();
+                        }).show();*/
                     }
                     break;
                 case "track_info":
@@ -532,10 +530,11 @@ var updateRadioIcon = function(radio_status)
 
 var updateRandomIcon = function(random)
 {
-    if (random == 1) {
-        $("#random-icon").addClass('active');
+    $("#random-icon").removeClass('gray');
+    if (random == 0) {
+        $("#random-icon").addClass('gray');
     } else {
-        $("#random-icon").removeClass('active');
+        $("#random-icon").removeClass('gray');
     }
 }
 
@@ -554,7 +553,7 @@ function clickPlay() {
 }
 
 function clickRandom() {
-    socket.send("MPD_API_TOGGLE_RANDOM," + ($("#random-icon").hasClass('active') ? 0 : 1));
+    socket.send("MPD_API_TOGGLE_RANDOM," + ($("#random-icon").hasClass('gray') ? 1 : 0));
 }
 
 function basename(path) {
@@ -597,6 +596,27 @@ $('#btnnotify').on('click', function (e) {
     }
 });
 
+function prepare() {
+    $('#nav_links > li').removeClass('active');
+    $('.page-btn').addClass('hide');
+    pagination = 0;
+    browsepath = '';
+}
+
+function getRadio() {
+    console.log('get list of radio stations');
+    socket.send('MPD_API_GET_RADIO,'+pagination);
+}
+
+function getQueue() {
+    console.log('get queue');
+    app.setLocation('#/'+pagination);
+}
+function getBrowse() {
+    console.log('get browse mpd database');
+    app.setLocation('#/browse/'+pagination+'/'+browsepath);
+}
+        
 function getHost() {
     socket.send('MPD_API_GET_MPDHOST');
 

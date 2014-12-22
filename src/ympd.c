@@ -23,7 +23,7 @@
 #include <getopt.h>
 #include <sys/time.h>
 #include <pthread.h>
-#include <libconfig.h>
+//#include <libconfig.h>
 #include <pwd.h>
 
 #include "mongoose.h"
@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     const char *radio_path = NULL;
     char *radio_url = NULL;
     char radio_added_song[512];
-    config_t cfg;
+//    config_t cfg;
     config_setting_t *settings;
     char config_file_name[512];
     struct passwd *pw = getpwuid(getuid());
@@ -84,15 +84,15 @@ int main(int argc, char **argv)
     mpd.port = 6600;
     strcpy(mpd.host, "127.0.0.1");
 
-    config_init(&cfg);
-    if(! config_read_file(&cfg, config_file_name))
+    config_init(&mpd.cfg);
+    if(! config_read_file(&mpd.cfg, config_file_name))
     {
-        printf("config file error %s:%d - %s\n", config_error_file(&cfg),
-                config_error_line(&cfg), config_error_text(&cfg));
-        config_destroy(&cfg);
+        printf("config file error %s:%d - %s\n", config_error_file(&mpd.cfg),
+                config_error_line(&mpd.cfg), config_error_text(&mpd.cfg));
+        config_destroy(&mpd.cfg);
         return(EXIT_FAILURE);
     }
-    if (!config_lookup_string(&cfg, "application.radio_path", &radio_path))
+    if (!config_lookup_string(&mpd.cfg, "application.radio_path", &radio_path))
     {
         fprintf(stderr, "No 'radio_path' setting in configuration file.\n");
     }
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
         free(run_as_user);
     }
 
-    if (!config_lookup_string(&cfg, "streamripper.url", &radio_url))
+    if (!config_lookup_string(&mpd.cfg, "streamripper.url", &radio_url))
     {
         fprintf(stderr, "No 'radio_url' setting in configuration file.\n");
     }
@@ -145,7 +145,7 @@ int main(int argc, char **argv)
     mpd_disconnect();
     mg_destroy_server(&server);
 
-    config_destroy(&cfg);
+    config_destroy(&mpd.cfg);
 
     return EXIT_SUCCESS;
 }

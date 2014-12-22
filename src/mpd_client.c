@@ -231,6 +231,10 @@ int callback_mpd(struct mg_connection *c)
             if(sscanf(c->content, "MPD_API_GET_QUEUE,%u", &uint_buf))
                 n = mpd_put_queue(mpd.buf, uint_buf);
             break;
+        case MPD_API_GET_RADIO:
+            if(sscanf(c->content, "MPD_API_GET_RADIO,%u", &uint_buf))
+                n = mpd_put_radio(mpd.buf, uint_buf);
+            break;
         case MPD_API_GET_BROWSE:
             if(sscanf(c->content, "MPD_API_GET_BROWSE,%u,%m[^\t\n]", &uint_buf, &p_charbuf) && p_charbuf != NULL)
             {
@@ -609,6 +613,36 @@ int mpd_get_track_info(char *buffer)
     cur += json_emit_raw_str(cur, end - cur, "}}");
     mpd_song_free(song);
     mpd_response_finish(mpd.conn);
+
+    return cur - buffer;
+}
+
+int mpd_put_radio(char *buffer, unsigned int offset)
+{
+    char *cur = buffer;
+    const char *end = buffer + MAX_SIZE;
+    config_setting_t *setting;
+
+    setting = config_lookup(&mpd.cfg, "radio.station");
+    if(setting != NULL)
+    {
+        int count = config_setting_length(setting);
+        int i;
+        for(i = 0; i < count; ++i)
+        {
+            config_setting_t *station = config_setting_get_elem(setting, i);
+
+            /* Only output the record if all of the expected fields are present. */
+            const char *name, *url;
+
+            if(!(config_setting_lookup_string(station, "name", &name)
+                && config_setting_lookup_string(station, "url", &url)))
+                    continue;
+            printf("%-30s  %-30s\n", name, url);
+        }
+
+        putchar('\n');
+    }
 
     return cur - buffer;
 }
