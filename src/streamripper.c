@@ -52,7 +52,7 @@ void streamripper_set_url_dest(char* dest)
          *music_path = NULL,
          *radio_path = NULL,
          *radio_url = NULL;
-    config_setting_t *setting;
+    config_setting_t *root, *setting;
 
     if (!(&mpd.cfg)) {
         fprintf(stderr, "%s: mpd is NULL\n", __func__);
@@ -76,6 +76,21 @@ void streamripper_set_url_dest(char* dest)
             return;
         }
     } //TODO: else set new current radio to cfg
+    else {
+        root = config_root_setting(&mpd.cfg);
+        setting = config_setting_get_member(root, "radio");
+        if (setting) {
+            int ret = config_setting_remove(setting, "current");
+            if (ret == CONFIG_TRUE) {
+                config_setting_t *current = config_setting_add(setting, "current", CONFIG_TYPE_STRING);
+                config_setting_set_string(current, radio_dest);
+                if(! config_write_file(&mpd.cfg, mpd.config_file_name))
+                {
+                    fprintf(stderr, "%s: Error while writing file.\n", __func__);
+                }
+            }
+        }
+    }
     
     setting = config_lookup(&mpd.cfg, "radio.station");
     if(setting != NULL)

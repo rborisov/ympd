@@ -98,6 +98,7 @@ struct t_mpd {
     int radio_status;
 
     config_t cfg;
+    char config_file_name[512];
 } mpd;
 
 struct t_mpd_client_session {

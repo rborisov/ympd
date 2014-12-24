@@ -70,12 +70,12 @@ int main(int argc, char **argv)
           *radio_url = NULL,
           *radio_dest = NULL;
     char chrbuff[512] = "";
-    char config_file_name[512] = "";
+//    char config_file_name[512] = "";
     struct passwd *pw = getpwuid(getuid());
     char *homedir = pw->pw_dir;
 
-    sprintf(config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
-    printf("conf = %s\n", config_file_name);
+    sprintf(mpd.config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
+    printf("conf = %s\n", mpd.config_file_name);
 
     atexit(bye);
     mg_set_option(server, "listening_port", "8080");
@@ -83,7 +83,7 @@ int main(int argc, char **argv)
     strcpy(mpd.host, "127.0.0.1");
 
     config_init(&mpd.cfg);
-    if(! config_read_file(&mpd.cfg, config_file_name))
+    if(! config_read_file(&mpd.cfg, mpd.config_file_name))
     {
         printf("config file error %s:%d - %s\n", config_error_file(&mpd.cfg),
                 config_error_line(&mpd.cfg), config_error_text(&mpd.cfg));
