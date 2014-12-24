@@ -746,7 +746,7 @@ void get_random_song(char *str, char *path)
             song = mpd_entity_get_song(entity);
             //TODO: make a criteria and pick the song with it
             listened = db_get_song_numplayed(mpd_get_title(song),
-                        mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
+                        mpd_get_artist(song));
             ydebug_printf("%i", listened);
             if (rnd && listened < listened0) {
                 sprintf(str, "%s", mpd_song_get_uri(song));

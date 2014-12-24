@@ -1,3 +1,16 @@
+cloned ympd was reworked to be a internet radio using as car media system;
+main innovation is not to play stream but store mp3s by streamripper and play only fully downloaded songs in order;
+
+raspberry pi
+============
+
+http://www.raspyfi.com/wi-fi-on-raspberry-pi-a-simple-guide/
+sudo apt-get install wicd-curses
+
+http://blogs.wcode.org/2013/09/howto-boot-your-raspberry-pi-into-a-fullscreen-browser-kiosk/
+
+
+
 ympd
 ====
 
