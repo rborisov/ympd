@@ -136,12 +136,22 @@ function webSocketConnect() {
                 return;
 
             var obj = JSON.parse(msg.data);
-//            console.log(obj.type);
-//            console.log(current_app);
             switch (obj.type) {
                 case "radio":
-                    if(current_app !== 'radio')
-                        break;
+                    $('#crabsalad > tbody').empty();
+                    for(var ii in obj.data) {
+                        console.log(obj.data[ii].name);
+                        $('#crabsalad > tbody').append(
+                                "<tr dest=\"" + obj.data[ii].name + "\">" +
+                                "<td><H4><span class=\"label label-success\">"+ obj.data[ii].name +"</span></H4></td>" +
+                                "</tr>");
+                    }
+                    $('#crabsalad > tbody > tr').on({
+                        click: function() {
+                            $('.modal').modal('hide');
+                            socket.send("MPD_API_SET_RADIO," + $(this).attr("dest"));
+                        },
+                    });
 
                     break;
                 case "queue":
@@ -215,8 +225,7 @@ function webSocketConnect() {
                                 $('#salamisandwich > tbody').append(
                                     "<tr uri=\"" + obj.data[item].uri + "\" class=\"song\">" +
                             //        "<td><span class=\"glyphicon glyphicon-music\"></span></td>" + 
-                                    //"<td><span class=\"label label-success\">" + obj.data[item].title +"</span></td>" + 
-                                    "<td><button type=\"button\" class=\"btn btn-default\">" + obj.data[item].title +"</button></td>" +
+                                    "<td><span class=\"label label-success\">" + obj.data[item].title +"</span></td>" + 
                                     "<td><span class=\"badge\">"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
                                     "</span></td><td></td></tr>"
                                 );
@@ -595,13 +604,6 @@ $('#btnnotify').on('click', function (e) {
         });
     }
 });
-
-function prepare() {
-    $('#nav_links > li').removeClass('active');
-    $('.page-btn').addClass('hide');
-    pagination = 0;
-    browsepath = '';
-}
 
 function getRadio() {
     console.log('get list of radio stations');

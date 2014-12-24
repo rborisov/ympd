@@ -122,7 +122,7 @@
         </style>
     </head>
     <body class="art-img">
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-xs-4">
                     <div class="thumbnail">
@@ -130,7 +130,8 @@
                     </div>
                 </div>
                 <div class="col-xs-8">
-                    <H3><span id="counter" class="badge"></span>
+                    <span id="counter" class="label label-default"></span>
+                    <H3>
                         <span id="currenttrack" class="label label-success"></span>
                     </H3>
                     <H4><span id="artist" class="label label-warning"></span>
@@ -150,14 +151,14 @@
                     <span id="play-icon" class="glyphicon glyphicon-pause"></span>
                 </button>
                 <!-- browser/queue/radio controls -->
-                <button id="floatingTopLeft" class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
+                <button id="floatingTopLeft" class="btn btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
                     <span id="radio-icon" class="glyphicon glyphicon-cloud-download"></span>
                 </button>
-                <button id="floatingTopLeft1" class="btn btn-circle btn-lg" onclick="clickRandom();">
+                <button id="floatingTopLeft1" class="btn btn-lg" onclick="clickRandom();">
                     <span id="random-icon" class="glyphicon glyphicon-random gray"></span>
                 </button>
                 <div class="btn-group">
-                    <button class="btn btn-circle btn-flt-topleft2 btn-lg 
+                    <button class="btn btn-flt-topleft2 btn-lg 
                         glyphicon glyphicon-folder-open dropdown-toggle" 
                         data-toggle="dropdown" aria-expanded="false">
                         <!--span class="caret"></span-->
@@ -184,12 +185,15 @@
         <!-- Modal -->
         <div class="modal fade" id="radio-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
             <div class="modal-dialog">
-                    <div class="modal-header">
-                        <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
-                    </div>
+                <div class="modal-content">
                     <div class="modal-body">
-                        <ul id="crabsalad" class="list-group">
-                        </ul>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <table id="crabsalad">
+                            <tbody>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -198,65 +202,62 @@
 
         <div class="modal fade" id="browse-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-header">
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
-                </div>
-                <div class="modal-body">
-                    <ol id="breadcrump" class="breadcrumb">
-                    </ol>
-                    <!-- Table -->
-                    <table id="salamisandwich">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Title</th>
-                                <th>Duration</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <ul class="pager">
-                        <li id="prev" class="page-btn hide"><a href="">Previous</a></li>
-                        <li id="next" class="page-btn"><a href="">Next</a></li>
-                    </ul>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <!--button type="button" class="btn btn-default" onclick="confirmSettings();">Save</button-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <ul class="pager">
+                            <li id="prev" class="page-btn hide"><a href="">Previous</a></li>
+                            <li id="next" class="page-btn"><a href="">Next</a></li>
+                        </ul>
+                    </div>
+                    <div class="modal-body">
+                        <ol id="breadcrump" class="breadcrumb">
+                        </ol>
+                        <!-- Table -->
+                        <table id="salamisandwich">
+                            <thead>
+                                <tr>
+                                    <th>#</th><th>Title</th><th>Duration</th><th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="modal fade" id="queue-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
             <div class="modal-dialog">
-                <div class="modal-header">
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">Cancel</button>
-                </div>
-                <div class="modal-body">
-                    <ol id="samueladams" class="samueladams">
-                    </ol>
-                    <!-- Table -->
-                    <table id="cocacola">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Title</th>
-                                <th>Duration</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-                <div class="modal-footer">
-                    <ul class="pager">
-                        <li id="prev" class="page-btn hide"><a href="">Previous</a></li>
-                        <li id="next" class="page-btn"><a href="">Next</a></li>
-                    </ul>
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                    <!--button type="button" class="btn btn-default" onclick="confirmSettings();">Save</button-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <ul class="pager">
+                            <li id="prev" class="page-btn hide"><a href="">Previous</a></li>
+                            <li id="next" class="page-btn"><a href="">Next</a></li>
+                        </ul>
+                    </div>
+                    <div class="modal-body">
+                        <ol id="samueladams" class="samueladams">
+                        </ol>
+                        <!-- Table -->
+                        <table id="cocacola">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Title</th>
+                                    <th>Duration</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

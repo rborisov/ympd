@@ -64,17 +64,15 @@ int main(int argc, char **argv)
     struct mg_server *server = mg_create_server(NULL);
     unsigned int current_timer = 0, last_timer = 0;
     char *run_as_user = NULL;
-    char radio_song_name[512];
-    const char *radio_path = NULL;
-    char *radio_url = NULL;
-    char radio_added_song[512];
-//    config_t cfg;
-    config_setting_t *settings;
-    char config_file_name[512];
+    char radio_song_name[512] = "";
+    const char *music_path = NULL, 
+          *radio_path = NULL,
+          *radio_url = NULL,
+          *radio_dest = NULL;
+    char chrbuff[512] = "";
+    char config_file_name[512] = "";
     struct passwd *pw = getpwuid(getuid());
     char *homedir = pw->pw_dir;
-
-    //ydebug_enable();
 
     sprintf(config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
     printf("conf = %s\n", config_file_name);
@@ -92,11 +90,11 @@ int main(int argc, char **argv)
         config_destroy(&mpd.cfg);
         return(EXIT_FAILURE);
     }
-    if (!config_lookup_string(&mpd.cfg, "application.radio_path", &radio_path))
+/*    if (!config_lookup_string(&mpd.cfg, "application.music_path", &music_path))
     {
-        fprintf(stderr, "No 'radio_path' setting in configuration file.\n");
+        fprintf(stderr, "No 'application.music_path' setting in configuration file.\n");
     }
-
+*/
     /* drop privilges at last to ensure proper port binding */
     if(run_as_user != NULL)
     {
@@ -104,20 +102,30 @@ int main(int argc, char **argv)
         free(run_as_user);
     }
 
-    if (!config_lookup_string(&mpd.cfg, "streamripper.url", &radio_url))
+/*    if (!config_lookup_string(&mpd.cfg, "radio.path", &radio_path))
     {
-        fprintf(stderr, "No 'radio_url' setting in configuration file.\n");
-    }
-    printf("url = %s\n", radio_url);
+        fprintf(stderr, "No 'radio.path' setting in configuration file.\n");
+    }*/
+/*    if (!config_lookup_string(&mpd.cfg, "radio.url", &radio_url))
+    {
+        fprintf(stderr, "No 'radio.url' setting in configuration file.\n");
+    }*/
+/*    if (!config_lookup_string(&mpd.cfg, "radio.dest", &radio_dest))
+    {
+        fprintf(stderr, "No 'radio.dest' setting in configuration file.\n");
+    }*/
 
     db_init();
 
-    setstream_streamripper(radio_url);
-    setpath_streamuri(radio_path);
+//    setstream_streamripper(radio_url);
+//    streamripper_set_url(NULL);
+//    sprintf(chrbuff, "%s%s%s", music_path, radio_path, radio_dest);
+//    setpath_streamuri(chrbuff);
+//    printf("url: %s path: %s\n", radio_url, chrbuff);
+    streamripper_set_url_dest(NULL);
     init_streamripper();
     mpd.radio_status = 1;
     printf("init_streamripper\n");
-//    start_streamripper();
     
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
@@ -131,11 +139,11 @@ int main(int argc, char **argv)
             if (mpd.radio_status == 1)
                 if (poll_streamripper(radio_song_name))
                 {
-                    sprintf(radio_added_song, "%s%s", "radio/", radio_song_name);
-                    printf("%s\n", radio_added_song);
-                    mpd_run_update(mpd.conn, radio_added_song);
+//                    sprintf(chrbuff, "%s%s/%s", radio_path, radio_dest, radio_song_name);
+//                    printf("%s\n", chrbuff);
+                    mpd_run_update(mpd.conn, radio_song_name);
                     sleep(1);
-                    mpd_run_add(mpd.conn, radio_added_song);
+                    mpd_run_add(mpd.conn, radio_song_name);
                 }
         }
     }

@@ -65,7 +65,8 @@
     X(MPD_API_TOGGLE_RADIO) \
     X(MPD_API_DB_ALBUM) \
     X(MPD_API_DB_ALBUM_ART) \
-    X(MPD_API_GET_RADIO)
+    X(MPD_API_GET_RADIO) \
+    X(MPD_API_SET_RADIO)
 
 enum mpd_cmd_ids {
     MPD_CMDS(GEN_ENUM)

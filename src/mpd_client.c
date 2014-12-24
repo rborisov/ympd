@@ -74,6 +74,18 @@ int radio_get_status()
     return mpd.radio_status;
 }
 
+void start_new_radio(char* p_charbuf)
+{
+    char *music_path,
+         *radio_path,
+         *dest;
+    stop_streamripper();
+//    setstream_streamripper(url);
+//    sprintf(chrbuff, "%s%s%s", music_path, radio_path, dest);
+//    setpath_streamuri(chrbuff);
+    init_streamripper();
+}
+
 static inline enum mpd_cmd_ids get_cmd_id(char *cmd)
 {
     for(int i = 0; i < sizeof(mpd_cmd_strs)/sizeof(mpd_cmd_strs[0]); i++)
@@ -239,6 +251,19 @@ int callback_mpd(struct mg_connection *c)
             if(sscanf(c->content, "MPD_API_GET_BROWSE,%u,%m[^\t\n]", &uint_buf, &p_charbuf) && p_charbuf != NULL)
             {
                 n = mpd_put_browse(mpd.buf, p_charbuf, uint_buf);
+                free(p_charbuf);
+            }
+            break;
+        case MPD_API_SET_RADIO:
+            if(sscanf(c->content, "MPD_API_SET_RADIO,%m[^\t\n]", &p_charbuf) && p_charbuf != NULL)
+            {
+                printf("%s set radio: %s\n", __func__, p_charbuf);
+                stop_streamripper();
+                streamripper_set_url_dest(p_charbuf);
+//                setstream_streamripper(p_charbuf);
+//                sprintf(chrbuff, "%s%s%s", music_path, radio_path, radio_dest);
+//                setpath_streamuri(chrbuff);
+                init_streamripper();
                 free(p_charbuf);
             }
             break;
@@ -628,6 +653,9 @@ int mpd_put_radio(char *buffer, unsigned int offset)
     {
         int count = config_setting_length(setting);
         int i;
+        
+        cur += json_emit_raw_str(cur, end  - cur, "{\"type\":\"radio\",\"data\":[ ");
+        
         for(i = 0; i < count; ++i)
         {
             config_setting_t *station = config_setting_get_elem(setting, i);
@@ -639,9 +667,18 @@ int mpd_put_radio(char *buffer, unsigned int offset)
                 && config_setting_lookup_string(station, "url", &url)))
                     continue;
             printf("%-30s  %-30s\n", name, url);
+            cur += json_emit_raw_str(cur, end - cur, "{\"name\":");
+            cur += json_emit_quoted_str(cur, end - cur, name);
+            cur += json_emit_raw_str(cur, end - cur, ",\"url\":");
+            cur += json_emit_quoted_str(cur, end - cur, url);
+            cur += json_emit_raw_str(cur, end - cur, "},");
         }
 
         putchar('\n');
+
+        /* remove last ',' */
+        cur--;
+        cur += json_emit_raw_str(cur, end - cur, "]}");
     }
 
     return cur - buffer;

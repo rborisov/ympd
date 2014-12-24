@@ -11,4 +11,8 @@ void setstream_streamripper(char*);
 void setpath_streamuri(char*);
 void init_streamripper();
 
+void streamripper_set_url(char*);
+void streamripper_set_url_dest(char*);
+int poll_streamripper(char* newfilename);
+
 #endif
