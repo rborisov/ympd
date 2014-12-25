@@ -385,6 +385,7 @@ static int mpd_notify_callback(struct mg_connection *c) {
 
         if(s->song_id != mpd.song_id)
         {
+            printf("%s ssong = %i mpdsong = %i\n", __func__, s->song_id, mpd.song_id);
             n = mpd_put_current_song(mpd.buf);
             mg_websocket_write(c, 1, mpd.buf, n);
             s->song_id = mpd.song_id;
@@ -563,6 +564,52 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
 
     mpd_status_free(status);
     return len;
+}
+/*
+struct mpd_song *mpd_queue_get_song(int id)
+{
+    return;
+}
+*/
+int mpd_put_next_song(char *buffer, int current_id)
+{
+    char *cur = buffer;
+    const char *end = buffer + MAX_SIZE;
+    struct mpd_entity *entity;
+
+    if (!mpd_send_list_queue_meta(mpd.conn))
+        RETURN_ERROR_AND_RECOVER("mpd_send_list_queue_meta");
+
+    cur += json_emit_raw_str(cur, end  - cur, "{\"type\":\"next_song\",\"data\":[ ");
+
+    while((entity = mpd_recv_entity(mpd.conn)) != NULL) {
+        const struct mpd_song *song;
+
+        if(mpd_entity_get_type(entity) == MPD_ENTITY_TYPE_SONG) {
+            song = mpd_entity_get_song(entity);
+            if (mpd_song_get_pos(song) == current_id+1) {
+                cur += json_emit_raw_str(cur, end - cur, "{\"id\":");
+                cur += json_emit_int(cur, end - cur, mpd_song_get_id(song));
+                cur += json_emit_raw_str(cur, end - cur, ",\"pos\":");
+                cur += json_emit_int(cur, end - cur, mpd_song_get_pos(song));
+                cur += json_emit_raw_str(cur, end - cur, ",\"duration\":");
+                cur += json_emit_int(cur, end - cur, mpd_song_get_duration(song));
+                cur += json_emit_raw_str(cur, end - cur, ",\"title\":");
+                cur += json_emit_quoted_str(cur, end - cur, mpd_get_title(song));
+                cur += json_emit_raw_str(cur, end - cur, ",\"artist\":");
+                cur += json_emit_quoted_str(cur, end - cur, mpd_get_artist(song));
+                cur += json_emit_raw_str(cur, end - cur, "},");
+                break;
+            }
+        }
+        mpd_entity_free(entity);
+    }
+
+    /* remove last ',' */
+    cur--;
+
+    cur += json_emit_raw_str(cur, end - cur, "]}");
+    return cur - buffer;
 }
 
 int mpd_put_current_song(char *buffer)

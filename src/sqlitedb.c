@@ -64,7 +64,7 @@ int db_get_song_numplayed(char* song, char* artist)
     int np = sql_get_int_field(conn, "SELECT numplayed FROM Songs WHERE "
             "song = '%s' AND artist = '%s'", song, artist);
     ydebug_printf("%s found numplayed %i\n", __func__, np);
-    return (np>0) ? np : 0;
+    return np;
 }
 
 int db_get_album_id(char* artist, char* album)
