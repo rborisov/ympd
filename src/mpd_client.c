@@ -392,7 +392,10 @@ static int mpd_notify_callback(struct mg_connection *c) {
 
             n = mpd_get_track_info(mpd.buf);
             mg_websocket_write(c, 1, mpd.buf, n);
-        }
+        } /*else {
+            n = mpd_put_next_song(mpd.buf, mpd.song_id);
+            mg_websocket_write(c, 1, mpd.buf, n);
+        }*/
 
         if(s->queue_version != mpd.queue_version)
         {
@@ -565,21 +568,17 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     mpd_status_free(status);
     return len;
 }
-/*
-struct mpd_song *mpd_queue_get_song(int id)
-{
-    return;
-}
-*/
+
 int mpd_put_next_song(char *buffer, int current_id)
 {
     char *cur = buffer;
     const char *end = buffer + MAX_SIZE;
     struct mpd_entity *entity;
+    int count = 0;
 
     if (!mpd_send_list_queue_meta(mpd.conn))
         RETURN_ERROR_AND_RECOVER("mpd_send_list_queue_meta");
-
+    
     cur += json_emit_raw_str(cur, end  - cur, "{\"type\":\"next_song\",\"data\":[ ");
 
     while((entity = mpd_recv_entity(mpd.conn)) != NULL) {
@@ -737,6 +736,7 @@ int mpd_put_queue(char *buffer, unsigned int offset)
     const char *end = buffer + MAX_SIZE;
     struct mpd_entity *entity;
 
+    offset += mpd.song_id;
     if (!mpd_send_list_queue_range_meta(mpd.conn, offset, offset+MAX_ELEMENTS_PER_PAGE))
         RETURN_ERROR_AND_RECOVER("mpd_send_list_queue_meta");
 

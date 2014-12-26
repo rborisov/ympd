@@ -157,11 +157,17 @@ function webSocketConnect() {
                 case "queue":
                     if(current_app !== 'queue')
                         break;
-
+                    //console.log(current_song.currentSongId);
                     $('#cocacola > tbody').empty();
                     for (var song in obj.data) {
                         var minutes = Math.floor(obj.data[song].duration / 60);
                         var seconds = obj.data[song].duration - minutes * 60;
+                        
+                        if (obj.data[song].id == current_song.currentSongId+1) {
+                            //console.log(obj.data[song].title);
+                            $('#next_track').text(obj.data[song].title);
+                            $('#next_artist').text(obj.data[song].artist);
+                        }
 
                         $('#cocacola > tbody').append(
                                 "<tr trackid=\"" + obj.data[song].id + "\"><td><span class=\"badge\">" + (obj.data[song].pos + 1) + "</span></td>" +
