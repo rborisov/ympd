@@ -24,6 +24,7 @@ RIP_MANAGER_INFO *rmi = 0;
 STREAM_PREFS prefs;
 char chrbuff[128] = "";
 char filepath[128] = "";
+char newsongname[128] = "";
 
 void streamripper_set_url(char* url)
 {
@@ -75,7 +76,7 @@ void streamripper_set_url_dest(char* dest)
             fprintf(stderr, "%s: No 'radio.dest' setting in configuration file.\n", __func__);
             return;
         }
-    } //TODO: else set new current radio to cfg
+    }
     else {
         root = config_root_setting(&mpd.cfg);
         setting = config_setting_get_member(root, "radio");
@@ -214,9 +215,9 @@ int poll_streamripper(char* newfilename)
             fprintf(stderr, "%s: BUG!\n", __func__);
             return 0;
         }
-//        mstrncpy(newfilename, filename, MAX_TRACK_LEN);
-        sprintf(newfilename, "%s", filename);
-        printf("%s: track done %s\n", __func__, newfilename);
+        mstrncpy(newfilename, newsongname, MAX_TRACK_LEN);
+//        sprintf(newfilename, "%s", filename);
+//        printf("%s: track done %s\n", __func__, newfilename);
         m_track_done = FALSE;
         return 1;
     }
@@ -278,6 +279,8 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
             break;
         case RM_TRACK_DONE:
             m_track_done = TRUE;
+            sprintf(newsongname, "%s%s", filepath, strrchr(data, '/' )+1);
+            printf("%s: RM_TRACK_DONE: %s\n", __func__, newsongname);
             break;
     }
 }
