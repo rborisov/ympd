@@ -92,6 +92,7 @@ struct t_mpd {
     char buf[MAX_SIZE];
     size_t buf_size;
 
+    int song_pos;
     int song_id;
     unsigned queue_version;
 

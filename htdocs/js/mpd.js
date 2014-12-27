@@ -24,6 +24,8 @@ var browsepath;
 var lastSongTitle = "";
 var current_song = new Object();
 var MAX_ELEMENTS_PER_PAGE = 5;
+var current_song_pos = 0;
+var next_song_pos = 0;
 
 var app = $.sammy(function() {
     function runBrowse() {
@@ -155,15 +157,16 @@ function webSocketConnect() {
 
                     break;
                 case "queue":
+                    console.log(current_song_pos);
                     if(current_app !== 'queue')
                         break;
-                    //console.log(current_song.currentSongId);
                     $('#cocacola > tbody').empty();
                     for (var song in obj.data) {
                         var minutes = Math.floor(obj.data[song].duration / 60);
                         var seconds = obj.data[song].duration - minutes * 60;
                         
-                        if (obj.data[song].id == current_song.currentSongId+1) {
+                        if (obj.data[song].pos == next_song_pos) {
+//                        if (obj.data[song].pos == current_song.position+1) {  
                             //console.log(obj.data[song].title);
                             $('#next_track').text(obj.data[song].title);
                             $('#next_artist').text(obj.data[song].artist);
@@ -309,13 +312,18 @@ function webSocketConnect() {
                     updateVolumeIcon(obj.data.volume);
                     updateRadioIcon(obj.data.radio_status);
                     updateRandomIcon(obj.data.random);
-                    //console.log(obj.data.radio_status);
+//                    console.log(obj.data.songpos);
 
                     if(JSON.stringify(obj) === JSON.stringify(last_state))
                         break;
 
                     current_song.totalTime  = obj.data.totalTime;
                     current_song.currentSongId = obj.data.currentsongid;
+                    current_song_pos = obj.data.songpos;
+                    console.log("song_pos"+current_song_pos);
+                    $('#currentpos').text(current_song_pos+"("+obj.data.queue_len+")");
+                    next_song_pos = obj.data.nextsongpos;
+                    $('#nextpos').text(next_song_pos);
                     var total_minutes = Math.floor(obj.data.totalTime / 60);
                     var total_seconds = obj.data.totalTime - total_minutes * 60;
 
@@ -407,6 +415,7 @@ function webSocketConnect() {
                     break;
                 case "song_change":
                     $('#currenttrack').text(" " + obj.data.title);
+//                    $('#currentpos').text(obj.data.pos);
                     var notification = "<strong><h4>" + obj.data.title + "</h4></strong>";
                     
                     if(obj.data.album) {

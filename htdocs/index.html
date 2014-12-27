@@ -133,18 +133,18 @@
                     </div>
                 </div>
                 <div class="col-xs-8">
-                    <span id="counter" class="label label-default"></span>
                     <H3>
+                        <span id="currentpos" class="label label-danger"></span>
+                        <span id="counter" class="label label-default"></span>
                         <span id="currenttrack" class="label label-success"></span>
-                    <!--/H3>
-                    <H4--><span id="artist" class="label label-warning"></span>
+                        <span id="artist" class="label label-warning"></span>
                         <span id="album" class="label label-info"></span>
                     </H3>
                 </div>
             </div>
             <div>
-                <H3><span class="label label-default">
-                        next<span class="glyphicon glyphicon-chevron-right"></span>
+                <H3><span id="nextpos" class="label label-default">
+                        <span class="glyphicon glyphicon-chevron-right"></span>
                     </span>
                     <span id="next_artist" class="label label-warning">
                     </span>
@@ -163,14 +163,14 @@
                     <span id="play-icon" class="glyphicon glyphicon-pause"></span>
                 </button>
                 <!-- browser/queue/radio controls -->
-                <button id="floatingTopLeft" class="btn btn-circle btn-transparent btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
+                <button id="floatingTopLeft" class="btn btn-circle btn-success btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
                     <span id="radio-icon" class="glyphicon glyphicon-cloud-download"></span>
                 </button>
-                <button id="floatingTopLeft1" class="btn btn-circle btn-transparent btn-lg" onclick="clickRandom();">
+                <button id="floatingTopLeft1" class="btn btn-circle btn-success btn-lg" onclick="clickRandom();">
                     <span id="random-icon" class="glyphicon glyphicon-random gray"></span>
                 </button>
                 <div class="btn-group">
-                    <button class="btn btn-flt-topleft2 btn-circle btn-transparent btn-lg 
+                    <button class="btn btn-flt-topleft2 btn-circle btn-success btn-lg 
                         glyphicon glyphicon-folder-open dropdown-toggle" 
                         data-toggle="dropdown" aria-expanded="false">
                         <!--span class="caret"></span-->
@@ -184,7 +184,7 @@
                         <!--li><a href="#" data-toggle="modal" data-target="#settings" onclick="getHost();">Settings</a></li-->
                     </ul>
                 </div>
-                <button class="btn btn-flt-topleft3 btn-circle btn-transparent btn-lg" onclick="socket.send('MPD_API_RM_ALL');">
+                <button class="btn btn-flt-topleft3 btn-circle btn-danger btn-lg" onclick="socket.send('MPD_API_RM_ALL');">
                     <span class="glyphicon glyphicon-remove-circle"></span>
                 </button>
                 <!--button class="btn btn-circle btn-flt-topleft3 btn-lg" data-toggle="modal" data-target="#browse-list" onClick="getBrowse();">
@@ -193,7 +193,7 @@
                         <!--li id="browse"><a href="#/browse/0/">Browse database</a></li-->
                 <!--li><a href="#" data-toggle="modal" data-target="#radio_list" onclick="getHost();">Settings</a></li-->
             </div>
-            <div class="notifications top-right panel-transparent"></div>
+            <div class="notifications top-right"></div>
             </div>
         </div>
 

@@ -524,7 +524,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     struct mpd_status *status;
     int len;
     unsigned queue_len;
-    int song_pos;
+    int song_pos, next_song_pos;
 
     status = mpd_run_status(mpd.conn);
     if (!status) {
@@ -534,13 +534,14 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     }
 
     song_pos = mpd_status_get_song_pos(status);
-    
+    next_song_pos = mpd_status_get_next_song_pos(status);
+    queue_len = mpd_status_get_queue_length(status);
     len = snprintf(buffer, MAX_SIZE,
         "{\"type\":\"state\", \"data\":{"
         " \"state\":%d, \"volume\":%d, \"repeat\":%d,"
         " \"single\":%d, \"consume\":%d, \"random\":%d, "
-        " \"songpos\": %d, \"elapsedTime\": %d, \"totalTime\":%d, "
-        " \"currentsongid\": %d, \"radio_status\": %d"
+        " \"songpos\":%d, \"nextsongpos\":%d, \"elapsedTime\":%d, \"totalTime\":%d, "
+        " \"currentsongid\":%d, \"radio_status\":%d, \"queue_len\":%d"
         "}}", 
         mpd_status_get_state(status),
         mpd_status_get_volume(status), 
@@ -548,16 +549,15 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
         mpd_status_get_single(status),
         mpd_status_get_consume(status),
         mpd_status_get_random(status),
-        song_pos,
+        song_pos, next_song_pos,
         mpd_status_get_elapsed_time(status),
         mpd_status_get_total_time(status),
         mpd_status_get_song_id(status),
-        radio_get_status());
+        radio_get_status(),
+        queue_len);
 
     *current_song_id = mpd_status_get_song_id(status);
     *queue_version = mpd_status_get_queue_version(status);
-
-    queue_len = mpd_status_get_queue_length(status);
 
     if (song_pos+1 >= queue_len)
     {
@@ -565,50 +565,9 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
         ydebug_printf("%s: queue is empty\n", __func__);
     }
 
+    mpd.song_pos = song_pos;
     mpd_status_free(status);
     return len;
-}
-
-int mpd_put_next_song(char *buffer, int current_id)
-{
-    char *cur = buffer;
-    const char *end = buffer + MAX_SIZE;
-    struct mpd_entity *entity;
-    int count = 0;
-
-    if (!mpd_send_list_queue_meta(mpd.conn))
-        RETURN_ERROR_AND_RECOVER("mpd_send_list_queue_meta");
-    
-    cur += json_emit_raw_str(cur, end  - cur, "{\"type\":\"next_song\",\"data\":[ ");
-
-    while((entity = mpd_recv_entity(mpd.conn)) != NULL) {
-        const struct mpd_song *song;
-
-        if(mpd_entity_get_type(entity) == MPD_ENTITY_TYPE_SONG) {
-            song = mpd_entity_get_song(entity);
-            if (mpd_song_get_pos(song) == current_id+1) {
-                cur += json_emit_raw_str(cur, end - cur, "{\"id\":");
-                cur += json_emit_int(cur, end - cur, mpd_song_get_id(song));
-                cur += json_emit_raw_str(cur, end - cur, ",\"pos\":");
-                cur += json_emit_int(cur, end - cur, mpd_song_get_pos(song));
-                cur += json_emit_raw_str(cur, end - cur, ",\"duration\":");
-                cur += json_emit_int(cur, end - cur, mpd_song_get_duration(song));
-                cur += json_emit_raw_str(cur, end - cur, ",\"title\":");
-                cur += json_emit_quoted_str(cur, end - cur, mpd_get_title(song));
-                cur += json_emit_raw_str(cur, end - cur, ",\"artist\":");
-                cur += json_emit_quoted_str(cur, end - cur, mpd_get_artist(song));
-                cur += json_emit_raw_str(cur, end - cur, "},");
-                break;
-            }
-        }
-        mpd_entity_free(entity);
-    }
-
-    /* remove last ',' */
-    cur--;
-
-    cur += json_emit_raw_str(cur, end - cur, "]}");
-    return cur - buffer;
 }
 
 int mpd_put_current_song(char *buffer)
@@ -736,7 +695,8 @@ int mpd_put_queue(char *buffer, unsigned int offset)
     const char *end = buffer + MAX_SIZE;
     struct mpd_entity *entity;
 
-    offset += mpd.song_id;
+    offset = mpd.song_pos; //TODO: +=
+    printf("%s %i\n", __func__, offset);
     if (!mpd_send_list_queue_range_meta(mpd.conn, offset, offset+MAX_ELEMENTS_PER_PAGE))
         RETURN_ERROR_AND_RECOVER("mpd_send_list_queue_meta");
 
