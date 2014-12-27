@@ -534,7 +534,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     }
 
     song_pos = mpd_status_get_song_pos(status);
-    next_song_pos = mpd_status_get_next_song_pos(status);
+    next_song_pos = song_pos+1; //TODO: mpd_status_get_next_song_pos(status);
     queue_len = mpd_status_get_queue_length(status);
     len = snprintf(buffer, MAX_SIZE,
         "{\"type\":\"state\", \"data\":{"
