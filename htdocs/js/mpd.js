@@ -157,7 +157,7 @@ function webSocketConnect() {
 
                     break;
                 case "queue":
-                    console.log(current_song_pos);
+//                    console.log(current_song_pos);
                     if(current_app !== 'queue')
                         break;
                     $('#cocacola > tbody').empty();
@@ -320,7 +320,7 @@ function webSocketConnect() {
                     current_song.totalTime  = obj.data.totalTime;
                     current_song.currentSongId = obj.data.currentsongid;
                     current_song_pos = obj.data.songpos;
-                    console.log("song_pos"+current_song_pos);
+//                    console.log("song_pos"+current_song_pos);
                     $('#currentpos').text(current_song_pos+"("+obj.data.queue_len+")");
                     next_song_pos = obj.data.nextsongpos;
                     $('#nextpos').text(next_song_pos);
@@ -381,6 +381,15 @@ function webSocketConnect() {
                         }).show();*/
                     }
                     break;
+                case "artist_info":
+                    if (obj.data.artist && obj.data.art) {
+                        var artimage = document.getElementById("artimage");
+                        artimage.src = "/images/"+obj.data.art;
+                    } else {
+                        if (obj.data.artist)
+                            download_artist_info(obj.data.artist);
+                    }
+                    break;
                 case "track_info":
                     if (obj.data.title && obj.data.artist) {
                         $.get("http://ws.audioscrobbler.com/2.0/?method=track.getinfo&artist=" +
@@ -397,6 +406,7 @@ function webSocketConnect() {
                                             artimage.src = art_url;
                                         } else {
                                             artimage.src = "/images/art.jpg";
+                                            console.log("there is no track.album.image");
                                         }
                                         if (lastfm.track.album.title) {
                                             $('#album').text(lastfm.track.album.title);
@@ -408,7 +418,9 @@ function webSocketConnect() {
                                                     lastfm.track.album.title+'*'+art_url);
                                         }
                                     } else {
+                                        artimage.src = "/images/art.jpg";
                                         console.log("there is no track info");
+                                        socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
                                     }
                                 });
                     }
@@ -503,6 +515,32 @@ function get_appropriate_ws_url()
     u = u.split('/');
 
     return pcol + u[0];
+}
+
+var download_artist_info = function(artist)
+{
+    $.get("http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=" +
+        artist +
+        "&autocorrect=1&api_key=ecb4076a85c81aae38a7e8f11e42a0b1&format=json&callback=",
+    function(lastfm)
+    {
+        var art_url;
+        var artimage = document.getElementById("artimage");
+        if (lastfm && lastfm.artist) {
+            if (lastfm.artist.image[1]['#text']) {
+                art_url = lastfm.artist.image[1]['#text'];
+                console.log('art_url :'+art_url);
+                artimage.src = art_url;
+                socket.send('MPD_API_DB_ARTIST,'+artist+'*'+art_url);
+            } else {
+                console.log("there is no artist image");
+                artimage.src = "/images/art.jpg";
+            }
+        } else {
+            console.log("there is no artist info");
+            artimage.src = "/images/art.jpg";
+        }
+    });
 }
 
 var updateVolumeIcon = function(volume)

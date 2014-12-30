@@ -111,6 +111,28 @@
                 top: 4px;
                 left: 139px;
             }
+            .btn-flt-topright.btn-lg
+            {
+                position: fixed;
+                z-index: 10000;
+                top: 4px;
+                right: 4px;
+            }
+            .btn-flt-topright1.btn-lg
+            {
+                position: fixed;
+                z-index: 10000;
+                top: 4px;
+                right: 59px;
+            }
+            .btn-flt-top1right.btn-lg
+            {
+                position: fixed;
+                z-index: 10000;
+                top: 59px;
+                right: 4px;
+            }
+
             .dd-flt-topleft2.dropdown-menu
             {
                 position: fixed;
@@ -153,13 +175,13 @@
             </div>
             <div>
                 <!-- player controls -->
-                <button id="floatingBottomRight1" class="btn btn-warning btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
+                <button class="btn btn-flt-topright1 btn-warning btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
                     <span class="glyphicon glyphicon-step-backward"></span>
                 </button>
-                <button id="floatingBottom1Right" class="btn btn-warning btn-circle btn-lg" onclick="socket.send('MPD_API_SET_NEXT');">
+                <button class="btn btn-flt-top1right btn-warning btn-circle btn-lg" onclick="socket.send('MPD_API_SET_NEXT');">
                     <span class="glyphicon glyphicon-step-forward"></span>
                 </button>
-                <button id="floatingBottomRight" class="btn btn-warning btn-play btn-lg" onclick="clickPlay();">
+                <button class="btn btn-flt-topright btn-warning btn-play btn-lg" onclick="clickPlay();">
                     <span id="play-icon" class="glyphicon glyphicon-pause"></span>
                 </button>
                 <!-- browser/queue/radio controls -->

@@ -8,8 +8,10 @@ int db_get_song_numplayed(char*, char*);
 int db_get_album_id(char*, char*);
 char* db_get_song_album(char*, char*);
 char* db_get_album_art(char*, char*);
+char* db_get_artist_art(char*);
 int db_update_song_album(char*, char*, char*);
 int db_update_album_art(char*, char*, char*);
+int db_update_artist_art(char*, char*);
 void db_result_free(char*);
 
 #endif

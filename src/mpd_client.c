@@ -48,6 +48,51 @@ int mpd_search_one(char *buffer, char *searchstr);
 void get_random_song(char *str, char *path);
 int mpd_get_track_info(char *buffer);
 
+struct mpd_status *
+getStatus(struct mpd_connection *conn)
+{
+    struct mpd_status *ret = mpd_run_status(conn);
+//    if (ret == NULL)
+//        printErrorAndExit(conn);
+
+    return ret;
+}
+
+int mpd_crop(struct mpd_connection *conn)
+{
+    struct mpd_status *status = getStatus(conn);
+    int length = mpd_status_get_queue_length(status) - 1;
+
+    if (length < 0) {
+        mpd_status_free(status);
+        printf("%s: A playlist longer than 1 song in length is required to crop.\n", __func__);
+    } else if (mpd_status_get_state(status) == MPD_STATE_PLAY ||
+            mpd_status_get_state(status) == MPD_STATE_PAUSE) {
+        if (!mpd_command_list_begin(conn, false)) {
+            printf("%s: mpd_command_list_begin failed\n", __func__);
+            return 0; //printErrorAndExit(conn);
+        }
+
+        for (; length >= 0; --length)
+            if (length != mpd_status_get_song_pos(status))
+                mpd_send_delete(conn, length);
+
+        mpd_status_free(status);
+
+        if (!mpd_command_list_end(conn) || !mpd_response_finish(conn)) {
+            printf("%s: mpd_command_list_end || mpd_response_finish failed\n", __func__);
+            return 0; //printErrorAndExit(conn);
+        }
+
+        return 0;
+    } else {
+        mpd_status_free(status);
+        printf("%s: You need to be playing to crop the playlist\n", __func__);
+        return 0;
+    }
+    return 1;
+}
+
 void start_radio()
 {
     init_streamripper();
@@ -156,6 +201,27 @@ void db_put_album(char* charbuf)
     free(str_copy);
 }
 
+void db_put_artist(char* charbuf)
+{
+    char artist[128] = "";
+    char *token, *art_str;
+    char *str_copy = strdup(charbuf);
+
+    token = strsep(&str_copy, "*");
+    if (token)
+        strncpy(artist, token, strlen(token));
+    else return;
+    token = strsep(&str_copy, "*");
+    if (token) {
+        art_str = download_file(token);
+        db_update_artist_art(artist, art_str);
+    } else {
+        printf("%s: no art for %s\n", __func__, artist);
+    }
+
+    free(str_copy);
+}
+
 int callback_mpd(struct mg_connection *c)
 {
     enum mpd_cmd_ids cmd_id = get_cmd_id(c->content);
@@ -182,8 +248,27 @@ int callback_mpd(struct mg_connection *c)
                 free(p_charbuf);
             }
             break;
+        case MPD_API_DB_ARTIST:
+            if(sscanf(c->content, "MPD_API_DB_ARTIST,%m[^\t\n]",
+                        &p_charbuf) && p_charbuf != NULL)
+            {
+                printf("%s: MPD_API_DB_ARTIST: %s\n", __func__, p_charbuf);
+                db_put_artist(p_charbuf);
+                free(p_charbuf);
+            }
+            break;
+        case MPD_API_DB_GET_ARTIST:
+            if(sscanf(c->content, "MPD_API_DB_GET_ARTIST,%m[^\t\n]",
+                        &p_charbuf) && p_charbuf != NULL)
+            {
+                printf("%s: MPD_API_DB_GET_ARTIST: %s\n", __func__, p_charbuf);
+                n = mpd_put_artist_art(mpd.buf, p_charbuf);
+                mg_websocket_write(c, 1, mpd.buf, n);
+                free(p_charbuf);
+            }
+            break;
         case MPD_API_TOGGLE_RADIO:
-            ydebug_printf("RADIO_TOGGLE_RADIO %i\n", radio_get_status());
+            printf("%s: RADIO_TOGGLE_RADIO %i\n", __func__, radio_get_status());
             radio_toggle();
             break;
         case MPD_API_UPDATE_DB:
@@ -205,7 +290,8 @@ int callback_mpd(struct mg_connection *c)
             mpd_run_stop(mpd.conn);
             break;
         case MPD_API_RM_ALL:
-            mpd_run_clear(mpd.conn);
+            //mpd_run_clear(mpd.conn);
+            mpd_crop(mpd.conn);
             break;
         case MPD_API_RM_TRACK:
             if(sscanf(c->content, "MPD_API_RM_TRACK,%u", &uint_buf))
@@ -260,9 +346,6 @@ int callback_mpd(struct mg_connection *c)
                 printf("%s set radio: %s\n", __func__, p_charbuf);
                 stop_streamripper();
                 streamripper_set_url_dest(p_charbuf);
-//                setstream_streamripper(p_charbuf);
-//                sprintf(chrbuff, "%s%s%s", music_path, radio_path, radio_dest);
-//                setpath_streamuri(chrbuff);
                 init_streamripper();
                 free(p_charbuf);
             }
@@ -519,6 +602,14 @@ char* mpd_get_art(struct mpd_song const *song)
     return str;
 }
 
+char* mpd_get_artist_art(char* artist)
+{
+    char *str = db_get_artist_art(artist);
+    if (str)
+        printf("%s: %s\n", __func__, str);
+    return str;
+}
+
 int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
 {
     struct mpd_status *status;
@@ -568,6 +659,27 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     mpd.song_pos = song_pos;
     mpd_status_free(status);
     return len;
+}
+
+int mpd_put_artist_art(char *buffer, char *artist)
+{
+    char *cur = buffer;
+    const char *end = buffer + MAX_SIZE;
+
+    if (artist == NULL)
+        return;
+
+    cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"artist_info\", \"data\":{\"artist\":");
+    cur += json_emit_quoted_str(cur, end - cur, artist);
+    if (mpd_get_artist_art(artist)) {
+        cur += json_emit_raw_str(cur, end - cur, ",\"art\":");
+        cur += json_emit_quoted_str(cur, end - cur, mpd_get_artist_art(artist));
+    }
+    cur += json_emit_raw_str(cur, end - cur, "}}");
+
+    mpd_response_finish(mpd.conn);
+
+    return cur - buffer;
 }
 
 int mpd_put_current_song(char *buffer)
