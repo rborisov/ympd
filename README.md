@@ -9,7 +9,35 @@ sudo apt-get install wicd-curses
 
 http://blogs.wcode.org/2013/09/howto-boot-your-raspberry-pi-into-a-fullscreen-browser-kiosk/
 
+mpd.conf
+========
 
+audio_output {
+    type        "alsa"
+    name        "My ALSA EQ"
+    device        "plug:plugequal"
+    format        "44100:16:2"    # optional
+    mixer_device    "default"    # optional
+    mixer_control    "PCM"        # optional
+    mixer_index    "0"        # optional
+}
+
+sudo apt-get install libasound2-plugin-equal
+/etc/asound.conf
+================
+pcm.plugequal {
+   type equal;
+   slave {
+     pcm "plughw:0,0";
+   }
+}
+
+pcm.mmap0 {
+   type mmap_emul;
+   slave {
+     pcm plugequal;
+   }
+}
 
 ympd
 ====
