@@ -221,7 +221,7 @@ compose_console_string (RIP_MANAGER_INFO *rmi, TRACK_INFO* ti)
     msnprintf (console_string, SR_MAX_PATH, m_S m_(" - ") m_S, 
 	       ti->artist, ti->title);
     string_from_gstring (rmi, rmi->filename, SR_MAX_PATH, console_string,
-			 CODESET_LOCALE);
+			 CODESET_FILESYS); //CODESET_LOCALE);
 }
 
 /* 

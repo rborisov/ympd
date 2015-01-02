@@ -137,16 +137,17 @@ void setpath_streamuri(char* outpath)
 void init_streamripper()
 {
     sr_set_locale ();
-//    debug_set_filename("streamripper.log");
-//    debug_enable();
+    debug_set_filename("streamripper.log");
+    debug_enable();
     
     prefs_load ();
     prefs.overwrite = OVERWRITE_ALWAYS;
     OPT_FLAG_SET(prefs.flags, OPT_SEPARATE_DIRS, 0);
     prefs.dropcount = 1;
     strncpy (prefs.cs_opt.codeset_filesys, "UTF-8", MAX_CODESET_STRING);
-    strncpy (prefs.cs_opt.codeset_id3, "UTF-8", MAX_CODESET_STRING);
+//    strncpy (prefs.cs_opt.codeset_id3, "UTF-8", MAX_CODESET_STRING);
     strncpy (prefs.cs_opt.codeset_metadata, "UTF-8", MAX_CODESET_STRING);
+    strncpy (prefs.cs_opt.codeset_relay, "UTF-8", MAX_CODESET_STRING);
     prefs_save ();
     
     rip_manager_init();
@@ -181,7 +182,7 @@ int status_streamripper()
 
 int poll_streamripper(char* newfilename)
 {
-    static char filename[MAX_TRACK_LEN];
+//    static char filename[MAX_TRACK_LEN];
 
     if (!rmi->started) {
         start_streamripper();
@@ -217,13 +218,13 @@ int poll_streamripper(char* newfilename)
         }
         mstrncpy(newfilename, newsongname, MAX_TRACK_LEN);
 //        sprintf(newfilename, "%s", filename);
-//        printf("%s: track done %s\n", __func__, newfilename);
+        printf("%s: track done %s\n", __func__, newfilename);
         m_track_done = FALSE;
         return 1;
     }
     if (m_new_track) {
         printf("%s: new track %s %i\n", __func__, rmi->filename, rmi->filesize);
-        sprintf(filename, "%s%s%s", filepath, rmi->filename, ".mp3");
+//        sprintf(filename, "%s%s%s", filepath, rmi->filename, ".mp3");
         m_new_track = FALSE;
     }
     
@@ -280,7 +281,7 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
         case RM_TRACK_DONE:
             m_track_done = TRUE;
             sprintf(newsongname, "%s%s", filepath, strrchr(data, '/' )+1);
-            printf("%s: RM_TRACK_DONE: %s\n", __func__, newsongname);
+            wprintf("%s: RM_TRACK_DONE: (%s)%s\n", __func__, data, newsongname);
             break;
     }
 }

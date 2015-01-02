@@ -133,13 +133,13 @@ filelib_init (RIP_MANAGER_INFO* rmi,
     
     debug_printf ("converting output_directory\n");
     gstring_from_string (rmi, tmp_output_directory, SR_MAX_PATH, 
-			 output_directory, CODESET_LOCALE);
+			 output_directory, CODESET_FILESYS);
     debug_printf ("converting output_pattern\n");
     gstring_from_string (rmi, tmp_output_pattern, SR_MAX_PATH, 
-			 output_pattern, CODESET_LOCALE);
+			 output_pattern, CODESET_FILESYS);
     debug_printf ("converting showfile_pattern\n");
     gstring_from_string (rmi, tmp_showfile_pattern, SR_MAX_PATH, 
-			 showfile_pattern, CODESET_LOCALE);
+			 showfile_pattern, CODESET_FILESYS);
     debug_printf ("converting icy_name\n");
     gstring_from_string (rmi, fli->m_icy_name, SR_MAX_PATH, icy_name, 
 			 CODESET_METADATA);

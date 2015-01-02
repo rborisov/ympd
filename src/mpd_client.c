@@ -298,8 +298,10 @@ int callback_mpd(struct mg_connection *c)
                 mpd_run_delete_id(mpd.conn, uint_buf);
             break;
         case MPD_API_PLAY_TRACK:
-            if(sscanf(c->content, "MPD_API_PLAY_TRACK,%u", &uint_buf))
+            if(sscanf(c->content, "MPD_API_PLAY_TRACK,%u", &uint_buf)) {
+                printf("%s: PLAY_TRACK id %i\n", __func__, uint_buf);
                 mpd_run_play_id(mpd.conn, uint_buf);
+            }
             break;
         case MPD_API_TOGGLE_RANDOM:
             if(sscanf(c->content, "MPD_API_TOGGLE_RANDOM,%u", &uint_buf))
@@ -465,6 +467,12 @@ static int mpd_notify_callback(struct mg_connection *c) {
     else
     {
         mg_websocket_write(c, 1, mpd.buf, mpd.buf_size);
+
+        if (mpd.song_id == -1) 
+        {
+            printf("%s song_id == %i\n", __func__, mpd.song_id);
+            return MG_REQUEST_PROCESSED;
+        }
 
         if(s->song_id != mpd.song_id)
         {
