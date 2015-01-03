@@ -3,9 +3,9 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=320px, height=240px, initial-scale=1.0">
-        <meta name="description" content="ympd - fast and lightweight MPD webclient">
-        <meta name="author" content="andy@ndyk.de">
+        <meta name="viewport" content="width=480px, height=320px, initial-scale=1.0">
+        <meta name="description" content="ympd - fast and lightweight MPD webclient (improved)">
+        <meta name="author" content="rborisoff@gmail.com">
 
         <title>ympd</title>
 
@@ -26,6 +26,7 @@
         <style>
             html { 
                 overflow: hidden;
+                background: black;
             }
             #floatingTop1Left
             {
@@ -146,6 +147,12 @@
             }
 
             .img-thumbnail{background-color:transparent}
+
+            .flt-next-radio
+            {
+                position: fixed;
+                top: 200px;
+            }
         </style>
     </head>
     <body class="art-img">
@@ -166,7 +173,7 @@
                     </H3>
                 </div>
             </div>
-            <div class="row">
+            <div class="row flt-next-radio">
                 <div class="col-xs-8">
                     <H4><span id="nextpos" class="label label-default">
                             <span class="glyphicon glyphicon-chevron-right"></span>
@@ -177,7 +184,7 @@
                     </H4>
                 </div>
                 <div class="col-xs-4">
-                    <div class="img-thumbnail">
+                    <div class="thumbnail img-thumbnail">
                         <img src="/images/fb_logo.png" width="80" height="80" id="radioimage"></img>
                     </div>
                 </div>
