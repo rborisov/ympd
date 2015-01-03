@@ -419,7 +419,7 @@ function webSocketConnect() {
                                         }
                                     } else {
                                         artimage.src = "/images/art.jpg";
-                                        console.log("there is no track info");
+                                        console.log("there is no track info "+obj.data.artist+" "+obj.data.title);
                                         socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
                                     }
                                 });
