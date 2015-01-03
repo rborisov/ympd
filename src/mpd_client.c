@@ -47,6 +47,7 @@ char outfn[128];
 int mpd_search_one(char *buffer, char *searchstr);
 void get_random_song(char *str, char *path);
 int mpd_get_track_info(char *buffer);
+int mpd_put_current_radio(char *buffer, char *currentname);
 
 struct mpd_status *
 getStatus(struct mpd_connection *conn)
@@ -349,6 +350,7 @@ int callback_mpd(struct mg_connection *c)
                 stop_streamripper();
                 streamripper_set_url_dest(p_charbuf);
                 init_streamripper();
+                n = mpd_put_current_radio(mpd.buf, p_charbuf);
                 free(p_charbuf);
             }
             break;
@@ -764,6 +766,39 @@ int mpd_get_track_info(char *buffer)
     mpd_song_free(song);
     mpd_response_finish(mpd.conn);
 
+    return cur - buffer;
+}
+
+int mpd_put_current_radio(char *buffer, char *currentname)
+{
+    char *cur = buffer;
+    const char *end = buffer + MAX_SIZE;
+    config_setting_t *setting;
+
+    printf("%s: looking for %s art\n", __func__, currentname);
+    setting = config_lookup(&mpd.cfg, "radio.station");
+    if (setting != NULL) {
+        int count = config_setting_length(setting);
+        int i;
+        for (i = 0; i < count; i++) {
+            config_setting_t *station = config_setting_get_elem(setting, i);
+            const char *name, *logo;
+            if (!config_setting_lookup_string(station, "name", &name))
+                continue;
+            if (strcmp(name, currentname) == 0) {
+                printf("%-30s\n", name);
+                cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"current_radio\", \"data\":{\"name\":");
+                cur += json_emit_quoted_str(cur, end - cur, name);
+                if (config_setting_lookup_string(station, "logo", &logo)) {
+                    printf("%s: logo %s\n", __func__, logo);
+                    cur += json_emit_raw_str(cur, end - cur, ",\"logo\":");
+                    cur += json_emit_quoted_str(cur, end - cur, logo);
+                }
+                cur += json_emit_raw_str(cur, end - cur, "}}");
+                break;
+            }
+        }
+    }
     return cur - buffer;
 }
 

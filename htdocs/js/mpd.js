@@ -381,6 +381,15 @@ function webSocketConnect() {
                         }).show();*/
                     }
                     break;
+                case "current_radio":
+                    console.log(obj.data.name+" "+obj.data.logo);
+                    if (obj.data.name)
+                        $('#currentradio').text(" " + obj.data.name);
+                    if (obj.data.logo) {
+                        var logoimage = document.getElementById("radioimage");
+                        radioimage.src = "/images/"+obj.data.logo;
+                    }
+                    break;
                 case "artist_info":
                     if (obj.data.artist && obj.data.art) {
                         var artimage = document.getElementById("artimage");
