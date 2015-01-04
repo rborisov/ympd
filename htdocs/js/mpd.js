@@ -309,7 +309,8 @@ function webSocketConnect() {
                     break;
                 case "state":
                     updatePlayIcon(obj.data.state);
-                    updateVolumeIcon(obj.data.volume);
+                    $('#volume').text(obj.data.volume);
+                    //updateVolumeIcon(obj.data.volume);
                     updateRadioIcon(obj.data.radio_status);
                     updateRandomIcon(obj.data.random);
 //                    console.log(obj.data.songpos);
@@ -330,9 +331,9 @@ function webSocketConnect() {
                     var elapsed_minutes = Math.floor(obj.data.elapsedTime / 60);
                     var elapsed_seconds = obj.data.elapsedTime - elapsed_minutes * 60;
 
-                    $('#volumeslider').slider(obj.data.volume);
+                    /*$('#volumeslider').slider(obj.data.volume);
                     var progress = Math.floor(100*obj.data.elapsedTime/obj.data.totalTime);
-                    $('#progressbar').slider(progress);
+                    $('#progressbar').slider(progress);*/
 
                     $('#counter')
                     .text(elapsed_minutes + ":" + 

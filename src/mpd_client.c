@@ -96,12 +96,14 @@ int mpd_crop(struct mpd_connection *conn)
 
 void start_radio()
 {
+    //TODO: no need to start streamripper here
     init_streamripper();
     mpd.radio_status = 1;
 }
 
 void stop_radio()
 {
+    //TODO: no need to stop streamripper here
     stop_streamripper();
     mpd.radio_status = 0;
 }
@@ -324,6 +326,18 @@ int callback_mpd(struct mg_connection *c)
             if(sscanf(c->content, "MPD_API_SET_VOLUME,%ud", &uint_buf) && uint_buf <= 100)
                 mpd_run_set_volume(mpd.conn, uint_buf);
             break;
+        case MPD_API_INCREASE_VOLUME:
+            mpd.volume += 5;
+            if (mpd.volume > 100)
+                mpd.volume = 100;
+            mpd_run_set_volume(mpd.conn, mpd.volume);
+            break;
+        case MPD_API_DECREASE_VOLUME:
+            mpd.volume -= 5;
+            if (mpd.volume < 0)
+                mpd.volume = 0;
+            mpd_run_set_volume(mpd.conn, mpd.volume);
+            break;
         case MPD_API_SET_SEEK:
             if(sscanf(c->content, "MPD_API_SET_SEEK,%u,%u", &uint_buf, &uint_buf_2))
                 mpd_run_seek_id(mpd.conn, uint_buf, uint_buf_2);
@@ -348,9 +362,10 @@ int callback_mpd(struct mg_connection *c)
             {
                 printf("%s set radio: %s\n", __func__, p_charbuf);
                 stop_streamripper();
-                streamripper_set_url_dest(p_charbuf);
+                strcpy(mpd.currentradio, p_charbuf);
+                streamripper_set_url_dest(mpd.currentradio);
                 init_streamripper();
-                n = mpd_put_current_radio(mpd.buf, p_charbuf);
+                //n = mpd_put_current_radio(mpd.buf, p_charbuf);
                 free(p_charbuf);
             }
             break;
@@ -496,6 +511,11 @@ static int mpd_notify_callback(struct mg_connection *c) {
             mg_websocket_write(c, 1, mpd.buf, n);
             s->queue_version = mpd.queue_version;
         }
+
+        //TODO: support different sources; 
+        n = mpd_put_current_radio(mpd.buf, mpd.currentradio);
+        if (n > 0)
+            mg_websocket_write(c, 1, mpd.buf, n);
     }
 
     return MG_REQUEST_PROCESSED;
@@ -609,6 +629,7 @@ char* mpd_get_art(struct mpd_song const *song)
                 mpd_song_get_tag(song, MPD_TAG_ARTIST, 0)));
     if (str)
         ydebug_printf("%s: %s\n", __func__, str);
+    //TODO: check if file exists
     return str;
 }
 
@@ -637,6 +658,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     song_pos = mpd_status_get_song_pos(status);
     next_song_pos = song_pos+1; //TODO: mpd_status_get_next_song_pos(status);
     queue_len = mpd_status_get_queue_length(status);
+    mpd.volume = mpd_status_get_volume(status);
     len = snprintf(buffer, MAX_SIZE,
         "{\"type\":\"state\", \"data\":{"
         " \"state\":%d, \"volume\":%d, \"repeat\":%d,"
@@ -645,7 +667,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
         " \"currentsongid\":%d, \"radio_status\":%d, \"queue_len\":%d"
         "}}", 
         mpd_status_get_state(status),
-        mpd_status_get_volume(status), 
+        mpd.volume, 
         mpd_status_get_repeat(status),
         mpd_status_get_single(status),
         mpd_status_get_consume(status),
@@ -775,7 +797,9 @@ int mpd_put_current_radio(char *buffer, char *currentname)
     const char *end = buffer + MAX_SIZE;
     config_setting_t *setting;
 
-    printf("%s: looking for %s art\n", __func__, currentname);
+    //printf("%s: looking for %s art\n", __func__, currentname);
+    //TODO: store current radio art to mpd. ; 
+    //don't read config everytime
     setting = config_lookup(&mpd.cfg, "radio.station");
     if (setting != NULL) {
         int count = config_setting_length(setting);
@@ -786,11 +810,11 @@ int mpd_put_current_radio(char *buffer, char *currentname)
             if (!config_setting_lookup_string(station, "name", &name))
                 continue;
             if (strcmp(name, currentname) == 0) {
-                printf("%-30s\n", name);
+                //printf("%-30s\n", name);
                 cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"current_radio\", \"data\":{\"name\":");
                 cur += json_emit_quoted_str(cur, end - cur, name);
                 if (config_setting_lookup_string(station, "logo", &logo)) {
-                    printf("%s: logo %s\n", __func__, logo);
+                    //printf("%s: logo %s\n", __func__, logo);
                     cur += json_emit_raw_str(cur, end - cur, ",\"logo\":");
                     cur += json_emit_quoted_str(cur, end - cur, logo);
                 }

@@ -133,7 +133,27 @@
                 top: 59px;
                 right: 4px;
             }
-
+            .btn-flt-top2right.btn-lg
+            {
+                position: fixed;
+                z-index: 10000;
+                top: 104px;
+                right: 4px;
+            }
+            .btn-flt-top3right.btn-lg
+            {
+                position: fixed;
+                z-index: 10000;
+                top: 149px;
+                right: 4px;
+            }
+            .btn-flt-top4right.btn-lg
+            {
+                position: fixed;
+                z-index: 10000;
+                top: 194px;
+                right: 4px;
+            }
             .dd-flt-topleft2.dropdown-menu
             {
                 position: fixed;
@@ -175,16 +195,16 @@
             </div>
             <div class="row flt-next-radio">
                 <div class="col-xs-8">
-                    <H4><span id="nextpos" class="label label-default">
+                    <H4><span id="nextpos" class="label label-default pull-right">
                             <span class="glyphicon glyphicon-chevron-right"></span>
                         </span>
-                        <span id="next_artist" class="label label-warning">
+                        <span id="next_artist" class="label label-warning pull-right">
                         </span>
-                        <span id="next_track" class="label label-success"></span>
+                        <span id="next_track" class="label label-success pull-right"></span>
                     </H4>
                 </div>
                 <div class="col-xs-4">
-                    <div class="thumbnail img-thumbnail">
+                    <div class="thumbnail img-thumbnail pull-right">
                         <img src="/images/fb_logo.png" width="80" height="80" id="radioimage"></img>
                     </div>
                 </div>
@@ -199,6 +219,15 @@
                 </button>
                 <button class="btn btn-flt-topright btn-warning btn-play btn-lg" onclick="clickPlay();">
                     <span id="play-icon" class="glyphicon glyphicon-pause"></span>
+                </button>
+                <button class="btn btn-flt-top2right btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
+                    <span class="glyphicon glyphicon-volume-up"></span>
+                </button>
+                <button class="btn btn-flt-top3right btn-info btn-circle btn-lg">
+                    <span id="volume"></span>
+                </button>
+                <button class="btn btn-flt-top4right btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_DECREASE_VOLUME');">
+                    <span class="glyphicon glyphicon-volume-down"></span>
                 </button>
                 <!-- browser/queue/radio controls -->
                 <button id="floatingTopLeft" class="btn btn-circle btn-success btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">

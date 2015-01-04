@@ -113,6 +113,8 @@ void streamripper_set_url_dest(char* dest)
         }
     }
 
+    strcpy(mpd.currentradio, radio_dest);
+
     sprintf(filepath, "%s%s/", radio_path, radio_dest);
     printf("%s: filepath = %s\n", __func__, filepath);
     sprintf(chrbuff, "%s%s", music_path, filepath);

@@ -68,7 +68,9 @@
     X(MPD_API_GET_RADIO) \
     X(MPD_API_SET_RADIO) \
     X(MPD_API_DB_ARTIST) \
-    X(MPD_API_DB_GET_ARTIST)
+    X(MPD_API_DB_GET_ARTIST) \
+    X(MPD_API_INCREASE_VOLUME) \
+    X(MPD_API_DECREASE_VOLUME)
 
 enum mpd_cmd_ids {
     MPD_CMDS(GEN_ENUM)
@@ -99,6 +101,8 @@ struct t_mpd {
     unsigned queue_version;
 
     int radio_status;
+    int volume;
+    char currentradio[128];
 
     config_t cfg;
     char config_file_name[512];
