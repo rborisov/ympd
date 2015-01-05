@@ -346,6 +346,7 @@ parse_arguments (STREAM_PREFS* prefs, int argc, char **argv)
     // Load prefs
     prefs_load ();
     prefs_get_stream_prefs (prefs, prefs->url);
+    strncpy(prefs->incomplete_directory, "/home/ruinrobo/tmp/", SR_MAX_PATH);
     prefs_save ();
 
     // Parse arguments
@@ -360,7 +361,8 @@ parse_arguments (STREAM_PREFS* prefs, int argc, char **argv)
 		exit(1);
 	    }
 	}
-	switch (argv[i][1])
+	
+    switch (argv[i][1])
 	{
 	case 'a':
 	    /* Create single file output + cue sheet */

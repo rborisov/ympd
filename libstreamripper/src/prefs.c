@@ -417,6 +417,7 @@ debug_stream_prefs (STREAM_PREFS* prefs)
     debug_printf ("proxyurl = %s\n", prefs->proxyurl);
     debug_printf ("output_directory = %s\n", prefs->output_directory);
     debug_printf ("output_pattern = %s\n", prefs->output_pattern);
+    debug_printf ("incomplete_directory = %s\n", prefs->incomplete_directory);
     debug_printf ("showfile_pattern = %s\n", prefs->showfile_pattern);
     debug_printf ("if_name = %s\n", prefs->if_name);
     debug_printf ("rules_file = %s\n", prefs->rules_file);
@@ -498,6 +499,7 @@ prefs_get_stream_defaults (STREAM_PREFS* prefs)
 
     strcpy(prefs->output_directory, "./");
     prefs->output_pattern[0] = 0;
+    strcpy(prefs->incomplete_directory, "");
     prefs->showfile_pattern[0] = 0;
     prefs->if_name[0] = 0;
     prefs->rules_file[0] = 0;
@@ -674,6 +676,7 @@ prefs_get_stream_prefs_keyfile (STREAM_PREFS* prefs, char* group)
     prefs_get_string (prefs->proxyurl, MAX_URL_LEN, group, "proxy");
     prefs_get_string (prefs->output_directory, SR_MAX_PATH, group, "output_dir");
     prefs_get_string (prefs->output_pattern, SR_MAX_PATH, group, "output_pattern");
+    prefs_get_string (prefs->incomplete_directory, SR_MAX_PATH, group, "incomplete_dir");
     prefs_get_string (prefs->showfile_pattern, SR_MAX_PATH, group, "showfile_pattern");
     prefs_get_string (prefs->if_name, SR_MAX_PATH, group, "if_name");
     prefs_get_string (prefs->rules_file, SR_MAX_PATH, group, "rules_file");
@@ -773,6 +776,9 @@ prefs_set_stream_prefs_keyfile (STREAM_PREFS* prefs, STREAM_PREFS* gp,
     }
     if (!gp || !strcmp(prefs->output_pattern, gp->output_pattern)) {
 	prefs_set_string (group, "output_pattern", prefs->output_pattern);
+    }
+    if (!gp || !strcmp(prefs->incomplete_directory, gp->incomplete_directory)) {
+        prefs_set_string (group, "incomplete_dir", prefs->incomplete_directory);
     }
     if (!gp || !strcmp(prefs->showfile_pattern, gp->showfile_pattern)) {
 	prefs_set_string (group, "showfile_pattern", prefs->showfile_pattern);

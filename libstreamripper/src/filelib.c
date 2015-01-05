@@ -103,6 +103,7 @@ filelib_init (RIP_MANAGER_INFO* rmi,
 	      int content_type,
 	      char* output_directory,  /* Locale encoded - from command line */
 	      char* output_pattern,    /* Locale encoded - from command line */
+          char* incomplete_directory,
 	      char* showfile_pattern,  /* Locale encoded - from command line */
 	      int get_separate_dirs,
 	      int get_date_stamp,
@@ -199,8 +200,15 @@ filelib_init (RIP_MANAGER_INFO* rmi,
 		   fli->m_output_directory);
     debug_mprintf (m_("m_output_pattern: ") m_S m_("\n"),
 		   fli->m_output_pattern);
-    msnprintf (fli->m_incomplete_directory, SR_MAX_PATH, m_S m_S m_C, 
-	       fli->m_output_directory, m_("incomplete"), PATH_SLASH);
+    if (strcmp(incomplete_directory, "") && *incomplete_directory) {
+        msnprintf (fli->m_incomplete_directory, SR_MAX_PATH, m_S m_C,
+                incomplete_directory, PATH_SLASH);
+        debug_mprintf (m_("m_incomplete_directory: ") m_S m_("\n"),
+                           fli->m_incomplete_directory);
+    } else {
+        msnprintf (fli->m_incomplete_directory, SR_MAX_PATH, m_S m_S m_C, 
+                fli->m_output_directory, m_("incomplete"), PATH_SLASH);
+    }
 
     /* Recursively make the output directory & incomplete directory */
     if (fli->m_do_individual_tracks) {

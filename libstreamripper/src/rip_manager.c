@@ -537,6 +537,7 @@ start_ripping (RIP_MANAGER_INFO* rmi)
 	     rmi->http_info.content_type, 
 	     rmi->prefs->output_directory,
 	     rmi->prefs->output_pattern,
+         rmi->prefs->incomplete_directory,
 	     rmi->prefs->showfile_pattern,
 	     GET_SEPARATE_DIRS(rmi->prefs->flags),
 	     GET_DATE_STAMP(rmi->prefs->flags),

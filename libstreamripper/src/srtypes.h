@@ -443,6 +443,9 @@ struct stream_prefs
     char output_directory[SR_MAX_PATH];	// base directory to output files too
     char output_pattern[SR_MAX_PATH];	// filename pattern when ripping 
                                         //  with splitting
+    char incomplete_directory[SR_MAX_PATH]; //rborisov: added ability to change 
+                                            //incomplete folder
+
     char showfile_pattern[SR_MAX_PATH];	// filename base when ripping to
                                         //  single file without splitting
     char if_name[SR_MAX_PATH];		// local interface to use
