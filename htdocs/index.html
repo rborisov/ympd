@@ -57,25 +57,25 @@
                 top: 4px;
                 left: 4px;
             }
-            #floatingBottomRight
+            .btn-flt-bottom2right.btn-lg
             {
                 position: fixed;
                 z-index: 10000;
-                bottom: 4px;
+                bottom: 100px;
                 right: 4px;
             }
-            #floatingBottomRight1
-            {
-                position: fixed;
-                z-index: 10000;
-                bottom: 4px;
-                right: 59px;
-            }
-            #floatingBottom1Right
+            .btn-flt-bottom1right.btn-lg
             {
                 position: fixed;
                 z-index: 10000;
                 bottom: 59px;
+                right: 4px;
+            }
+            .btn-flt-bottomright.btn-lg
+            {
+                position: fixed;
+                z-index: 10000;
+                bottom: 4px;
                 right: 4px;
             }
             .btn-transparent.btn-lg
@@ -172,6 +172,13 @@
             {
                 position: fixed;
                 top: 200px;
+                left: 240px;
+            }
+            .flt-bottomleft
+            {
+                position: fixed;
+                bottom: 0px;
+                left: 4px;
             }
         </style>
     </head>
@@ -185,29 +192,22 @@
                 </div>
                 <div class="col-xs-7">
                     <H3>
-                        <span id="currentpos" class="label label-danger"></span>
-                        <span id="counter" class="label label-default"></span>
+                        <span id="counter" class="label label-danger"></span>
+                        <span id="currentpos" class="label label-default"></span>
                         <span id="currenttrack" class="label label-success"></span>
                         <span id="artist" class="label label-warning"></span>
                         <span id="album" class="label label-info"></span>
                     </H3>
                 </div>
             </div>
-            <div class="row flt-next-radio">
-                <div class="col-xs-8">
-                    <H4><span id="nextpos" class="label label-default pull-right">
-                            <span class="glyphicon glyphicon-chevron-right"></span>
-                        </span>
-                        <span id="next_artist" class="label label-warning pull-right">
-                        </span>
-                        <span id="next_track" class="label label-success pull-right"></span>
-                    </H4>
-                </div>
-                <div class="col-xs-4">
-                    <div class="thumbnail img-thumbnail pull-right">
-                        <img src="/images/fb_logo.png" width="80" height="80" id="radioimage"></img>
-                    </div>
-                </div>
+            <div class="thumbnail img-thumbnail flt-bottomleft">
+                <img src="/images/fb_logo.png" width="80" height="80" id="radioimage"></img>
+            </div>
+            <div class="flt-next-radio">
+                <H4><span id="nextpos" class="label label-default"></span>
+                    <span id="next_artist" class="label label-warning"></span>
+                    <span id="next_track" class="label label-success"></span>
+                </H4>
             </div>
             <div>
                 <!-- player controls -->
@@ -220,13 +220,13 @@
                 <button class="btn btn-flt-topright btn-warning btn-play btn-lg" onclick="clickPlay();">
                     <span id="play-icon" class="glyphicon glyphicon-pause"></span>
                 </button>
-                <button class="btn btn-flt-top2right btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
+                <button class="btn btn-flt-bottom2right btn-info btn-play btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
                     <span class="glyphicon glyphicon-volume-up"></span>
                 </button>
-                <button class="btn btn-flt-top3right btn-info btn-circle btn-lg">
+                <button class="btn btn-flt-bottom1right btn-info btn-circle btn-lg">
                     <span id="volume"></span>
                 </button>
-                <button class="btn btn-flt-top4right btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_DECREASE_VOLUME');">
+                <button class="btn btn-flt-bottomright btn-info btn-play btn-lg" onclick="socket.send('MPD_API_DECREASE_VOLUME');">
                     <span class="glyphicon glyphicon-volume-down"></span>
                 </button>
                 <!-- browser/queue/radio controls -->
