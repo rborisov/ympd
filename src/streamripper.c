@@ -138,6 +138,8 @@ void setpath_streamuri(char* outpath)
 
 void init_streamripper()
 {
+    char* incomplete;
+    
     sr_set_locale ();
     debug_set_filename("streamripper.log");
     debug_enable();
@@ -150,6 +152,18 @@ void init_streamripper()
 //    strncpy (prefs.cs_opt.codeset_id3, "UTF-8", MAX_CODESET_STRING);
     strncpy (prefs.cs_opt.codeset_metadata, "UTF-8", MAX_CODESET_STRING);
     strncpy (prefs.cs_opt.codeset_relay, "UTF-8", MAX_CODESET_STRING);
+
+
+    if (!(&mpd.cfg)) {
+        fprintf(stderr, "%s: mpd is NULL\n", __func__);
+    } else {
+        if (!config_lookup_string(&mpd.cfg, "radio.incomplete", &incomplete))
+        {
+            fprintf(stderr, "%s: No 'radio.incomplete' setting in configuration file.\n", __func__);
+        } else {
+            strncpy(prefs.incomplete_directory, incomplete, SR_MAX_PATH);
+        }
+    }
     prefs_save ();
     
     rip_manager_init();

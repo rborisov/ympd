@@ -181,21 +181,21 @@ void db_put_album(char* charbuf)
     char *token, *art_str;
     char *str_copy = strdup(charbuf);
     
-    token = strsep(&str_copy, "*");
+    token = strsep(&str_copy, "|");
     if (token)
         strncpy(song, token, strlen(token));
     else return; 
-    token = strsep(&str_copy, "*");
+    token = strsep(&str_copy, "|");
     if (token)
         strncpy(artist, token, strlen(token));
     else return;
-    token = strsep(&str_copy, "*");
+    token = strsep(&str_copy, "|");
     if (token)
         strncpy(album, token, strlen(token));
     else return;
     db_update_song_album(song, artist, album);
 
-    token = strsep(&str_copy, "*");
+    token = strsep(&str_copy, "|");
     if (token) {
         art_str = download_file(token);
         db_update_album_art(artist, album, art_str);
@@ -210,11 +210,11 @@ void db_put_artist(char* charbuf)
     char *token, *art_str;
     char *str_copy = strdup(charbuf);
 
-    token = strsep(&str_copy, "*");
+    token = strsep(&str_copy, "|");
     if (token)
         strncpy(artist, token, strlen(token));
     else return;
-    token = strsep(&str_copy, "*");
+    token = strsep(&str_copy, "|");
     if (token) {
         art_str = download_file(token);
         db_update_artist_art(artist, art_str);

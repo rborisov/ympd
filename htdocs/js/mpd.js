@@ -402,37 +402,47 @@ function webSocketConnect() {
                     break;
                 case "track_info":
                     if (obj.data.title && obj.data.artist) {
+                        var artimage = document.getElementById("artimage");
+                        artimage.src = "/images/art.png";
+                        $('#album').text("");
                         $.get("http://ws.audioscrobbler.com/2.0/?method=track.getinfo&artist=" +
                                 obj.data.artist + "&track=" + obj.data.title +
                                 "&autocorrect=1&api_key=ecb4076a85c81aae38a7e8f11e42a0b1&format=json&callback=",
                                 function(lastfm)
                                 {
                                     var art_url;
-                                    var artimage = document.getElementById("artimage");
+                                    //var artimage = document.getElementById("artimage");
                                     if (lastfm && lastfm.track && lastfm.track.album) {
                                         if (lastfm.track.album.image) {
                                             art_url = lastfm.track.album.image[1]['#text'];
                                             console.log(art_url);
                                             artimage.src = art_url;
                                         } else {
-                                            artimage.src = "/images/art.jpg";
+                                            //artimage.src = "/images/art.jpg";
                                             console.log("there is no track.album.image");
                                         }
                                         if (lastfm.track.album.title) {
                                             $('#album').text(lastfm.track.album.title);
                                         } else {
-                                            $('#album').text("");
+                                            //$('#album').text("");
                                         }
                                         if (lastfm.track.album) {
-                                            socket.send('MPD_API_DB_ALBUM,'+obj.data.title+'*'+obj.data.artist+'*'+
-                                                    lastfm.track.album.title+'*'+art_url);
+                                            socket.send('MPD_API_DB_ALBUM,'+obj.data.title+'|'+obj.data.artist+'|'+
+                                                    lastfm.track.album.title+'|'+art_url);
                                         }
                                     } else {
-                                        artimage.src = "/images/art.jpg";
+                                        //artimage.src = "/images/art.jpg";
                                         console.log("there is no track info "+obj.data.artist+" "+obj.data.title);
                                         socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
                                     }
-                                });
+                                })
+                                //.done (function ()   { console.log("done"  ); })
+                                .fail (function ()   { console.log("fail"  ); })
+                                .error (function()   { 
+                                    console.log("error" );
+                                    socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
+                                })
+                                //.always (function()  { console.log("always"); });
                     }
                     break;
                 case "song_change":
@@ -541,14 +551,14 @@ var download_artist_info = function(artist)
                 art_url = lastfm.artist.image[1]['#text'];
                 console.log('art_url :'+art_url);
                 artimage.src = art_url;
-                socket.send('MPD_API_DB_ARTIST,'+artist+'*'+art_url);
+                socket.send('MPD_API_DB_ARTIST,'+artist+'|'+art_url);
             } else {
                 console.log("there is no artist image");
-                artimage.src = "/images/art.jpg";
+                //artimage.src = "/images/art.png";
             }
         } else {
             console.log("there is no artist info");
-            artimage.src = "/images/art.jpg";
+            //artimage.src = "/images/art.png";
         }
     });
 }
