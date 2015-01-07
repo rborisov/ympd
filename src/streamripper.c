@@ -120,6 +120,8 @@ void streamripper_set_url_dest(char* dest)
     sprintf(chrbuff, "%s%s", music_path, filepath);
     setpath_streamuri(chrbuff);
     printf("%s: path: %s\n", __func__, chrbuff);
+
+    rcm.image_update = 1;
 }
 
 void setstream_streamripper(char* streamuri)

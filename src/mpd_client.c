@@ -362,11 +362,9 @@ int callback_mpd(struct mg_connection *c)
             {
                 printf("%s set radio: %s\n", __func__, p_charbuf);
                 stop_streamripper();
-                strcpy(mpd.currentradio, p_charbuf);
-                streamripper_set_url_dest(mpd.currentradio);
-                rcm.image_update = 1;
+                strcpy(rcm.current_radio, p_charbuf);
+                streamripper_set_url_dest(rcm.current_radio);
                 init_streamripper();
-                //n = mpd_put_current_radio(mpd.buf, p_charbuf);
                 free(p_charbuf);
             }
             break;
@@ -514,7 +512,7 @@ static int mpd_notify_callback(struct mg_connection *c) {
         }
 
         //TODO: support different sources; 
-        n = mpd_put_current_radio(mpd.buf, mpd.currentradio);
+        n = mpd_put_current_radio(mpd.buf, rcm.current_radio);
         if (n > 0)
             mg_websocket_write(c, 1, mpd.buf, n);
     }
