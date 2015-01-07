@@ -364,6 +364,7 @@ int callback_mpd(struct mg_connection *c)
                 stop_streamripper();
                 strcpy(mpd.currentradio, p_charbuf);
                 streamripper_set_url_dest(mpd.currentradio);
+                rcm.image_update = 1;
                 init_streamripper();
                 //n = mpd_put_current_radio(mpd.buf, p_charbuf);
                 free(p_charbuf);
@@ -609,16 +610,15 @@ char* mpd_get_album(struct mpd_song const *song)
 
     str = (char *)mpd_song_get_tag(song, MPD_TAG_ALBUM, 0);
     if(str == NULL){
-        ydebug_printf("%s: song %s; artist %s\n", __func__,
+/*        ydebug_printf("%s: song %s; artist %s\n", __func__,
                 mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
-                mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
+                mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));*/
         str = db_get_song_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
                 mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
-/*        if(str == NULL)
-            str = basename((char *)mpd_song_get_uri(song));*/
     }
-    if (str)
+    /*if (str)
         ydebug_printf("%s: %s\n", __func__, str);
+*/
     return str;
 }
 
@@ -800,29 +800,40 @@ int mpd_put_current_radio(char *buffer, char *currentname)
     //printf("%s: looking for %s art\n", __func__, currentname);
     //TODO: store current radio art to mpd. ; 
     //don't read config everytime
-    setting = config_lookup(&mpd.cfg, "radio.station");
-    if (setting != NULL) {
-        int count = config_setting_length(setting);
-        int i;
-        for (i = 0; i < count; i++) {
-            config_setting_t *station = config_setting_get_elem(setting, i);
-            const char *name, *logo;
-            if (!config_setting_lookup_string(station, "name", &name))
-                continue;
-            if (strcmp(name, currentname) == 0) {
-                //printf("%-30s\n", name);
-                cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"current_radio\", \"data\":{\"name\":");
-                cur += json_emit_quoted_str(cur, end - cur, name);
-                if (config_setting_lookup_string(station, "logo", &logo)) {
-                    //printf("%s: logo %s\n", __func__, logo);
-                    cur += json_emit_raw_str(cur, end - cur, ",\"logo\":");
-                    cur += json_emit_quoted_str(cur, end - cur, logo);
+    cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"current_radio\", \"data\":{\"name\":");
+    cur += json_emit_quoted_str(cur, end - cur, currentname);
+    cur += json_emit_raw_str(cur, end - cur, ",\"status\":");
+    cur += json_emit_quoted_str(cur, end - cur, rcm.status_str);
+    cur += json_emit_raw_str(cur, end - cur, ",\"size\":");
+    cur += json_emit_quoted_str(cur, end - cur, rcm.filesize_str);
+    if (rcm.image_update) {  
+        setting = config_lookup(&mpd.cfg, "radio.station");
+        if (setting != NULL) {
+            int count = config_setting_length(setting);
+            int i;
+            for (i = 0; i < count; i++) {
+                config_setting_t *station = config_setting_get_elem(setting, i);
+                const char *name, *logo;
+                if (!config_setting_lookup_string(station, "name", &name))
+                    continue;
+                if (strcmp(name, currentname) == 0) {
+                    //printf("%-30s\n", name);
+                    //                cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"current_radio\", \"data\":{\"name\":");
+                    //                cur += json_emit_quoted_str(cur, end - cur, name);
+                    if (config_setting_lookup_string(station, "logo", &logo)) {
+                        //printf("%s: logo %s\n", __func__, logo);
+                        cur += json_emit_raw_str(cur, end - cur, ",\"logo\":");
+                        cur += json_emit_quoted_str(cur, end - cur, logo);
+                    }
+                    //                cur += json_emit_raw_str(cur, end - cur, "}}");
+                    break;
                 }
-                cur += json_emit_raw_str(cur, end - cur, "}}");
-                break;
             }
         }
+        rcm.image_update = 0;
     }
+
+    cur += json_emit_raw_str(cur, end - cur, "}}");
     return cur - buffer;
 }
 

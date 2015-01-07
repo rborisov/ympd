@@ -108,6 +108,15 @@ struct t_mpd {
     char config_file_name[512];
 } mpd;
 
+struct t_rcm {
+    char status_str[128];
+    char filesize_str[64];
+    char current_radio[128];
+
+    int radio_status; //0,1
+    int image_update; //0,1
+} rcm;
+
 struct t_mpd_client_session {
     int song_id;
     unsigned queue_version;

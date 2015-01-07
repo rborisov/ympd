@@ -28,6 +28,12 @@
                 overflow: hidden;
                 background: black;
             }
+            body {
+                font-family: "Courier New";
+            }
+            .nopadding {
+                  padding: 0px;
+            }
             #floatingTop1Left
             {
                   position: fixed;
@@ -98,6 +104,10 @@
             {
                 background: rgba(0,0,0,0.9);
             }
+            .list-group > a:focus
+            {
+                background-color: transparent;
+            }
             .btn-flt-topleft2.btn-lg
             {
                 position: fixed;
@@ -165,6 +175,9 @@
             .gray {
                 color: gray;
             }
+            .warning {
+                color: #eb9316;
+            }
 
             .img-thumbnail{background-color:transparent}
 
@@ -180,6 +193,16 @@
                 bottom: 0px;
                 left: 4px;
             }
+            .flt-bottom1left
+            {
+                position: fixed;
+                bottom: 20px;
+                left: 4px;
+            }
+            .list-group > a
+            {
+                background-color: transparent;
+            }
         </style>
     </head>
     <body class="art-img">
@@ -193,15 +216,48 @@
                 <div class="col-xs-7">
                     <H3>
                         <span id="counter" class="label label-danger"></span>
-                        <span id="currentpos" class="label label-default"></span>
-                        <span id="currenttrack" class="label label-success"></span>
-                        <span id="artist" class="label label-warning"></span>
+                        <span id="currentpos" class="label label-default"></span><br>
+                        <span id="currenttrack" class="label label-success"></span><br>
+                        <span class="label label-warning">
+                            <span class="glyphicon glyphicon-user"> </span>
+                            <span id="artist"></span>
+                        </span><br>
                         <span id="album" class="label label-info"></span>
                     </H3>
                 </div>
             </div>
-            <div class="thumbnail img-thumbnail flt-bottomleft">
-                <img src="/images/fb_logo.png" width="80" height="80" id="radioimage"></img>
+
+            <!--div class="row">
+                <div class="col-xs-4 nopadding">
+                    <div class="thumbnail img-thumbnail">
+                        <img src="/images/art.png" width="150" height="150" id="artimage"></img>
+                    </div>
+                </div>
+                <div class="col-xs-7 nopadding">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                        <span class="glyphicon glyphicon-music"> </span>
+                        <span id="currenttrack"></span>
+                        </li>
+                        <li class="list-group-item">
+                        <span class="glyphicon glyphicon-user"> </span>
+                        <span id="artist"></span>
+                        </li>
+                        <li class="list-group-item">
+                        <span class="glyphicon glyphicon-folder-close"> </span>
+                        <span id="album"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div-->
+
+            <div class="flt-bottom1left">
+                <img src="" width="50" height="50" id="radioimage" class="img-rounded"></img>
+            </div>
+            <div class="flt-bottomleft">
+                <span id="currentradio" class="label label-success"></span>
+                <span id="currentradiostatus" class="label label-info"></span>
+                <span id="currentradiosize" class="label label-danger"></span>
             </div>
             <div class="flt-next-radio">
                 <H4><span id="nextpos" class="label label-default"></span>

@@ -209,18 +209,21 @@ int poll_streamripper(char* newfilename)
         switch (rmi->status)
         {
             case RM_STATUS_BUFFERING:
-                printf("%s: stream ripper: buffering... %s\n", __func__, rmi->filename);
+                strcpy(rcm.status_str, "buffering");
+                //printf("%s: stream ripper: buffering... %s\n", __func__, rmi->filename);
                 break;
             case RM_STATUS_RIPPING:
                 if (rmi->track_count < rmi->prefs->dropcount) {
-//                    printf("%i (%i) skipping... %s %i\n", rmi->track_count, rmi->prefs->dropcount, rmi->filename, rmi->filesize);
+                    strcpy(rcm.status_str, "skipping");
                 }
                 else {
-//                    printf("ripping... %s %i\n", rmi->filename, rmi->filesize);
+                    strcpy(rcm.status_str, "ripping");
                 }
+                format_byte_size(rcm.filesize_str, rmi->filesize);
                 break;
             case RM_STATUS_RECONNECTING:
-                printf("%s: reconnecting...\n", __func__);
+                strcpy(rcm.status_str, "reconnecting");
+                //printf("%s: reconnecting...\n", __func__);
                 break;
 
         }
@@ -233,14 +236,12 @@ int poll_streamripper(char* newfilename)
             return 0;
         }
         mstrncpy(newfilename, newsongname, MAX_TRACK_LEN);
-//        sprintf(newfilename, "%s", filename);
         printf("%s: track done %s\n", __func__, newfilename);
         m_track_done = FALSE;
         return 1;
     }
     if (m_new_track) {
         printf("%s: new track %s %i\n", __func__, rmi->filename, rmi->filesize);
-//        sprintf(filename, "%s%s%s", filepath, rmi->filename, ".mp3");
         m_new_track = FALSE;
     }
     

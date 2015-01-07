@@ -384,8 +384,9 @@ function webSocketConnect() {
                     break;
                 case "current_radio":
                     console.log(obj.data.name+" "+obj.data.logo);
-                    if (obj.data.name)
-                        $('#currentradio').text(" " + obj.data.name);
+                    $('#currentradio').text(obj.data.name);
+                    $('#currentradiostatus').text(obj.data.status);
+                    $('#currentradiosize').text(obj.data.size);
                     if (obj.data.logo) {
                         var logoimage = document.getElementById("radioimage");
                         radioimage.src = "/images/"+obj.data.logo;
