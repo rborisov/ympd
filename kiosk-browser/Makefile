@@ -1,19 +1,17 @@
-PROGRAM=browser
-OBJECTS=browser.o
-
-CC=gcc
-CFLAGS=$(shell pkg-config --cflags gtk+-2.0 webkit-1.0)
+CFLAGS=$(shell pkg-config --cflags  webkitgtk-3.0)
 CFLAGS+= -Wall -g
+LDFLAGS=$(shell pkg-config --libs webkitgtk-3.0)
 
-LDFLAGS=$(shell pkg-config --libs gtk+-2.0 webkit-1.0)
+all: browser
 
-all: $(PROGRAM)
-
-browser: $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $(PROGRAM)
+browser: browser3.c
+	cc -c $(CFLAGS) browser3.c
+	cc -o browser browser3.o $(LDFLAGS)
 
 clean:
-	rm -rf $(OBJECTS) $(PROGRAM)
-	
-%.o : %.c
-	$(CC) $(CFLAGS) -c $<
+	rm -f *~
+	rm -f browser
+	rm -f browser3.o
+
+install:
+	cp browser /usr/bin/
