@@ -1,6 +1,6 @@
-CFLAGS=$(shell pkg-config --cflags  webkitgtk-3.0)
+CFLAGS=$(shell pkg-config --cflags  webkit2gtk-3.0)
 CFLAGS+= -Wall -g
-LDFLAGS=$(shell pkg-config --libs webkitgtk-3.0)
+LDFLAGS=$(shell pkg-config --libs webkit2gtk-3.0)
 
 all: browser
 
@@ -14,4 +14,4 @@ clean:
 	rm -f browser3.o
 
 install:
-	cp browser /usr/bin/
+	cp -f browser /usr/bin/
