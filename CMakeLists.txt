@@ -9,16 +9,20 @@ set(STREAMRIPPER_LIB_PATH "${PROJECT_SOURCE_DIR}/libstreamripper/")
 set(STREAMRIPPER_SRC_PATH "${PROJECT_SOURCE_DIR}/libstreamripper/src/")
 
 SET(CMAKE_BUILD_TYPE debug)
+SET(USE_GTK3 "1")
 
 option(WITH_MPD_HOST_CHANGE "Let users of the web frontend change the MPD Host" ON)
 
 find_package(LibMPDClient REQUIRED)
 find_package(Threads REQUIRED)
 find_package(GLIB2 REQUIRED)
+find_package(GTK3 REQUIRED)
+find_package(WebKit3 REQUIRED)
+find_package(LibSoup2 REQUIRED)
 #find_package(MySQL REQUIRED)
 
 configure_file(src/config.h.in ${PROJECT_BINARY_DIR}/config.h)
-include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR} ${STREAMRIPPER_LIB_PATH} ${STREAMRIPPER_SRC_PATH} ${GLIB2_INCLUDE_DIRS})
+include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR} ${STREAMRIPPER_LIB_PATH} ${STREAMRIPPER_SRC_PATH} ${GLIB2_INCLUDE_DIRS} ${GTK3_INCLUDE_DIRS} ${GTK3_LIBRARIES} ${WEBKIT_INCLUDE_DIR} ${LIBSOUP2_INCLUDE_DIRS})
 
 include(CheckCSourceCompiles)
 

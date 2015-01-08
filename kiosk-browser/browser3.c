@@ -73,6 +73,8 @@ int main(int argc, char* argv[])
     // Run the main GTK+ event loop
     gtk_main();
 
+    printf("gtk...\n");
+
     return 0;
 }
 

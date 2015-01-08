@@ -23,8 +23,10 @@
 #include <getopt.h>
 #include <sys/time.h>
 #include <pthread.h>
-//#include <libconfig.h>
 #include <pwd.h>
+
+//#include <gtk/gtk.h>
+//#include <webkit/webkit.h>
 
 #include "mongoose.h"
 #include "http_server.h"
@@ -34,7 +36,6 @@
 #include "sqlitedb.h"
 
 #include <mpd/client.h>
-//#include "ydebug.h"
 
 extern char *optarg;
 
@@ -60,17 +61,10 @@ static int server_callback(struct mg_connection *c) {
 
 int main(int argc, char **argv)
 {
-    int n, option_index = 0;
     struct mg_server *server = mg_create_server(NULL);
     unsigned int current_timer = 0, last_timer = 0;
     char *run_as_user = NULL;
     char radio_song_name[512] = "";
-    const char *music_path = NULL, 
-          *radio_path = NULL,
-          *radio_url = NULL,
-          *radio_dest = NULL;
-    char chrbuff[512] = "";
-//    char config_file_name[512] = "";
     struct passwd *pw = getpwuid(getuid());
     char *homedir = pw->pw_dir;
 
@@ -92,11 +86,6 @@ int main(int argc, char **argv)
         config_destroy(&mpd.cfg);
         return(EXIT_FAILURE);
     }
-/*    if (!config_lookup_string(&mpd.cfg, "application.music_path", &music_path))
-    {
-        fprintf(stderr, "No 'application.music_path' setting in configuration file.\n");
-    }
-*/
     /* drop privilges at last to ensure proper port binding */
     if(run_as_user != NULL)
     {
@@ -104,26 +93,8 @@ int main(int argc, char **argv)
         free(run_as_user);
     }
 
-/*    if (!config_lookup_string(&mpd.cfg, "radio.path", &radio_path))
-    {
-        fprintf(stderr, "No 'radio.path' setting in configuration file.\n");
-    }*/
-/*    if (!config_lookup_string(&mpd.cfg, "radio.url", &radio_url))
-    {
-        fprintf(stderr, "No 'radio.url' setting in configuration file.\n");
-    }*/
-/*    if (!config_lookup_string(&mpd.cfg, "radio.dest", &radio_dest))
-    {
-        fprintf(stderr, "No 'radio.dest' setting in configuration file.\n");
-    }*/
-
     db_init();
 
-//    setstream_streamripper(radio_url);
-//    streamripper_set_url(NULL);
-//    sprintf(chrbuff, "%s%s%s", music_path, radio_path, radio_dest);
-//    setpath_streamuri(chrbuff);
-//    printf("url: %s path: %s\n", radio_url, chrbuff);
     streamripper_set_url_dest(NULL);
     init_streamripper();
     mpd.radio_status = 1;
@@ -131,6 +102,9 @@ int main(int argc, char **argv)
     
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
+
+
+    
 
     while (!force_exit) {
         current_timer = mg_poll_server(server, 200);
@@ -141,8 +115,6 @@ int main(int argc, char **argv)
             if (mpd.radio_status == 1)
                 if (poll_streamripper(radio_song_name))
                 {
-//                    sprintf(chrbuff, "%s%s/%s", radio_path, radio_dest, radio_song_name);
-//                    printf("%s\n", chrbuff);
                     mpd_run_update(mpd.conn, radio_song_name);
                     sleep(1);
                     mpd_run_add(mpd.conn, radio_song_name);
