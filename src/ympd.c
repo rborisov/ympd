@@ -74,6 +74,8 @@ int main(int argc, char **argv)
     struct passwd *pw = getpwuid(getuid());
     char *homedir = pw->pw_dir;
 
+    rcm.last_timer = 0;
+
     sprintf(mpd.config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
     printf("conf = %s\n", mpd.config_file_name);
 

@@ -383,7 +383,7 @@ function webSocketConnect() {
                     }
                     break;
                 case "current_radio":
-                    console.log(obj.data.name+" "+obj.data.logo);
+                    //console.log(obj.data.name+" "+obj.data.logo);
                     $('#currentradio').text(obj.data.name);
                     $('#currentradiostatus').text(obj.data.status);
                     $('#currentradiosize').text(obj.data.size);
@@ -449,17 +449,17 @@ function webSocketConnect() {
                 case "song_change":
                     $('#currenttrack').text(" " + obj.data.title);
 //                    $('#currentpos').text(obj.data.pos);
-                    var notification = "<strong><h4>" + obj.data.title + "</h4></strong>";
+                    //var notification = "<strong><h4>" + obj.data.title + "</h4></strong>";
                     
                     if(obj.data.album) {
                         $('#album').text(obj.data.album);
-                        notification += obj.data.album + "<br />";
+                        //notification += obj.data.album + "<br />";
                     } else
                        $('#album').text(""); 
 
                     if(obj.data.artist) {
                         $('#artist').text(obj.data.artist);
-                        notification += obj.data.artist + "<br />";
+                        //notification += obj.data.artist + "<br />";
                     } else
                         $('#artist').text("");
 
@@ -468,7 +468,7 @@ function webSocketConnect() {
                         var art_url = "/images/"+obj.data.art;
                         document.getElementById("artimage").src = art_url;
                     }
-
+/*
                     if ($.cookie("notification") === "true")
                         songNotify(obj.data.title, obj.data.artist, obj.data.album );
                     else
@@ -476,7 +476,7 @@ function webSocketConnect() {
                             message:{html: notification},
                             type: "info",
                         }).show();
-                    
+  */                  
                     socket.send('MPD_API_GET_QUEUE,'+pagination);
                         
                     break;

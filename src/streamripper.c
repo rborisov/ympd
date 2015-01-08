@@ -23,7 +23,7 @@ static BOOL m_track_done = FALSE;
 RIP_MANAGER_INFO *rmi = 0;
 STREAM_PREFS prefs;
 char chrbuff[128] = "";
-char filepath[128] = "";
+//char filepath[128] = "";
 char newsongname[128] = "";
 
 void streamripper_set_url(char* url)
@@ -70,6 +70,7 @@ void streamripper_set_url_dest(char* dest)
         fprintf(stderr, "%s: No 'radio.path' setting in configuration file.\n", __func__);
         return;
     }
+    rcm.image_update = 1;
     if (!radio_dest || radio_dest == "") {
         if (!config_lookup_string(&mpd.cfg, "radio.current", &radio_dest))
         {
@@ -113,15 +114,13 @@ void streamripper_set_url_dest(char* dest)
         }
     }
 
-    strcpy(mpd.currentradio, radio_dest);
+    strcpy(rcm.current_radio, radio_dest);
 
-    sprintf(filepath, "%s%s/", radio_path, radio_dest);
-    printf("%s: filepath = %s\n", __func__, filepath);
-    sprintf(chrbuff, "%s%s", music_path, filepath);
+    sprintf(rcm.file_path, "%s%s", radio_path, radio_dest);
+    printf("%s: rcm.file_path = %s\n", __func__, rcm.file_path);
+    sprintf(chrbuff, "%s%s", music_path, rcm.file_path);
     setpath_streamuri(chrbuff);
     printf("%s: path: %s\n", __func__, chrbuff);
-
-    rcm.image_update = 1;
 }
 
 void setstream_streamripper(char* streamuri)
@@ -299,7 +298,7 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
             break;
         case RM_TRACK_DONE:
             m_track_done = TRUE;
-            sprintf(newsongname, "%s%s", filepath, strrchr(data, '/' )+1);
+            sprintf(newsongname, "%s/%s", rcm.file_path, strrchr(data, '/' )+1);
             wprintf("%s: RM_TRACK_DONE: (%s)%s\n", __func__, data, newsongname);
             break;
     }

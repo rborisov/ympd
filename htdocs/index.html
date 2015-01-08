@@ -203,20 +203,24 @@
             {
                 background-color: transparent;
             }
+            .modal
+            {
+                z-index: 20000;
+            }
         </style>
     </head>
     <body class="art-img">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-xs-5">
+                <div class="col-xs-4 nopadding">
                     <div class="thumbnail img-thumbnail">
                         <img src="/images/art.png" width="150" height="150" id="artimage"></img>
                     </div>
                 </div>
-                <div class="col-xs-7">
+                <div class="col-xs-8 nopadding">
+                    <span id="counter" class="label label-danger"></span>
+                    <span id="currentpos" class="label label-default"></span><br>
                     <H3>
-                        <span id="counter" class="label label-danger"></span>
-                        <span id="currentpos" class="label label-default"></span><br>
                         <span id="currenttrack" class="label label-success"></span><br>
                         <span class="label label-warning">
                             <span class="glyphicon glyphicon-user"> </span>

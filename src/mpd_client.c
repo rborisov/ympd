@@ -47,7 +47,7 @@ char outfn[128];
 int mpd_search_one(char *buffer, char *searchstr);
 void get_random_song(char *str, char *path);
 int mpd_get_track_info(char *buffer);
-int mpd_put_current_radio(char *buffer, char *currentname);
+int mpd_put_current_radio(char *buffer);
 
 struct mpd_status *
 getStatus(struct mpd_connection *conn)
@@ -511,10 +511,14 @@ static int mpd_notify_callback(struct mg_connection *c) {
             s->queue_version = mpd.queue_version;
         }
 
-        //TODO: support different sources; 
-        n = mpd_put_current_radio(mpd.buf, rcm.current_radio);
-        if (n > 0)
-            mg_websocket_write(c, 1, mpd.buf, n);
+        //TODO: support different sources;
+        if (((unsigned int)time(NULL) - rcm.last_timer) > 10) {
+            n = mpd_put_current_radio(mpd.buf);
+            if (n > 0)
+                mg_websocket_write(c, 1, mpd.buf, n);
+            rcm.last_timer = (unsigned int)time(NULL);
+            printf("%s %i\n", __func__, rcm.last_timer); 
+        }
     }
 
     return MG_REQUEST_PROCESSED;
@@ -570,7 +574,7 @@ void mpd_poll(struct mg_server *s)
             mpd.buf_size = mpd_put_state(mpd.buf, &mpd.song_id, &mpd.queue_version);
             mg_iterate_over_connections(s, mpd_notify_callback, NULL);
             if (queue_is_empty) {
-                get_random_song(str, "radio");
+                get_random_song(str, rcm.file_path);
                 ydebug_printf("%s: add random song %s\n", __func__, str);
                 mpd_run_add(mpd.conn, str);
                 queue_is_empty = 0;
@@ -789,17 +793,14 @@ int mpd_get_track_info(char *buffer)
     return cur - buffer;
 }
 
-int mpd_put_current_radio(char *buffer, char *currentname)
+int mpd_put_current_radio(char *buffer)
 {
     char *cur = buffer;
     const char *end = buffer + MAX_SIZE;
     config_setting_t *setting;
 
-    //printf("%s: looking for %s art\n", __func__, currentname);
-    //TODO: store current radio art to mpd. ; 
-    //don't read config everytime
     cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"current_radio\", \"data\":{\"name\":");
-    cur += json_emit_quoted_str(cur, end - cur, currentname);
+    cur += json_emit_quoted_str(cur, end - cur, rcm.current_radio);
     cur += json_emit_raw_str(cur, end - cur, ",\"status\":");
     cur += json_emit_quoted_str(cur, end - cur, rcm.status_str);
     cur += json_emit_raw_str(cur, end - cur, ",\"size\":");
@@ -814,16 +815,11 @@ int mpd_put_current_radio(char *buffer, char *currentname)
                 const char *name, *logo;
                 if (!config_setting_lookup_string(station, "name", &name))
                     continue;
-                if (strcmp(name, currentname) == 0) {
-                    //printf("%-30s\n", name);
-                    //                cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"current_radio\", \"data\":{\"name\":");
-                    //                cur += json_emit_quoted_str(cur, end - cur, name);
+                if (strcmp(name, rcm.current_radio) == 0) {
                     if (config_setting_lookup_string(station, "logo", &logo)) {
-                        //printf("%s: logo %s\n", __func__, logo);
                         cur += json_emit_raw_str(cur, end - cur, ",\"logo\":");
                         cur += json_emit_quoted_str(cur, end - cur, logo);
                     }
-                    //                cur += json_emit_raw_str(cur, end - cur, "}}");
                     break;
                 }
             }
