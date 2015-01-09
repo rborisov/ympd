@@ -285,6 +285,7 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
         case RM_ERROR:
             err = (ERROR_INFO*)data;
             fprintf(stderr, "\n%s: error %d [%s]\n", __func__, err->error_code, err->error_str);
+            sprintf(rcm.status_str, "error [%s]", err->error_str);
             m_alldone = TRUE;
             break;
         case RM_DONE:

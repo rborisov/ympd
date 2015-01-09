@@ -26,13 +26,13 @@
         <style>
             html { 
                 overflow: hidden;
-                background: black;
             }
             body {
                 font-family: "Courier New";
+                background: #1F0F00;
             }
             .nopadding {
-                  padding: 0px;
+                  padding: 4px;
             }
             #floatingTop1Left
             {
@@ -67,14 +67,14 @@
             {
                 position: fixed;
                 z-index: 10000;
-                bottom: 100px;
+                bottom: 94px;
                 right: 4px;
             }
             .btn-flt-bottom1right.btn-lg
             {
                 position: fixed;
                 z-index: 10000;
-                bottom: 59px;
+                bottom: 49px;
                 right: 4px;
             }
             .btn-flt-bottomright.btn-lg
@@ -171,7 +171,24 @@
                 top: 45px;
                 left: 98px;
             }
-
+            .bkgreen
+            {
+                background: green;
+            }
+            .bkorange
+            {
+                background: orange;
+                color: black;
+            }
+            .bkblack
+            {
+                background: black;
+                color: GreenYellow;
+            }
+            H3 {
+                font-family: "Courier New";
+                font-weight: bold;
+            }
             .gray {
                 color: gray;
             }
@@ -209,9 +226,28 @@
             }
         </style>
     </head>
-    <body class="art-img">
+    <body>
         <div class="container-fluid">
-            <div class="row">
+            <div class="panel panel-default bkblack">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-xs-4 nopadding">
+                            <img src="" width="150" height="150" id="artimage" class="img-rounded"/>
+                        </div>
+                        <div class="col-xs-7">
+                            <span id="counter" class="badge bkgreen"></span><span id="currentpos" class="badge bkorange"></span>
+                            <H3><span id="currenttrack" ></span></H3>
+                            <H4><span id="artist" class="bkorange"> </span>
+                            <span id="album" ></span></H4>
+                        </div>
+                    </div>
+                    <div>
+                        <span id="nextpos" class="label label-default"></span>
+                        <span id="next_artist" class="label label-warning"></span>
+                    </div>
+                </div>
+            </div>
+            <!--div class="row">
                 <div class="col-xs-4 nopadding">
                     <div class="thumbnail img-thumbnail">
                         <img src="/images/art.png" width="150" height="150" id="artimage"></img>
@@ -229,7 +265,7 @@
                         <span id="album" class="label label-info"></span>
                     </H3>
                 </div>
-            </div>
+            </div-->
 
             <!--div class="row">
                 <div class="col-xs-4 nopadding">
@@ -255,20 +291,20 @@
                 </div>
             </div-->
 
-            <div class="flt-bottom1left">
+            <!--div class="flt-bottom1left">
                 <img src="" width="50" height="50" id="radioimage" class="img-rounded"></img>
-            </div>
+            </div-->
             <div class="flt-bottomleft">
                 <span id="currentradio" class="label label-success"></span>
                 <span id="currentradiostatus" class="label label-info"></span>
                 <span id="currentradiosize" class="label label-danger"></span>
             </div>
-            <div class="flt-next-radio">
+            <!--div class="flt-next-radio">
                 <H4><span id="nextpos" class="label label-default"></span>
                     <span id="next_artist" class="label label-warning"></span>
                     <span id="next_track" class="label label-success"></span>
                 </H4>
-            </div>
+            </div-->
             <div>
                 <!-- player controls -->
                 <button class="btn btn-flt-topright1 btn-warning btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
@@ -280,14 +316,14 @@
                 <button class="btn btn-flt-topright btn-warning btn-play btn-lg" onclick="clickPlay();">
                     <span id="play-icon" class="glyphicon glyphicon-pause"></span>
                 </button>
-                <button class="btn btn-flt-bottom2right btn-info btn-play btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
-                    <span class="glyphicon glyphicon-volume-up"></span>
+                <button class="btn btn-flt-bottom2right btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
+                    <span class="glyphicon glyphicon-plus"></span>
                 </button>
                 <button class="btn btn-flt-bottom1right btn-info btn-circle btn-lg">
-                    <span id="volume"></span>
+                    <span id="volume-icon" class="glyphicon glyphicon-volume-up"></span>
                 </button>
-                <button class="btn btn-flt-bottomright btn-info btn-play btn-lg" onclick="socket.send('MPD_API_DECREASE_VOLUME');">
-                    <span class="glyphicon glyphicon-volume-down"></span>
+                <button class="btn btn-flt-bottomright btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_DECREASE_VOLUME');">
+                    <span class="glyphicon glyphicon-minus"></span>
                 </button>
                 <!-- browser/queue/radio controls -->
                 <button id="floatingTopLeft" class="btn btn-circle btn-success btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">

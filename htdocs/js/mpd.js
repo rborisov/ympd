@@ -310,7 +310,7 @@ function webSocketConnect() {
                 case "state":
                     updatePlayIcon(obj.data.state);
                     $('#volume').text(obj.data.volume);
-                    //updateVolumeIcon(obj.data.volume);
+                    updateVolumeIcon(obj.data.volume);
                     updateRadioIcon(obj.data.radio_status);
                     updateRandomIcon(obj.data.random);
 //                    console.log(obj.data.songpos);

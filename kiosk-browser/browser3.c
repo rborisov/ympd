@@ -26,8 +26,10 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
+#include <string.h>
 #include <gtk/gtk.h>
-#include <webkit2/webkit2.h>
+#include <webkit/webkit.h>
 
 
 static void destroyWindowCb(GtkWidget* widget, GtkWidget* window);
@@ -35,12 +37,50 @@ static gboolean closeWebViewCb(WebKitWebView* webView, GtkWidget* window);
 
 int main(int argc, char* argv[])
 {
+    int i, width = 0,
+        height = 0;
+    char url[128] = "http://localhost:8080";
+    char *c;
+
+    for (i = 1; i < argc; i++) {
+        if (argv[i][0] != '-')
+            continue;
+
+        c = strchr ("whl", argv[i][1]);
+        if (c != NULL) {
+            if ((i == (argc-1)) || (argv[i+1][0] == '-')) {
+                fprintf(stderr, "option %s requires an argument\n", argv[i]);
+                break;
+            }
+        }
+
+        switch (argv[i][1])
+        {
+            case 'w':
+                i++;
+                width = atoi(argv[i]);
+                printf("view width: %i\n", width);
+                break;
+            case 'h':
+                i++;
+                height = atoi(argv[i]);
+                printf("view height: %i\n", height);
+                break;
+            case 'l':
+                i++;
+                strncpy (url, argv[i], 128);
+                printf("url: %s\n", url);
+                break;
+        }
+    }
+
     // Initialize GTK+
     gtk_init(&argc, &argv);
 
     // Create an 800x600 window that will contain the browser instance
     GtkWidget *main_window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    ///gtk_window_set_default_size(GTK_WINDOW(main_window), 800, 600);
+    if (width && height)
+        gtk_window_set_default_size(GTK_WINDOW(main_window), width, height);
 
     // Create a browser instance
     WebKitWebView *webView = WEBKIT_WEB_VIEW(webkit_web_view_new());
@@ -50,30 +90,28 @@ int main(int argc, char* argv[])
 
     // Set up callbacks so that if either the main window or the browser instance is
     // closed, the program will exit
-    ///g_signal_connect(main_window, "destroy", G_CALLBACK(destroyWindowCb), NULL);
-    ///g_signal_connect(webView, "close", G_CALLBACK(closeWebViewCb), main_window);
+    g_signal_connect(main_window, "destroy", G_CALLBACK(destroyWindowCb), NULL);
+    g_signal_connect(webView, "close", G_CALLBACK(closeWebViewCb), main_window);
 
     // Load a web page into the browser instance
-    if(argc > 1)
-        webkit_web_view_load_uri(webView, argv[1]);
-    else
-        webkit_web_view_load_uri(webView, "http://localhost:8080");
+    webkit_web_view_load_uri(webView, url);
 
     // Make sure that when the browser area becomes visible, it will get mouse
     // and keyboard events
     gtk_widget_grab_focus(GTK_WIDGET(webView));
 
-    gtk_window_maximize(GTK_WINDOW(main_window));
-    gtk_window_fullscreen(GTK_WINDOW(main_window));
-    gtk_window_set_decorated(GTK_WINDOW(main_window), FALSE);
+    //maximize if no parameters
+    if (!width || !height) {
+        gtk_window_maximize(GTK_WINDOW(main_window));
+        gtk_window_fullscreen(GTK_WINDOW(main_window));
+        gtk_window_set_decorated(GTK_WINDOW(main_window), FALSE);
+    }
 
     // Make sure the main window and all its contents are visible
     gtk_widget_show_all(main_window);
 
     // Run the main GTK+ event loop
     gtk_main();
-
-    printf("gtk...\n");
 
     return 0;
 }
