@@ -143,6 +143,17 @@ static inline enum mpd_cmd_ids get_cmd_id(char *cmd)
     return -1;
 }
 
+void delete_file_forever(char* uri)
+{
+    char filepath[128]; 
+    if (!uri) {
+        //choose file by some criteria or random(?)
+        //TODO:
+    } else {
+        remove(uri);
+    }
+}
+
 char* download_file(char* url)
 {
     CURL *curl;
@@ -243,6 +254,12 @@ int callback_mpd(struct mg_connection *c)
     mpd_connection_set_timeout(mpd.conn, 10000);
     switch(cmd_id)
     {
+        case MPD_API_LIKE:
+            mpd_db_update_current_song_rating(1);
+            break;
+        case MPD_API_DISLIKE:
+            mpd_db_update_current_song_rating(-1);
+            break;
         case MPD_API_DB_ALBUM:
             if(sscanf(c->content, "MPD_API_DB_ALBUM,%m[^\t\n]", 
                         &p_charbuf) && p_charbuf != NULL)
@@ -517,7 +534,7 @@ static int mpd_notify_callback(struct mg_connection *c) {
             if (n > 0)
                 mg_websocket_write(c, 1, mpd.buf, n);
             rcm.last_timer = (unsigned int)time(NULL);
-            printf("%s %i\n", __func__, rcm.last_timer); 
+//            printf("%s %i\n", __func__, rcm.last_timer); 
         }
     }
 
@@ -714,6 +731,23 @@ int mpd_put_artist_art(char *buffer, char *artist)
     mpd_response_finish(mpd.conn);
 
     return cur - buffer;
+}
+
+int mpd_db_update_current_song_rating(int increase)
+{
+    int rating = 0;
+    struct mpd_song *song;
+
+    song = mpd_run_current_song(mpd.conn);
+    if(song == NULL)
+        return 0;
+
+    rating = db_update_song_rating(mpd_get_title(song),
+            mpd_song_get_tag(song, MPD_TAG_ARTIST, 0), increase);
+
+    mpd_song_free(song);
+
+    return rating;
 }
 
 int mpd_put_current_song(char *buffer)

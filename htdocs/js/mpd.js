@@ -548,7 +548,7 @@ var download_artist_info = function(artist)
         var art_url;
         var artimage = document.getElementById("artimage");
         if (lastfm && lastfm.artist) {
-            if (lastfm.artist.image[1]['#text']) {
+            if (lastfm.artist.image[2]['#text']) {
                 art_url = lastfm.artist.image[1]['#text'];
                 console.log('art_url :'+art_url);
                 artimage.src = art_url;

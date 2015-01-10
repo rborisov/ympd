@@ -70,7 +70,9 @@
     X(MPD_API_DB_ARTIST) \
     X(MPD_API_DB_GET_ARTIST) \
     X(MPD_API_INCREASE_VOLUME) \
-    X(MPD_API_DECREASE_VOLUME)
+    X(MPD_API_DECREASE_VOLUME) \
+    X(MPD_API_LIKE) \
+    X(MPD_API_DISLIKE)
 
 enum mpd_cmd_ids {
     MPD_CMDS(GEN_ENUM)
@@ -134,5 +136,7 @@ int mpd_put_radio(char *buffer, unsigned int offset);
 int mpd_put_browse(char *buffer, char *path, unsigned int offset);
 int mpd_search(char *buffer, char *searchstr);
 void mpd_disconnect();
+
+void delete_file_forever(char *);
 #endif
 

@@ -23,6 +23,8 @@
 #include <string.h>
 #include <pwd.h>
 #include <curl/curl.h>
+#include <unistd.h>
+#include <sys/types.h>
 
 #include "http_server.h"
 #include "config.h"

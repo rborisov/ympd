@@ -13,5 +13,6 @@ int db_update_song_album(char*, char*, char*);
 int db_update_album_art(char*, char*, char*);
 int db_update_artist_art(char*, char*);
 void db_result_free(char*);
+int db_update_song_rating(char*, char*, int);
 
 #endif

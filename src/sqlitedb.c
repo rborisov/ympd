@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include <sqlite3.h>
 #include "sqlitedb.h"
@@ -39,6 +40,12 @@ int db_init()
     char create_Artists_table_query[] = "CREATE TABLE IF NOT EXISTS Artists \
                                          (id INTEGER PRIMARY KEY, artist TEXT, \
                                           artpath TEXT)";
+    char create_Radio_table_query[] = "CREATE TABLE IF NOT EXISTS Radios \
+                                       (id INTEGER PRIMARY KEY, name TEXT, \
+                                        time DATETIME, rating INTEGER, style TEXT, url TEXT)";
+    char create_RadioUrl_table_query[] = "CREATE TABLE IF NOT EXISTS RadioUrls \
+                                       (id INTEGER PRIMARY KEY, radioid INTEGER, url TEXT, \
+                                        time DATETIME, bitrate INTEGER)";
     rc = sqlite3_open("rcardb.sqlite", &conn);
     if (rc != SQLITE_OK) 
         goto error;
@@ -49,6 +56,12 @@ int db_init()
     if (rc != SQLITE_OK)
         goto error;
     rc = sqlite3_exec(conn, create_Artists_table_query, 0, 0, 0);
+    if (rc != SQLITE_OK)
+        goto error;
+    rc = sqlite3_exec(conn, create_Radio_table_query, 0, 0, 0);
+    if (rc != SQLITE_OK)
+        goto error;
+    rc = sqlite3_exec(conn, create_RadioUrl_table_query, 0, 0, 0);
     if (rc != SQLITE_OK)
         goto error;
     return rc;
@@ -149,6 +162,24 @@ int db_update_song_album(char* song, char* artist, char* album)
     return rc;
 }
 
+int db_get_song_rating(char* song, char* artist)
+{
+    convert_str(song);
+    convert_str(artist);
+    int rating = sql_get_int_field(conn, "SELECT rating FROM Songs WHERE "
+            "song = '%s' AND artist = '%s'", song, artist);
+    return rating;
+}
+
+int db_update_song_rating(char* song, char* artist, int increase)
+{
+    int rc, rating = db_get_song_rating(song, artist) + increase;
+    printf("%s found %i updating...\n", __func__, rating);
+    rc = sql_exec(conn, "UPDATE Songs SET rating = '%i' "
+            "WHERE song = '%s' AND artist = '%s'", rating, song, artist);
+    return (rc == SQLITE_OK) ? rating : 0;
+}
+
 int db_update_album_art(char* artist, char* album, char* art)
 {
     int id, rc;
@@ -209,7 +240,7 @@ int db_listen_song(char* song, char* artist, char* album)
                     "WHERE song = '%s' AND artist = '%s'", song, artist);
     } else {
         ydebug_printf("%s %s %s doesn't exist. adding...\n", __func__, song, artist);
-        rc = sql_exec(conn, "INSERT INTO Songs (song, artist, numplayed, added, played, rating)"
+        rc = sql_exec(conn, "INSERT INTO Songs (song, artist, added, played, numplayed, rating)"
                 " VALUES ('%s', '%s', DATETIME('NOW', 'LOCALTIME'), DATETIME('NOW', 'LOCALTIME'), 1, 0)", 
                 song, artist);
     }

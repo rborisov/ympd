@@ -10,12 +10,12 @@
 #include "streamripper.h"
 #include "mpd_client.h"
 
-static void catch_sig (int code);
+//static void catch_sig (int code);
 static void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data);
 
 static BOOL         m_started = FALSE;
 static BOOL         m_alldone = FALSE;
-static BOOL         m_got_sig = FALSE;
+//static BOOL         m_got_sig = FALSE;
 static BOOL m_update = FALSE;
 static BOOL m_new_track = FALSE;
 static BOOL m_track_done = FALSE;
@@ -28,9 +28,9 @@ char newsongname[128] = "";
 
 void streamripper_set_url(char* url)
 {
-    char *radio_url = url;
+    const char *radio_url = url;
 
-    if (url && url != "")
+    if (url && strcmp(url, ""))
         goto done;
     
     if (!(&mpd.cfg)) {
@@ -49,10 +49,9 @@ done:
 
 void streamripper_set_url_dest(char* dest)
 {
-    char *radio_dest = dest,
+    const char *radio_dest = dest,
          *music_path = NULL,
-         *radio_path = NULL,
-         *radio_url = NULL;
+         *radio_path = NULL;
     config_setting_t *root, *setting;
 
     if (!(&mpd.cfg)) {
@@ -71,7 +70,7 @@ void streamripper_set_url_dest(char* dest)
         return;
     }
     rcm.image_update = 1;
-    if (!radio_dest || radio_dest == "") {
+    if (!radio_dest || strcmp(radio_dest, "") == 0) {
         if (!config_lookup_string(&mpd.cfg, "radio.current", &radio_dest))
         {
             fprintf(stderr, "%s: No 'radio.dest' setting in configuration file.\n", __func__);
@@ -123,10 +122,10 @@ void streamripper_set_url_dest(char* dest)
     printf("%s: path: %s\n", __func__, chrbuff);
 }
 
-void setstream_streamripper(char* streamuri)
+void setstream_streamripper(const char* streamuri)
 {
     prefs_load ();
-    prefs_get_stream_prefs (&prefs, streamuri);
+    prefs_get_stream_prefs (&prefs, (char *)streamuri);
     prefs_save ();
 }
 
@@ -139,7 +138,7 @@ void setpath_streamuri(char* outpath)
 
 void init_streamripper()
 {
-    char* incomplete;
+    const char* incomplete;
     
     sr_set_locale ();
     debug_set_filename("streamripper.log");
@@ -242,7 +241,7 @@ int poll_streamripper(char* newfilename)
         return 1;
     }
     if (m_new_track) {
-        printf("%s: new track %s %i\n", __func__, rmi->filename, rmi->filesize);
+        printf("%s: new track %s %lu\n", __func__, rmi->filename, rmi->filesize);
         m_new_track = FALSE;
     }
     
@@ -257,7 +256,7 @@ int stop_streamripper()
 
     return 0;
 }
-
+/*
 void catch_sig(int code)
 {
 //    print_to_console ("\n");
@@ -265,7 +264,7 @@ void catch_sig(int code)
         exit(2);
     m_got_sig = TRUE;
 }
-
+*/
 /*
  * This will get called whenever anything interesting happens with the
  * stream. Interesting are progress updates, error's, when the rip
@@ -287,6 +286,14 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
             fprintf(stderr, "\n%s: error %d [%s]\n", __func__, err->error_code, err->error_str);
             sprintf(rcm.status_str, "error [%s]", err->error_str);
             m_alldone = TRUE;
+            switch (err->error_code)
+            {
+                case 0x24:
+                case 0x25:
+                    printf("%s: %s - lets free file storage\n", __func__, err->error_str);
+                    delete_file_forever(NULL);
+                    break;
+            }
             break;
         case RM_DONE:
             m_alldone = TRUE;
@@ -300,7 +307,7 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
         case RM_TRACK_DONE:
             m_track_done = TRUE;
             sprintf(newsongname, "%s/%s", rcm.file_path, strrchr(data, '/' )+1);
-            wprintf("%s: RM_TRACK_DONE: (%s)%s\n", __func__, data, newsongname);
+            printf("%s: RM_TRACK_DONE: (%s)%s\n", __func__, (char*)data, newsongname);
             break;
     }
 }
