@@ -253,6 +253,8 @@
                     <div class="row">
                         <div class="col-xs-4 nopadding">
                             <img src="" width="150" height="150" id="artimage" class="img-rounded"/>
+                            <span id="nextpos" class="label label-default"></span>
+                            <span id="next_artist" class="label label-warning"></span>
                         </div>
                         <div class="col-xs-7">
                             <H4><button class="btn btn-success btn-circle-sm btn-lg" onclick="socket.send('MPD_API_LIKE');">
@@ -267,10 +269,10 @@
                             <H4><span id="album" ></span></H4>
                         </div>
                     </div>
-                    <div>
+                    <!--div>
                         <span id="nextpos" class="label label-default"></span>
                         <span id="next_artist" class="label label-warning"></span>
-                    </div>
+                    </div-->
                 </div>
             </div>
             <div class="flt-bottomleft">

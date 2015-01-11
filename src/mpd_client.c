@@ -43,6 +43,7 @@ const char * mpd_cmd_strs[] = {
 //int radio_status = 0;
 static int queue_is_empty = 0;
 char outfn[128];
+char outdir[128];
 
 int mpd_search_one(char *buffer, char *searchstr);
 void get_random_song(char *str, char *path);
@@ -154,7 +155,7 @@ void delete_file_forever(char* uri)
     }
 }
 
-char* download_file(char* url)
+char* download_file(char* url, char* artist)
 {
     CURL *curl;
     FILE *fp;
@@ -167,14 +168,17 @@ char* download_file(char* url)
         if (!config_lookup_string(&mpd.cfg, "application.images_path", &images_dir))
         {
             fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
-            sprintf(outfn, "%s/%s/images/%s", homedir, RCM_DIR_STR, strrchr(url, '/' ));
+            sprintf(outdir, "%s/%s/images%s", homedir, RCM_DIR_STR, artist);
         } else {
-            sprintf(outfn, "%s/%s", images_dir, strrchr(url, '/' )+1);
-            mkdir (images_dir, 0777);
+            sprintf(outdir, "%s%s", images_dir, artist);
         }
+        sprintf(outfn, "%s%s", outdir, strrchr(url, '/' ));
+        mkdir(images_dir, 0777);
+        mkdir(outdir, 0777);
         printf("%s\n", strrchr(outfn, '.'));
         if (access(outfn, F_OK) != -1) {
-            printf("%s: files exists\n", __func__);
+            printf("%s: file already exists %s\n", __func__, outfn);
+            goto done;
         }
         printf("%s out_filename: %s\n", __func__, outfn);
         fp = fopen(outfn,"wb");
@@ -191,10 +195,12 @@ char* download_file(char* url)
             }
         }
     }
-    out = strrchr(outfn, '/' )+1;
-    ydebug_printf("%s downloaded %s\n", __func__, out);
+done:
+    //out = strrchr(outfn, '/' )+1;
+    sprintf(outdir, "%s%s", artist, strrchr(outfn, '/'));
+    ydebug_printf("%s downloaded %s\n", __func__, outdir);
 
-    return out;
+    return outdir;
 }
 
 void db_put_album(char* charbuf)
@@ -219,7 +225,7 @@ void db_put_album(char* charbuf)
 
     token = strsep(&str_copy, "|");
     if (token) {
-        art_str = download_file(token);
+        art_str = download_file(token, artist);
         db_update_album_art(artist, album, art_str);
     }
 
@@ -238,7 +244,7 @@ void db_put_artist(char* charbuf)
     else return;
     token = strsep(&str_copy, "|");
     if (token) {
-        art_str = download_file(token);
+        art_str = download_file(token, artist);
         db_update_artist_art(artist, art_str);
     } else {
         printf("%s: no art for %s\n", __func__, artist);
@@ -652,6 +658,24 @@ char* mpd_get_album(struct mpd_song const *song)
     return str;
 }
 
+int image_exists(char* name)
+{
+    struct passwd *pw = getpwuid(getuid());
+    char *images_dir, *homedir = pw->pw_dir;
+    if (!config_lookup_string(&mpd.cfg, "application.images_path", &images_dir))
+    {
+        fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
+        sprintf(outdir, "%s/%s/images/", homedir, RCM_DIR_STR);
+    } else {
+        sprintf(outdir, "%s", images_dir);
+    }
+    sprintf(outfn, "%s/%s", outdir, name);
+    if (access(outfn, F_OK) != -1)
+        return 1;
+    else 
+        return 0;
+}
+
 char* mpd_get_art(struct mpd_song const *song)
 {
     char *str = db_get_album_art(mpd_song_get_tag(song, MPD_TAG_ARTIST, 0), 
@@ -659,7 +683,9 @@ char* mpd_get_art(struct mpd_song const *song)
                 mpd_song_get_tag(song, MPD_TAG_ARTIST, 0)));
     if (str)
         ydebug_printf("%s: %s\n", __func__, str);
-    //TODO: check if file exists
+    //check if file exists
+    if (!image_exists(str))
+        return NULL;
     return str;
 }
 
@@ -668,6 +694,8 @@ char* mpd_get_artist_art(char* artist)
     char *str = db_get_artist_art(artist);
     if (str)
         printf("%s: %s\n", __func__, str);
+    if (!image_exists(str))
+        return NULL;
     return str;
 }
 
