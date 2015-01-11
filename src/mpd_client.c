@@ -160,12 +160,23 @@ char* download_file(char* url)
     FILE *fp;
     CURLcode res;
     struct passwd *pw = getpwuid(getuid());
-    char *out, *homedir = pw->pw_dir;
+    char *out, *images_dir, *ext, *homedir = pw->pw_dir;
     curl = curl_easy_init();                                                                                                                              
     if (curl)
     {
-        sprintf(outfn, "%s/%s/images/%s", homedir, RCM_DIR_STR, strrchr(url, '/' ));
-        ydebug_printf("%s out_filename: %s\n", __func__, outfn);
+        if (!config_lookup_string(&mpd.cfg, "application.images_path", &images_dir))
+        {
+            fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
+            sprintf(outfn, "%s/%s/images/%s", homedir, RCM_DIR_STR, strrchr(url, '/' ));
+        } else {
+            sprintf(outfn, "%s/%s", images_dir, strrchr(url, '/' )+1);
+            mkdir (images_dir, 0777);
+        }
+        printf("%s\n", strrchr(outfn, '.'));
+        if (access(outfn, F_OK) != -1) {
+            printf("%s: files exists\n", __func__);
+        }
+        printf("%s out_filename: %s\n", __func__, outfn);
         fp = fopen(outfn,"wb");
         if (fp) {
             curl_easy_setopt(curl, CURLOPT_URL, url);

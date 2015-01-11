@@ -94,6 +94,12 @@
                 padding-left: 0; padding-right: 0;
                 border-radius: 50%;
             }
+            .btn-circle-sm
+            {
+                height: 35px; width: 35px;
+                padding-left: 0; padding-right: 0;
+                border-radius: 50%;
+            }
             .btn-play
             {
                 height: 65px; width: 65px;
@@ -243,16 +249,22 @@
     <body>
         <div class="container-fluid">
             <div class="panel panel-default bkblack">
-                <div class="panel-body">
+                <div class="panel-body" style="min-height: 150; max-height: 150">
                     <div class="row">
                         <div class="col-xs-4 nopadding">
                             <img src="" width="150" height="150" id="artimage" class="img-rounded"/>
                         </div>
                         <div class="col-xs-7">
-                            <span id="counter" class="badge bkgreen"></span><span id="currentpos" class="badge bkorange"></span>
+                            <H4><button class="btn btn-success btn-circle-sm btn-lg" onclick="socket.send('MPD_API_LIKE');">
+                                <span class="glyphicon glyphicon-thumbs-up"></span>
+                            </button>
+                            <button class="btn btn-default btn-circle-sm btn-lg" onclick="socket.send('MPD_API_DISLIKE');">
+                                <span class="glyphicon glyphicon-thumbs-down"></span>
+                            </button>
+                            <span id="counter" class="badge bkgreen"></span></H4><!--span id="currentpos" class="badge bkorange"></span-->
                             <H3><span id="currenttrack" ></span></H3>
-                            <H4><span id="artist" class="bkorange"> </span>
-                            <span id="album" ></span></H4>
+                            <H3><span id="artist" class="bkorange"></span></H3>
+                            <H4><span id="album" ></span></H4>
                         </div>
                     </div>
                     <div>
@@ -287,12 +299,12 @@
                     <span class="glyphicon glyphicon-minus"></span>
                 </button>
                 <!-- rating buttons -->
-                <button class="btn btn-flt-topright2 btn-success btn-circle btn-lg" onclick="socket.send('MPD_API_LIKE');">
+                <!--button class="btn btn-flt-topright2 btn-success btn-circle btn-lg" onclick="socket.send('MPD_API_LIKE');">
                     <span class="glyphicon glyphicon-thumbs-up"></span>
                 </button>
                 <button class="btn btn-flt-topright3 btn-default btn-circle btn-lg" onclick="socket.send('MPD_API_DISLIKE');">
                     <span class="glyphicon glyphicon-thumbs-down"></span>
-                </button>
+                </button-->
                 <!-- browser/queue/radio controls -->
                 <button id="floatingTopLeft" class="btn btn-circle btn-success btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
                     <span id="radio-icon" class="glyphicon glyphicon-cloud-download"></span>

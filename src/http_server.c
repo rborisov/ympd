@@ -26,6 +26,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#include "mpd_client.h"
 #include "http_server.h"
 #include "config.h"
 
@@ -38,7 +39,7 @@ int callback_http(struct mg_connection *c)
     char filename[256]; 
     int tmp;
     struct passwd *pw = getpwuid(getuid());
-    char *homedir = pw->pw_dir;
+    char *images_dir, *homedir = pw->pw_dir;
 
     printf("http: %s\n", c->uri);
 
@@ -55,8 +56,16 @@ int callback_http(struct mg_connection *c)
         return MG_REQUEST_PROCESSED;
     }
 
+
 //    printf("%s ", c->uri);
-    sprintf(filename, "%s/%s/%s", homedir, RCM_DIR_STR, c->uri);
+    if (!config_lookup_string(&mpd.cfg, "application.images_path", &images_dir))
+    {
+        fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
+        sprintf(filename, "%s/%s/images/%s", homedir, RCM_DIR_STR, c->uri);
+    } else {
+        sprintf(filename, "%s/%s", images_dir, c->uri);
+    }
+
     fd = fopen(filename, "r");
     if(!fd)
         printf("Failed open file %s\n", filename);
@@ -80,28 +89,3 @@ int callback_http(struct mg_connection *c)
     mg_printf_data(c, "Not Found");
     return MG_REQUEST_PROCESSED;
 }
-/*
-char* download_file(char* url)
-{
-    CURL *curl;
-    FILE *fp;
-    CURLcode res;
-    char outfn[254] = "page.html";
-    curl = curl_easy_init();                                                                                                                              
-    if (curl)
-    {
-        fp = fopen(outfn,"wb");
-        if (fp) {
-            curl_easy_setopt(curl, CURLOPT_URL, url);
-            curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
-            curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
-            res = curl_easy_perform(curl);
-            fclose(fp);
-            if (res != 0)
-                outfn = "";
-        }
-        curl_easy_cleanup(curl);
-    }
-    return outfn;
-}
-*/

@@ -389,13 +389,13 @@ function webSocketConnect() {
                     $('#currentradiosize').text(obj.data.size);
                     if (obj.data.logo) {
                         var logoimage = document.getElementById("radioimage");
-                        radioimage.src = "/images/"+obj.data.logo;
+                        radioimage.src = obj.data.logo;
                     }
                     break;
                 case "artist_info":
                     if (obj.data.artist && obj.data.art) {
                         var artimage = document.getElementById("artimage");
-                        artimage.src = "/images/"+obj.data.art;
+                        artimage.src = obj.data.art;
                     } else {
                         if (obj.data.artist)
                             download_artist_info(obj.data.artist);
@@ -404,7 +404,7 @@ function webSocketConnect() {
                 case "track_info":
                     if (obj.data.title && obj.data.artist) {
                         var artimage = document.getElementById("artimage");
-                        artimage.src = "/images/art.png";
+                        artimage.src = "art.png";
                         $('#album').text("");
                         $.get("http://ws.audioscrobbler.com/2.0/?method=track.getinfo&artist=" +
                                 obj.data.artist + "&track=" + obj.data.title +
@@ -465,7 +465,7 @@ function webSocketConnect() {
 
                     if(obj.data.art) {
                         console.log(obj.data.art);
-                        var art_url = "/images/"+obj.data.art;
+                        var art_url = obj.data.art;
                         document.getElementById("artimage").src = art_url;
                     }
 /*
