@@ -174,7 +174,7 @@ int db_get_song_rating(char* song, char* artist)
 int db_update_song_rating(char* song, char* artist, int increase)
 {
     int rc, rating = db_get_song_rating(song, artist) + increase;
-    printf("%s found %i updating...\n", __func__, rating);
+    printf("%s update %s, %s rating... %i\n", __func__, song, artist, rating);
     rc = sql_exec(conn, "UPDATE Songs SET rating = '%i' "
             "WHERE song = '%s' AND artist = '%s'", rating, song, artist);
     return (rc == SQLITE_OK) ? rating : 0;

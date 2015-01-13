@@ -147,6 +147,8 @@ void init_streamripper()
     prefs_load ();
     prefs.overwrite = OVERWRITE_ALWAYS;
     OPT_FLAG_SET(prefs.flags, OPT_SEPARATE_DIRS, 0);
+    OPT_FLAG_SET(prefs.flags, OPT_TRUNCATE_DUPS, 1);
+    OPT_FLAG_SET(prefs.flags, OPT_KEEP_INCOMPLETE, 0);
     prefs.dropcount = 1;
     strncpy (prefs.cs_opt.codeset_filesys, "UTF-8", MAX_CODESET_STRING);
 //    strncpy (prefs.cs_opt.codeset_id3, "UTF-8", MAX_CODESET_STRING);

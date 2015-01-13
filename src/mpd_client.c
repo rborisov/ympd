@@ -97,15 +97,11 @@ int mpd_crop(struct mpd_connection *conn)
 
 void start_radio()
 {
-    //TODO: no need to start streamripper here
-    init_streamripper();
     mpd.radio_status = 1;
 }
 
 void stop_radio()
 {
-    //TODO: no need to stop streamripper here
-    stop_streamripper();
     mpd.radio_status = 0;
 }
 
@@ -272,10 +268,11 @@ int callback_mpd(struct mg_connection *c)
     switch(cmd_id)
     {
         case MPD_API_LIKE:
-            mpd_db_update_current_song_rating(1);
+            mpd_db_update_current_song_rating(5);
             break;
         case MPD_API_DISLIKE:
-            mpd_db_update_current_song_rating(-1);
+            mpd_db_update_current_song_rating(-5);
+            mpd_run_next(mpd.conn);
             break;
         case MPD_API_DB_ALBUM:
             if(sscanf(c->content, "MPD_API_DB_ALBUM,%m[^\t\n]", 
@@ -318,6 +315,8 @@ int callback_mpd(struct mg_connection *c)
             mpd_run_previous(mpd.conn);
             break;
         case MPD_API_SET_NEXT:
+            //decrease rating before
+            mpd_db_update_current_song_rating(-1);
             mpd_run_next(mpd.conn);
             break;
         case MPD_API_SET_PLAY:

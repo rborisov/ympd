@@ -1,348 +1,203 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=480px, height=320px, initial-scale=1.0">
-        <meta name="description" content="ympd - fast and lightweight MPD webclient (improved)">
-        <meta name="author" content="rborisoff@gmail.com">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=480px, height=320px, initial-scale=1.0">
+<meta name="description" content="ympd - fast and lightweight MPD webclient (improved)">
+<meta name="author" content="rborisoff@gmail.com">
 
-        <title>ympd</title>
+<title>ympd</title>
 
-        <!-- Bootstrap core CSS -->
-        <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+<!-- Bootstrap core CSS -->
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/bootstrap-theme.min.css" rel="stylesheet">
 
-        <!-- Custom styles for this template -->
-        <link href="css/mpd.min.css" rel="stylesheet">
-        <link href="css/carradio.min.css" rel="stylesheet">
-        <link href="assets/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
+<!-- Custom styles for this template -->
+<link href="css/mpd.min.css" rel="stylesheet">
+<link href="css/carradio.min.css" rel="stylesheet">
+<link href="assets/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
 
-        <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!--[if lt IE 9]>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
         <![endif]-->
-        <style>
-            html { 
-                overflow: hidden;
-            }
-            body {
-                font-family: "Courier New";
-                background: #1F0F00;
-            }
-            .nopadding {
-                  padding: 4px;
-            }
-            #floatingTop1Left
-            {
-                  position: fixed;
-                  z-index: 10000;
-                  top: 59px;
-                  left: 4px;
-            }
-            #floatingTopLeft1
-            {
-                  position: fixed;
-                  z-index: 10000;
-                  top: 4px;
-                  left: 49px;
-            }
-            #floatingTopLeft2
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 4px;
-                left: 98px;
-            }
+</head>
+<style>
+.flt-topleft
+{
+    position: fixed;
+    z-index: 10000;
+    top: 4px;
+    left: 4px;
+}
+.btn-flt-bottomleft
+{
+    position: fixed;
+    z-index: 10000;
+    bottom: 4px;
+    left: 4px;
+}
+.btn-flt-bottomright1
+{
+    position: fixed;
+    z-index: 10000;
+    bottom: 4px;
+    right: 50px;
+}
 
-            #floatingTopLeft
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 4px;
-                left: 4px;
-            }
-            .btn-flt-bottom2right
-            {
-                position: fixed;
-                z-index: 10000;
-                bottom: 94px;
-                right: 4px;
-            }
-            .btn-flt-bottom1right
-            {
-                position: fixed;
-                z-index: 10000;
-                bottom: 49px;
-                right: 4px;
-            }
-            .btn-flt-bottomright
-            {
-                position: fixed;
-                z-index: 10000;
-                bottom: 4px;
-                right: 4px;
-            }
-            .btn-transparent
-            {
-                background: rgba(0,0,0,0.9);
-            }
-            .btn-circle
-            {
-                height: 45px; width: 45px;
-                padding-left: 0; padding-right: 0;
-                border-radius: 50%;
-            }
-            .btn-circle-sm
-            {
-                height: 35px; width: 35px;
-                padding-left: 0; padding-right: 0;
-                border-radius: 50%;
-            }
-            .btn-play
-            {
-                height: 65px; width: 65px;
-                padding-left: 0; padding-right: 0;
-                border-radius: 50%;
-            }
-            .panel-transparent
-            {
-                background: rgba(0,0,0,0.9);
-            }
-            .list-group > a:focus
-            {
-                background-color: transparent;
-            }
-            .btn-flt-topleft2.btn-lg
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 4px;
-                left: 94px;
-            }
-            .btn-flt-topleft3
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 4px;
-                left: 139px;
-            }
-            .btn-flt-topright
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 4px;
-                right: 4px;
-            }
-            .btn-flt-topright1
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 4px;
-                right: 59px;
-            }
-            .btn-flt-topright2
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 4px;
-                right: 109px;
-            }
-            .btn-flt-topright3
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 4px;
-                right: 154px;
-            }
-            .btn-flt-top1right
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 59px;
-                right: 4px;
-            }
-            .btn-flt-top2right
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 104px;
-                right: 4px;
-            }
-            .btn-flt-top3right
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 149px;
-                right: 4px;
-            }
-            .btn-flt-top4right
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 194px;
-                right: 4px;
-            }
-            .dd-flt-topleft2.dropdown-menu
-            {
-                position: fixed;
-                z-index: 10000;
-                top: 45px;
-                left: 98px;
-            }
-            .bkgreen
-            {
-                background: green;
-            }
-            .bkorange
-            {
-                background: orange;
-                color: black;
-            }
-            .bkblack
-            {
-                background: black;
-                color: GreenYellow;
-            }
-            H3 {
-                font-family: "Courier New";
-                font-weight: bold;
-            }
-            .gray {
-                color: gray;
-            }
-            .warning {
-                color: #eb9316;
-            }
 
-            .img-thumbnail{background-color:transparent}
-
-            .flt-next-radio
-            {
-                position: fixed;
-                top: 200px;
-                left: 240px;
-            }
-            .flt-bottomleft
-            {
-                position: fixed;
-                bottom: 0px;
-                left: 4px;
-            }
-            .flt-bottom1left
-            {
-                position: fixed;
-                bottom: 20px;
-                left: 4px;
-            }
-            .list-group > a
-            {
-                background-color: transparent;
-            }
-            .modal
-            {
-                z-index: 20000;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container-fluid">
-            <div class="panel panel-default bkblack">
-                <div class="panel-body" style="min-height: 150; max-height: 150">
-                    <div class="row">
-                        <div class="col-xs-4 nopadding">
-                            <img src="" width="150" height="150" id="artimage" class="img-rounded"/>
-                            <span id="nextpos" class="label label-default"></span>
-                            <span id="next_artist" class="label label-warning"></span>
-                        </div>
-                        <div class="col-xs-7">
-                            <H4><button class="btn btn-success btn-circle-sm btn-lg" onclick="socket.send('MPD_API_LIKE');">
-                                <span class="glyphicon glyphicon-thumbs-up"></span>
-                            </button>
-                            <button class="btn btn-default btn-circle-sm btn-lg" onclick="socket.send('MPD_API_DISLIKE');">
-                                <span class="glyphicon glyphicon-thumbs-down"></span>
-                            </button>
-                            <span id="counter" class="badge bkgreen"></span></H4><!--span id="currentpos" class="badge bkorange"></span-->
-                            <H3><span id="currenttrack" ></span></H3>
-                            <H3><span id="artist" class="bkorange"></span></H3>
-                            <H4><span id="album" ></span></H4>
-                        </div>
-                    </div>
-                    <!--div>
+</style>
+<body>
+<div class="container-fluid">
+    <span class="label label-warning flt-topleft">Jeep-Pi</span>
+    <div class="panel panel-default bkblack">
+        <div class="panel-body" style="min-height: 150; max-height: 150">
+            <div class="row">
+                <div class="col-xs-4 nopadding">
+                    <img src="" width="150" height="150" id="artimage" class="img-rounded"data-toggle="modal" data-target="#jukebox"/>
+                    <span id="currentpos" class="badge bkorange pull-right"></span><br>
+                    <span id="nextpos" class="label label-default"></span>
+                    <span id="next_artist" class="label label-warning"></span>
+                </div>
+                <div class="col-xs-7">
+                    <H4>
+                        <span id="counter" class="badge bkgreen"></span>
+                        <button class="btn btn-success btn-circle-sm btn-lg" onclick="socket.send('MPD_API_LIKE');">
+                            <span class="glyphicon glyphicon-thumbs-up"></span>
+                        </button>
+                        <button class="btn btn-default btn-circle-sm btn-lg" onclick="socket.send('MPD_API_DISLIKE');">
+                            <span class="glyphicon glyphicon-thumbs-down"></span>
+                        </button>
+                    </H4>
+                    <H3><span id="currenttrack"></span></H3>
+                    <H3><span id="artist" class="label label-warning"></span></H3>
+                    <H4><span id="album" ></span></H4>
+                </div>
+            </div>
+            <!--div>
                         <span id="nextpos" class="label label-default"></span>
                         <span id="next_artist" class="label label-warning"></span>
                     </div-->
-                </div>
-            </div>
-            <div class="flt-bottomleft">
-                <span id="currentradio" class="label label-success"></span>
-                <span id="currentradiostatus" class="label label-info"></span>
-                <span id="currentradiosize" class="label label-danger"></span>
-            </div>
-            <div>
-                <!-- player controls -->
-                <button class="btn btn-flt-topright1 btn-warning btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
-                    <span class="glyphicon glyphicon-step-backward"></span>
-                </button>
-                <button class="btn btn-flt-top1right btn-warning btn-circle btn-lg" onclick="socket.send('MPD_API_SET_NEXT');">
-                    <span class="glyphicon glyphicon-step-forward"></span>
-                </button>
-                <button class="btn btn-flt-topright btn-warning btn-play btn-lg" onclick="clickPlay();">
-                    <span id="play-icon" class="glyphicon glyphicon-pause"></span>
-                </button>
-                <button class="btn btn-flt-bottom2right btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
-                <button class="btn btn-flt-bottom1right btn-info btn-circle btn-lg">
-                    <span id="volume-icon" class="glyphicon glyphicon-volume-up"></span>
-                </button>
-                <button class="btn btn-flt-bottomright btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_DECREASE_VOLUME');">
-                    <span class="glyphicon glyphicon-minus"></span>
-                </button>
-                <!-- rating buttons -->
-                <!--button class="btn btn-flt-topright2 btn-success btn-circle btn-lg" onclick="socket.send('MPD_API_LIKE');">
-                    <span class="glyphicon glyphicon-thumbs-up"></span>
-                </button>
-                <button class="btn btn-flt-topright3 btn-default btn-circle btn-lg" onclick="socket.send('MPD_API_DISLIKE');">
-                    <span class="glyphicon glyphicon-thumbs-down"></span>
-                </button-->
-                <!-- browser/queue/radio controls -->
-                <button id="floatingTopLeft" class="btn btn-circle btn-success btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
-                    <span id="radio-icon" class="glyphicon glyphicon-cloud-download"></span>
-                </button>
-                <button id="floatingTopLeft1" class="btn btn-circle btn-success btn-lg" onclick="clickRandom();">
-                    <span id="random-icon" class="glyphicon glyphicon-random gray"></span>
-                </button>
-                <div class="btn-group">
-                    <button class="btn btn-flt-topleft2 btn-circle btn-success btn-lg 
-                        glyphicon glyphicon-folder-open dropdown-toggle" 
-                        data-toggle="dropdown" aria-expanded="false">
-                        <!--span class="caret"></span-->
-                    </button>
-                    <ul class="dropdown-menu dd-flt-topleft2" role="menu">
-                        <li id="queue"><a href="#/" data-toggle="modal" data-target="#queue-list" onclick="getQueue();">Queue</a></li>
-                        <li id="browse"><a href="#/browse/0/" 
-                            data-toggle="modal" data-target="#browse-list" onclick="getBrowse();">Browse database</a></li>
-                        <li id="radio"><a href="#/radio/0/" 
-                            data-toggle="modal" data-target="#radio-list" onclick="getRadio();">Browse radio</a></li>
-                        <!--li><a href="#" data-toggle="modal" data-target="#settings" onclick="getHost();">Settings</a></li-->
-                    </ul>
-                </div>
-                <button class="btn btn-flt-topleft3 btn-circle btn-danger btn-lg" onclick="socket.send('MPD_API_RM_ALL');">
-                    <span class="glyphicon glyphicon-remove-circle"></span>
-                </button>
-                <!--button class="btn btn-circle btn-flt-topleft3 btn-lg" data-toggle="modal" data-target="#browse-list" onClick="getBrowse();">
+        </div>
+    </div>
+    <div class="flt-bottomleft1">
+        <span id="currentradio" class="label label-success"></span>
+        <span id="currentradiostatus" class="label label-info"></span>
+        <span id="currentradiosize" class="label label-danger"></span>
+    </div>
+    <div>
+        <!-- player controls -->
+        <button class="btn btn-flt-topright1 btn-warning btn-circle btn-lg" onclick="socket.send('MPD_API_SET_PREV');">
+            <span class="glyphicon glyphicon-step-backward"></span>
+        </button>
+        <button class="btn btn-flt-top1right btn-warning btn-circle btn-lg" onclick="socket.send('MPD_API_SET_NEXT');">
+            <span class="glyphicon glyphicon-step-forward"></span>
+        </button>
+        <button class="btn btn-flt-topright btn-warning btn-play btn-lg" onclick="clickPlay();">
+            <span id="play-icon" class="glyphicon glyphicon-pause"></span>
+        </button>
+        <button class="btn btn-flt-top2right btn-success btn-circle btn-lg" onclick="socket.send('MPD_API_SYNC_QUEUE');">
+            <span class="glyphicon glyphicon-fast-forward"></span>
+        </button>
+        <button class="btn btn-flt-bottom2right btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
+            <span class="glyphicon glyphicon-plus"></span>
+        </button>
+        <button class="btn btn-flt-bottom1right btn-info btn-circle btn-lg">
+            <span id="volume-icon" class="glyphicon glyphicon-volume-up"></span>
+        </button>
+        <button class="btn btn-flt-bottomright btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_DECREASE_VOLUME');">
+            <span class="glyphicon glyphicon-minus"></span>
+        </button>
+        <!-- browser/queue/radio controls -->
+        <button class="btn btn-flt-bottomleft btn-circle btn-success btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
+            <span id="radio-icon" class="glyphicon glyphicon-cloud-download"></span>
+        </button>
+        <button class="btn btn-flt-bottomright1 btn-circle btn-success btn-lg" onclick="clickRandom();">
+            <span id="random-icon" class="glyphicon glyphicon-random gray"></span>
+        </button>
+        <!--div class="btn-group">
+            <button class="btn btn-flt-topleft2 btn-circle btn-success btn-lg 
+                glyphicon glyphicon-folder-open dropdown-toggle" 
+                data-toggle="dropdown" aria-expanded="false">
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu dd-flt-topleft2" role="menu">
+                <li id="queue"><a href="#/" data-toggle="modal" data-target="#queue-list" onclick="getQueue();">Queue</a></li>
+                <li id="browse"><a href="#/browse/0/" 
+                    data-toggle="modal" data-target="#browse-list" onclick="getBrowse();">Browse database</a></li>
+                <li id="radio"><a href="#/radio/0/" 
+                    data-toggle="modal" data-target="#radio-list" onclick="getRadio();">Browse radio</a></li>
+            </ul>
+        </div-->
+                <!--li><a href="#" data-toggle="modal" data-target="#settings" onclick="getHost();">Settings</a></li-->
+        <button class="btn btn-flt-topright2 btn-circle btn-danger btn-lg" onclick="socket.send('MPD_API_RM_ALL');">
+            <span class="glyphicon glyphicon-remove-circle"></span>
+        </button>
+        <!--button class="btn btn-circle btn-flt-topleft3 btn-lg" data-toggle="modal" data-target="#browse-list" onClick="getBrowse();">
                     <span class="glyphicon glyphicon-folder-open"></span>
                 </button-->
-                        <!--li id="browse"><a href="#/browse/0/">Browse database</a></li-->
-                <!--li><a href="#" data-toggle="modal" data-target="#radio_list" onclick="getHost();">Settings</a></li-->
-            </div>
-            <div class="notifications top-right"></div>
+        <!--li id="browse"><a href="#/browse/0/">Browse database</a></li-->
+        <!--li><a href="#" data-toggle="modal" data-target="#radio_list" onclick="getHost();">Settings</a></li-->
+    </div>
+    <div class="notifications top-right"></div>
+</div>
+
+<!-- Modal -->
+
+<div class="modal fade" id="jukebox" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <div class="container-fixed">
+                    <div class="row">
+                        <div class="col-xs-5">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Radio</span></div>
+                                <div class="panel-body">
+                                    <button class="btn btn-lg">
+                                        Choose <span class="glyphicon glyphicon-folder-open"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-5">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Queue</span></div>
+                            <div class="panel-body">
+                                <button class="btn btn-lg">
+                                    List <span class="glyphicon glyphicon-folder-open"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Music</span></div>
+                            <div class="panel-body">
+                                <button class="btn btn-circle btn-lg">
+                                    <span class="glyphicon glyphicon-folder-open"></span>
+                                </button>
+                                <button class="btn btn-circle btn-lg">
+                                    <span class="glyphicon glyphicon-list-alt"></span>
+                                </button>
+                                <button class="btn btn-circle btn-lg">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Modal -->
         <div class="modal fade" id="radio-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

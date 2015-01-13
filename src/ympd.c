@@ -86,6 +86,9 @@ int main(int argc, char **argv)
         config_destroy(&mpd.cfg);
         return(EXIT_FAILURE);
     }
+
+    //TODO: read mpd.radio_status from config
+
     /* drop privilges at last to ensure proper port binding */
     if(run_as_user != NULL)
     {
