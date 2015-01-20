@@ -34,6 +34,7 @@
 #include "config.h"
 #include "streamripper.h"
 #include "sqlitedb.h"
+#include "mpd_utils.h"
 
 #include <mpd/client.h>
 
@@ -120,7 +121,8 @@ int main(int argc, char **argv)
                 {
                     mpd_run_update(mpd.conn, radio_song_name);
                     sleep(1);
-                    mpd_run_add(mpd.conn, radio_song_name);
+                    //mpd_run_add(mpd.conn, radio_song_name);
+                    mpd_insert(mpd.conn, radio_song_name);
                 }
         }
     }

@@ -56,7 +56,7 @@
         <div class="panel-body" style="min-height: 150; max-height: 150">
             <div class="row">
                 <div class="col-xs-4 nopadding">
-                    <img src="" width="150" height="150" id="artimage" class="img-rounded"data-toggle="modal" data-target="#jukebox"/>
+                    <img src="" width="150" height="150" id="artimage" class="img-rounded" data-toggle="modal" data-target="#jukebox"/>
                     <span id="currentpos" class="badge bkorange pull-right"></span><br>
                     <span id="nextpos" class="label label-default"></span>
                     <span id="next_artist" class="label label-warning"></span>
@@ -76,10 +76,6 @@
                     <H4><span id="album" ></span></H4>
                 </div>
             </div>
-            <!--div>
-                        <span id="nextpos" class="label label-default"></span>
-                        <span id="next_artist" class="label label-warning"></span>
-                    </div-->
         </div>
     </div>
     <div class="flt-bottomleft1">
@@ -98,9 +94,6 @@
         <button class="btn btn-flt-topright btn-warning btn-play btn-lg" onclick="clickPlay();">
             <span id="play-icon" class="glyphicon glyphicon-pause"></span>
         </button>
-        <button class="btn btn-flt-top2right btn-success btn-circle btn-lg" onclick="socket.send('MPD_API_SYNC_QUEUE');">
-            <span class="glyphicon glyphicon-fast-forward"></span>
-        </button>
         <button class="btn btn-flt-bottom2right btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
             <span class="glyphicon glyphicon-plus"></span>
         </button>
@@ -114,27 +107,7 @@
         <button class="btn btn-flt-bottomleft btn-circle btn-success btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
             <span id="radio-icon" class="glyphicon glyphicon-cloud-download"></span>
         </button>
-        <button class="btn btn-flt-bottomright1 btn-circle btn-success btn-lg" onclick="clickRandom();">
-            <span id="random-icon" class="glyphicon glyphicon-random gray"></span>
-        </button>
-        <!--div class="btn-group">
-            <button class="btn btn-flt-topleft2 btn-circle btn-success btn-lg 
-                glyphicon glyphicon-folder-open dropdown-toggle" 
-                data-toggle="dropdown" aria-expanded="false">
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu dd-flt-topleft2" role="menu">
-                <li id="queue"><a href="#/" data-toggle="modal" data-target="#queue-list" onclick="getQueue();">Queue</a></li>
-                <li id="browse"><a href="#/browse/0/" 
-                    data-toggle="modal" data-target="#browse-list" onclick="getBrowse();">Browse database</a></li>
-                <li id="radio"><a href="#/radio/0/" 
-                    data-toggle="modal" data-target="#radio-list" onclick="getRadio();">Browse radio</a></li>
-            </ul>
-        </div-->
                 <!--li><a href="#" data-toggle="modal" data-target="#settings" onclick="getHost();">Settings</a></li-->
-        <button class="btn btn-flt-topright2 btn-circle btn-danger btn-lg" onclick="socket.send('MPD_API_RM_ALL');">
-            <span class="glyphicon glyphicon-remove-circle"></span>
-        </button>
         <!--button class="btn btn-circle btn-flt-topleft3 btn-lg" data-toggle="modal" data-target="#browse-list" onClick="getBrowse();">
                     <span class="glyphicon glyphicon-folder-open"></span>
                 </button-->
@@ -150,46 +123,52 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-body">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
                 <div class="container-fixed">
                     <div class="row">
                         <div class="col-xs-5">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">Radio</span></div>
-                                <div class="panel-body">
-                                    <button class="btn btn-lg">
-                                        Choose <span class="glyphicon glyphicon-folder-open"></span>
-                                    </button>
-                                </div>
-                            </div>
+                            <H4>Radio</H4>
+                            <button class="btn btn-circle btn-lg" data-dismiss="modal" data-toggle="modal" data-target="#radio-list" onclick="getRadio();" >
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                            </button>
                         </div>
                         <div class="col-xs-5">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">Queue</span></div>
-                            <div class="panel-body">
-                                <button class="btn btn-lg">
-                                    List <span class="glyphicon glyphicon-folder-open"></span>
-                                </button>
-                            </div>
+                            <H4>Queue</H4>
+                            <a id="queue" class="btn btn-circle btn-lg" href="#/" role="button"
+                                data-dismiss="modal" data-toggle="modal" data-target="#queue-list" onclick="getQueue();">
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                            </a>
+                            <button class="btn btn-success btn-circle btn-lg" onclick="socket.send('MPD_API_SYNC_QUEUE');">
+                                <span class="glyphicon glyphicon-fast-forward"></span>
+                            </button>
+                            <button class="btn btn-circle btn-danger btn-lg" onclick="socket.send('MPD_API_RM_ALL');">
+                                <span class="glyphicon glyphicon-remove-circle"></span>
+                            </button>
+                            <button class="btn btn-circle btn-success btn-lg" onclick="clickRandom();">
+                                <span id="random-icon" class="glyphicon glyphicon-random gray"></span>
+                            </button>
+                        </div>
+                        <div class="col-xs-2">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-xs-6">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">Music</span></div>
-                            <div class="panel-body">
-                                <button class="btn btn-circle btn-lg">
-                                    <span class="glyphicon glyphicon-folder-open"></span>
-                                </button>
-                                <button class="btn btn-circle btn-lg">
-                                    <span class="glyphicon glyphicon-list-alt"></span>
-                                </button>
-                                <button class="btn btn-circle btn-lg">
-                                    <span class="glyphicon glyphicon-search"></span>
-                                </button>
-                            </div>
+                            <H4>Music library</H4>
+                            <a id="browse" class="btn btn-circle btn-lg" href="#/browse/0/" role="button"
+                                data-dismiss="modal" data-toggle="modal" data-target="#browse-list" onclick="getBrowse();">
+                                <span class="glyphicon glyphicon-folder-open"></span>
+                            </a>
+                            <!--button id="browse" class="btn btn-circle btn-lg" data-dismiss="modal" data-toggle="modal" data-target="#browse-list" onclick="getBrowse();">
+                                <a href="#/browse/0/"></a><span class="glyphicon glyphicon-folder-open"></span>
+                            </button-->
+                            <button class="btn btn-circle btn-lg">
+                                <span class="glyphicon glyphicon-list-alt"></span>
+                            </button>
+                            <button class="btn btn-circle btn-lg">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -197,37 +176,33 @@
         </div>
     </div>
 </div>
-
-        <div class="modal fade" id="radio-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
+<div class="modal fade" id="radio-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-10">
                         <table id="crabsalad">
                             <tbody>
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="modal fade" id="browse-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="col-xs-2">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <ul class="pager">
-                            <li id="prev" class="page-btn hide"><a href="">Previous</a></li>
-                            <li id="next" class="page-btn"><a href="">Next</a></li>
-                        </ul>
                     </div>
-                    <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="browse-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-10">
                         <ol id="breadcrump" class="breadcrumb">
                         </ol>
                         <!-- Table -->
@@ -241,22 +216,26 @@
                             </tbody>
                         </table>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="queue-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="col-xs-2">
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                         <ul class="pager">
-                            <li id="prev" class="page-btn hide"><a href="">Previous</a></li>
+                            <li id="prev" class="page-btn disabled"><a href="">Prev</a></li>
                             <li id="next" class="page-btn"><a href="">Next</a></li>
                         </ul>
                     </div>
-                    <div class="modal-body">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="queue-list" tabindex="-1" role="dialog" aria-labelledby="controlLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-xs-10">
                         <ol id="samueladams" class="samueladams">
                         </ol>
                         <!-- Table -->
@@ -273,9 +252,20 @@
                             </tbody>
                         </table>
                     </div>
+                    <div class="col-xs-2">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <ul class="pager">
+                            <li id="prev" class="page-btn disabled"><a href="">Prev</a></li>
+                            <li id="next" class="page-btn"><a href="">Next</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
 
         <div class="modal fade" id="settings" tabindex="-1" role="dialog" aria-labelledby="settingsLabel" aria-hidden="true">

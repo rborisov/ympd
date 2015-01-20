@@ -1,0 +1,9 @@
+#ifndef __MPD_UTILS_H__
+#define __MPD_UTILS_H__
+
+#include <mpd/client.h>
+
+unsigned mpd_get_queue_length(struct mpd_connection *);
+int mpd_insert (struct mpd_connection *, char * );
+
+#endif

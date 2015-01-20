@@ -1,6 +1,7 @@
 /* ympd
    (c) 2013-2014 Andrew Karpow <andy@ndyk.de>
    This project's homepage is: http://www.ympd.org
+   (c) 2014-2015 Roman Borisov <rborisoff@gmail.com>
    
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -669,10 +670,15 @@ int image_exists(char* name)
         sprintf(outdir, "%s", images_dir);
     }
     sprintf(outfn, "%s/%s", outdir, name);
-    if (access(outfn, F_OK) != -1)
+    printf("%s looking for %s ", __func__, outfn);
+    if (access(outfn, F_OK) != -1) {
+        printf ("ok\n");
         return 1;
-    else 
+    }
+    else {
+        printf("no\n");
         return 0;
+    }
 }
 
 char* mpd_get_art(struct mpd_song const *song)
@@ -680,11 +686,12 @@ char* mpd_get_art(struct mpd_song const *song)
     char *str = db_get_album_art(mpd_song_get_tag(song, MPD_TAG_ARTIST, 0), 
             db_get_song_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0), 
                 mpd_song_get_tag(song, MPD_TAG_ARTIST, 0)));
-    if (str)
+    if (str) {
         ydebug_printf("%s: %s\n", __func__, str);
-    //check if file exists
-    if (!image_exists(str))
-        return NULL;
+        //check if file exists
+        if (!image_exists(str))
+            return NULL;
+    }
     return str;
 }
 
@@ -757,7 +764,6 @@ int mpd_put_artist_art(char *buffer, char *artist)
 
     if (artist == NULL)
         return;
-
     cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"artist_info\", \"data\":{\"artist\":");
     cur += json_emit_quoted_str(cur, end - cur, artist);
     if (mpd_get_artist_art(artist)) {

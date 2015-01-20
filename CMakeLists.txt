@@ -57,7 +57,7 @@ set(SOURCES
     src/streamripper.c
     src/sqlitedb.c
     src/sql.c
-    src/ydebug.c
+    src/mpd_utils.c
     assets.c
 )
 

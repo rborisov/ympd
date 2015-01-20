@@ -19,7 +19,9 @@
 var socket;
 var last_state;
 var current_app;
-var pagination = 0; //TODO: differnet pagination for different lists
+var pagination = 0;
+var queue_pagination = 0;
+var radio_pagination = 0;
 var browsepath;
 var lastSongTitle = "";
 var current_song = new Object();
@@ -41,19 +43,21 @@ var app = $.sammy(function() {
 
     function prepare() {
         $('#nav_links > li').removeClass('active');
-        $('.page-btn').addClass('hide');
-        pagination = 0;
+        $('.page-btn').addClass('disabled');//.addClass('hide');
+        //pagination = 0;
         browsepath = '';
     }
 
     this.get(/\#\/(\d+)/, function() {
         prepare();
-        pagination = parseInt(this.params['splat'][0]);
+        queue_pagination = 0;
+        queue_pagination = parseInt(this.params['splat'][0]);
         runBrowse();
     });
 
     this.get(/\#\/browse\/(\d+)\/(.*)/, function() {
         prepare();
+        pagination = 0;
         browsepath = this.params['splat'][1];
         pagination = parseInt(this.params['splat'][0]);
         current_app = 'browse';
@@ -179,10 +183,10 @@ function webSocketConnect() {
                                 "</span></td><td></td></tr>");
                     }
 
-                    if(obj.data[obj.data.length-1].pos + 1 >= pagination + MAX_ELEMENTS_PER_PAGE)
-                        $('#next').removeClass('hide');
-                    if(pagination > 0)
-                        $('#prev').removeClass('hide');
+                    if(obj.data[obj.data.length-1].pos + 1 >= queue_pagination + MAX_ELEMENTS_PER_PAGE)
+                        $('#next').removeClass('disabled');//('hide');
+                    if(queue_pagination > 0)
+                        $('#prev').removeClass('disabled');//('hide');
 
                     $('#cocacola > tbody > tr').on({
                         mouseover: function(){
@@ -241,7 +245,7 @@ function webSocketConnect() {
                                 break;
                             case "wrap":
                                 if(current_app == 'browse') {
-                                    $('#next').removeClass('hide');
+                                    $('#next').removeClass('disabled');//('hide');
                                 } else {
                                     $('#salamisandwich > tbody').append(
                                         "<tr><td><span class=\"glyphicon glyphicon-remove\"></span></td>" + 
@@ -253,7 +257,7 @@ function webSocketConnect() {
                         }
 
                         if(pagination > 0)
-                            $('#prev').removeClass('hide');
+                            $('#prev').removeClass('disabled');//('hide');
 
                     }
 
@@ -375,7 +379,7 @@ function webSocketConnect() {
                     break;
                 case "update_queue":
                     if(current_app === 'queue') {
-                        socket.send('MPD_API_GET_QUEUE,'+pagination);
+                        socket.send('MPD_API_GET_QUEUE,'+queue_pagination);
                         /*$('.top-right').notify({
                             message:{html: "Update Queue"},
                             type: "info",
@@ -477,7 +481,7 @@ function webSocketConnect() {
                             type: "info",
                         }).show();
   */                  
-                    socket.send('MPD_API_GET_QUEUE,'+pagination);
+                    socket.send('MPD_API_GET_QUEUE,'+queue_pagination);
                         
                     break;
                 case "mpdhost":
@@ -681,12 +685,12 @@ $('#btnnotify').on('click', function (e) {
 
 function getRadio() {
     console.log('get list of radio stations');
-    socket.send('MPD_API_GET_RADIO,'+pagination);
+    socket.send('MPD_API_GET_RADIO,'+radio_pagination);
 }
 
 function getQueue() {
     console.log('get queue');
-    app.setLocation('#/'+pagination);
+    app.setLocation('#/'+queue_pagination);
 }
 function getBrowse() {
     console.log('get browse mpd database');
@@ -718,23 +722,42 @@ $('#search').submit(function () {
 });
 
 $('.page-btn').on('click', function (e) {
-
-    switch ($(this).text()) {
+    /*switch ($(this).text()) {
         case "Next":
             pagination += MAX_ELEMENTS_PER_PAGE;
             break;
-        case "Previous":
+        case "Prev":
             pagination -= MAX_ELEMENTS_PER_PAGE;
             if(pagination <= 0)
                 pagination = 0;
             break;
-    }
+    }*/
 
     switch(current_app) {
         case "queue":
-            app.setLocation('#/'+pagination);
+            switch ($(this).text()) {
+                case "Next":
+                    queue_pagination += MAX_ELEMENTS_PER_PAGE;
+                    break;
+                case "Prev":
+                    queue_pagination -= MAX_ELEMENTS_PER_PAGE;
+                    if(queue_pagination <= 0)
+                        queue_pagination = 0;
+                    break;
+            }
+            app.setLocation('#/'+queue_pagination);
             break;
         case "browse":
+            switch ($(this).text()) {
+                case "Next":
+                    pagination += MAX_ELEMENTS_PER_PAGE;
+                    break;
+                case "Prev":
+                    pagination -= MAX_ELEMENTS_PER_PAGE;
+                    if(pagination <= 0)
+                        pagination = 0;
+                    break;
+            }
             app.setLocation('#/browse/'+pagination+'/'+browsepath);
             break;
     }
