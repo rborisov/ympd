@@ -80,7 +80,7 @@ int db_get_song_numplayed(char* song, char* artist)
     convert_str(artist);
     int np = sql_get_int_field(conn, "SELECT numplayed FROM Songs WHERE "
             "song = '%s' AND artist = '%s'", song, artist);
-    ydebug_printf("%s found numplayed %i\n", __func__, np);
+    //printf("%s found numplayed %i\n", __func__, np);
     return np;
 }
 

@@ -27,6 +27,7 @@
 #include <curl/curl.h>
 
 #include "mpd_client.h"
+#include "mpd_utils.h"
 #include "config.h"
 #include "json_encode.h"
 #include "radio.h"
@@ -47,7 +48,6 @@ char outfn[128];
 char outdir[128];
 
 int mpd_search_one(char *buffer, char *searchstr);
-void get_random_song(char *str, char *path);
 int mpd_get_track_info(char *buffer);
 int mpd_put_current_radio(char *buffer);
 
@@ -608,7 +608,7 @@ void mpd_poll(struct mg_server *s)
             mpd.buf_size = mpd_put_state(mpd.buf, &mpd.song_id, &mpd.queue_version);
             mg_iterate_over_connections(s, mpd_notify_callback, NULL);
             if (queue_is_empty) {
-                get_random_song(str, rcm.file_path);
+                get_random_song(mpd.conn, str, rcm.file_path);
                 ydebug_printf("%s: add random song %s\n", __func__, str);
                 mpd_run_add(mpd.conn, str);
                 queue_is_empty = 0;
@@ -992,40 +992,6 @@ int mpd_put_queue(char *buffer, unsigned int offset)
 
     cur += json_emit_raw_str(cur, end - cur, "]}");
     return cur - buffer;
-}
-
-void get_random_song(char *str, char *path)
-{
-    struct mpd_entity *entity;
-    int listened0 = 65000;
-
-    if (!mpd_send_list_meta(mpd.conn, path))
-    {
-        ydebug_printf("error: mpd_send_list_meta\n");
-        return;
-    }
-
-    while((entity = mpd_recv_entity(mpd.conn)) != NULL) 
-    {
-        const struct mpd_song *song;
-        if (mpd_entity_get_type(entity) == MPD_ENTITY_TYPE_SONG) 
-        {
-            unsigned int rnd = (unsigned int)(rand() % 2);
-            int listened;
-            song = mpd_entity_get_song(entity);
-            //TODO: make a criteria and pick the song with it
-            listened = db_get_song_numplayed(mpd_get_title(song),
-                        mpd_get_artist(song));
-            ydebug_printf("%i", listened);
-            if (rnd && listened < listened0) {
-                sprintf(str, "%s", mpd_song_get_uri(song));
-                ydebug_printf("%i ", listened);
-                listened0 = listened;
-            }
-        }
-        mpd_entity_free(entity);
-    }
-    ydebug_printf("\n");
 }
 
 int mpd_put_browse(char *buffer, char *path, unsigned int offset)
