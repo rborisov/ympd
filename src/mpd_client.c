@@ -42,7 +42,6 @@ const char * mpd_cmd_strs[] = {
     MPD_CMDS(GEN_STR)
 };
 
-//int radio_status = 0;
 static int queue_is_empty = 0;
 char outfn[128];
 char outdir[128];
@@ -51,19 +50,11 @@ int mpd_search_one(char *buffer, char *searchstr);
 int mpd_get_track_info(char *buffer);
 int mpd_put_current_radio(char *buffer);
 
-struct mpd_status *
-getStatus(struct mpd_connection *conn)
-{
-    struct mpd_status *ret = mpd_run_status(conn);
-//    if (ret == NULL)
-//        printErrorAndExit(conn);
-
-    return ret;
-}
-
 int mpd_crop(struct mpd_connection *conn)
 {
-    struct mpd_status *status = getStatus(conn);
+    struct mpd_status *status = mpd_run_status(conn);
+    if (status == 0)
+        return 0;
     int length = mpd_status_get_queue_length(status) - 1;
 
     if (length < 0) {
@@ -139,17 +130,6 @@ static inline enum mpd_cmd_ids get_cmd_id(char *cmd)
             return i;
 
     return -1;
-}
-
-void delete_file_forever(char* uri)
-{
-    char filepath[128]; 
-    if (!uri) {
-        //choose file by some criteria or random(?)
-        //TODO:
-    } else {
-        remove(uri);
-    }
 }
 
 char* download_file(char* url, char* artist)

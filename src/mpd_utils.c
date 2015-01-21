@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "mpd_client.h"
 #include "mpd_utils.h"
 
 unsigned mpd_get_queue_length(struct mpd_connection *conn)
@@ -76,3 +77,44 @@ void get_random_song(struct mpd_connection *conn, char *str, char *path)
     //TODO: look in / path if not found
 }
 
+void get_worst_song(struct mpd_connection *conn, char *str)
+{
+    struct mpd_entity *entity;
+    int rating0 = 65000;
+    if (!mpd_send_list_meta(conn, "/")) {
+        printf("error: mpd_send_list_meta\n");
+        return;
+    }
+    while((entity = mpd_recv_entity(conn)) != NULL) {
+        if (mpd_entity_get_type(entity) == MPD_ENTITY_TYPE_SONG) {
+            const struct mpd_song *song = mpd_entity_get_song(entity);
+            int rating = db_get_song_rating(mpd_get_title(song),
+                    mpd_get_artist(song));
+            if (rating < rating0) {
+                rating0 = rating;
+                sprintf(str, "%s", mpd_song_get_uri(song));
+            }
+        }
+        mpd_entity_free(entity);
+    }
+}
+
+void delete_file_forever(char* uri)
+{
+    if (!uri) {
+        char *music_path = NULL;
+        char path[128], song[128];
+        if (!config_lookup_string(&mpd.cfg, "application.music_path", &music_path))
+        {
+            fprintf(stderr, "%s: No 'application.music_path' setting in configuration file.\n", __func__);
+            return;
+        }
+        get_worst_song(mpd.conn, song);
+        sprintf(path, "%s%s", music_path, song);
+        printf("%s: %s\n", __func__, path);
+        remove(path);
+    } else {
+        remove(uri);
+    }
+}
+                        

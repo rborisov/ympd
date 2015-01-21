@@ -78,7 +78,7 @@
             </div>
         </div>
     </div>
-    <div class="flt-bottomleft1">
+    <div class="flt-bottomleft">
         <span id="currentradio" class="label label-success"></span>
         <span id="currentradiostatus" class="label label-info"></span>
         <span id="currentradiosize" class="label label-danger"></span>
@@ -94,18 +94,14 @@
         <button class="btn btn-flt-topright btn-warning btn-play btn-lg" onclick="clickPlay();">
             <span id="play-icon" class="glyphicon glyphicon-pause"></span>
         </button>
-        <button class="btn btn-flt-bottom2right btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
+        <button class="btn btn-flt-bottom1right btn-info btn-play btn-lg" onclick="socket.send('MPD_API_INCREASE_VOLUME');">
             <span class="glyphicon glyphicon-plus"></span>
         </button>
-        <button class="btn btn-flt-bottom1right btn-info btn-circle btn-lg">
+        <button class="btn btn-flt-bottomright btn-info btn-circle btn-lg">
             <span id="volume-icon" class="glyphicon glyphicon-volume-up"></span>
         </button>
-        <button class="btn btn-flt-bottomright btn-info btn-circle btn-lg" onclick="socket.send('MPD_API_DECREASE_VOLUME');">
+        <button class="btn btn-flt-bottomright1 btn-info btn-play btn-lg" onclick="socket.send('MPD_API_DECREASE_VOLUME');">
             <span class="glyphicon glyphicon-minus"></span>
-        </button>
-        <!-- browser/queue/radio controls -->
-        <button class="btn btn-flt-bottomleft btn-circle btn-success btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
-            <span id="radio-icon" class="glyphicon glyphicon-cloud-download"></span>
         </button>
                 <!--li><a href="#" data-toggle="modal" data-target="#settings" onclick="getHost();">Settings</a></li-->
         <!--button class="btn btn-circle btn-flt-topleft3 btn-lg" data-toggle="modal" data-target="#browse-list" onClick="getBrowse();">
@@ -129,6 +125,9 @@
                             <H4>Radio</H4>
                             <button class="btn btn-circle btn-lg" data-dismiss="modal" data-toggle="modal" data-target="#radio-list" onclick="getRadio();" >
                                 <span class="glyphicon glyphicon-folder-open"></span>
+                            </button>
+                            <button class="btn btn-circle btn-lg" onclick="socket.send('MPD_API_TOGGLE_RADIO');">
+                                <span id="radio-icon" class="glyphicon glyphicon-cloud-download"></span>
                             </button>
                         </div>
                         <div class="col-xs-5">

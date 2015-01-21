@@ -9,6 +9,7 @@
 #include "debug.h"
 #include "streamripper.h"
 #include "mpd_client.h"
+#include "mpd_utils.h"
 
 //static void catch_sig (int code);
 static void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data);
