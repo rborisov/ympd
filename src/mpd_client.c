@@ -707,8 +707,10 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
         "{\"type\":\"state\", \"data\":{"
         " \"state\":%d, \"volume\":%d, \"repeat\":%d,"
         " \"single\":%d, \"consume\":%d, \"random\":%d, "
-        " \"songpos\":%d, \"nextsongpos\":%d, \"elapsedTime\":%d, \"totalTime\":%d, "
-        " \"currentsongid\":%d, \"radio_status\":%d, \"queue_len\":%d"
+        " \"songpos\":%d, \"nextsongpos\":%d, "
+        " \"elapsedTime\":%d, \"totalTime\":%d, "
+        " \"currentsongid\":%d, \"radio_status\":%d, \"queue_len\":%d, "
+        " \"songrating\":%d"
         "}}", 
         mpd_status_get_state(status),
         mpd.volume, 
@@ -721,7 +723,8 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
         mpd_status_get_total_time(status),
         mpd_status_get_song_id(status),
         radio_get_status(),
-        queue_len);
+        queue_len, 
+        get_current_song_rating());
 
     *current_song_id = mpd_status_get_song_id(status);
     *queue_version = mpd_status_get_queue_version(status);

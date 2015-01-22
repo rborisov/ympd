@@ -117,4 +117,18 @@ void delete_file_forever(char* uri)
         remove(uri);
     }
 }
-                        
+
+int get_current_song_rating()
+{
+    int rating;
+    struct mpd_song *song;
+
+    song = mpd_run_current_song(mpd.conn);
+    if(song == NULL)
+        return 0;
+    
+    rating = db_get_song_rating(mpd_get_title(song), mpd_get_artist(song));
+    
+    mpd_song_free(song);
+    return rating;
+}

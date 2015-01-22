@@ -326,6 +326,7 @@ function webSocketConnect() {
                     current_song.currentSongId = obj.data.currentsongid;
                     current_song_pos = obj.data.songpos;
 //                    console.log("song_pos"+current_song_pos);
+                    $('#songrating').text(obj.data.songrating);
                     $('#currentpos').text(current_song_pos+"("+obj.data.queue_len+")");
                     next_song_pos = obj.data.nextsongpos;
                     $('#nextpos').text(next_song_pos);
@@ -338,6 +339,7 @@ function webSocketConnect() {
                     /*$('#volumeslider').slider(obj.data.volume);
                     var progress = Math.floor(100*obj.data.elapsedTime/obj.data.totalTime);
                     $('#progressbar').slider(progress);*/
+
 
                     $('#counter')
                     .text(elapsed_minutes + ":" + 
