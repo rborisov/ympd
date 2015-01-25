@@ -5,6 +5,44 @@
 #include "mpd_client.h"
 #include "mpd_utils.h"
 
+int mpd_list_artists(struct mpd_connection *conn)
+{
+    int num = 0;
+
+    mpd_search_db_tags(conn, MPD_TAG_ARTIST);
+    if (!mpd_search_commit(conn)) {
+        printf("%s: search_commit error\n", __func__);
+        return 0;
+    }
+
+    struct mpd_pair *pair;
+    while ((pair = mpd_recv_pair_tag(conn, MPD_TAG_ARTIST)) != NULL) {
+        printf("%s: %s\n", __func__, pair->value);
+        mpd_return_pair(conn, pair);
+        num++;
+    }
+
+    if (!mpd_response_finish(conn)) {
+        printf("%s: error\n", __func__);
+        return 0;
+    }
+
+    printf("%s: found %i\n", __func__, num);
+    return num;
+}
+
+char* mpd_get_title(struct mpd_song const *song)
+{
+    char *str;
+
+    str = (char *)mpd_song_get_tag(song, MPD_TAG_TITLE, 0);
+    if(str == NULL){
+        str = basename((char *)mpd_song_get_uri(song));
+    }
+
+    return str;
+}
+
 unsigned mpd_get_queue_length(struct mpd_connection *conn)
 {
     struct mpd_status *status = mpd_run_status(conn);
@@ -96,25 +134,6 @@ void get_worst_song(struct mpd_connection *conn, char *str)
             }
         }
         mpd_entity_free(entity);
-    }
-}
-
-void delete_file_forever(char* uri)
-{
-    if (!uri) {
-        char *music_path = NULL;
-        char path[128], song[128];
-        if (!config_lookup_string(&mpd.cfg, "application.music_path", &music_path))
-        {
-            fprintf(stderr, "%s: No 'application.music_path' setting in configuration file.\n", __func__);
-            return;
-        }
-        get_worst_song(mpd.conn, song);
-        sprintf(path, "%s%s", music_path, song);
-        printf("%s: %s\n", __func__, path);
-        remove(path);
-    } else {
-        remove(uri);
     }
 }
 

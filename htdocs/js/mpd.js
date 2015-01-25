@@ -634,6 +634,10 @@ function updateDB() {
     }).show();
 }
 
+function listArtists() {
+    socket.send('MPD_API_LIST_ARTISTS');
+}
+
 function clickPlay() {
     if($('#track-icon').hasClass('glyphicon-stop'))
         socket.send('MPD_API_SET_PLAY');

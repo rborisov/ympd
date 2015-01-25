@@ -3,6 +3,7 @@
  * Copyright (C) 2007 Alp Toker <alp@atoker.com>
  * Copyright (C) 2011 Lukasz Slachciak
  * Copyright (C) 2011 Bob Murphy
+ * Copyright (C) 2015 Roman Borisov <rborisoff@gmail.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,7 +34,9 @@
 
 
 static void destroyWindowCb(GtkWidget* widget, GtkWidget* window);
-static gboolean closeWebViewCb(WebKitWebView* webView, GtkWidget* window);
+static void closeWebViewCb(WebKitWebView* webView, GtkWidget* window);
+static void updateSettings(WebKitWebView* webView);
+static void reloadViewCb(WebKitWebView* webView, GtkWidget* window);
 
 int main(int argc, char* argv[])
 {
@@ -91,7 +94,10 @@ int main(int argc, char* argv[])
     // Set up callbacks so that if either the main window or the browser instance is
     // closed, the program will exit
     g_signal_connect(main_window, "destroy", G_CALLBACK(destroyWindowCb), NULL);
-    g_signal_connect(webView, "close", G_CALLBACK(closeWebViewCb), main_window);
+    g_signal_connect(webView, "close-web-view", G_CALLBACK(closeWebViewCb), main_window);
+    g_signal_connect(webView, "load-error", G_CALLBACK(reloadViewCb), NULL);
+
+//    updateSettings(webView);
 
     // Load a web page into the browser instance
     webkit_web_view_load_uri(webView, url);
@@ -116,13 +122,26 @@ int main(int argc, char* argv[])
     return 0;
 }
 
+static void updateSettings(WebKitWebView* webView)
+{
+    WebKitWebSettings *settings = webkit_web_settings_new ();
+//    g_object_set (G_OBJECT(settings), "enable-scripts", FALSE, NULL);
+    g_object_set (G_OBJECT(settings), "enable-offline-web-application-cache", TRUE, NULL);
+    /* Apply the result */
+    webkit_web_view_set_settings (WEBKIT_WEB_VIEW(webView), settings);
+}
+
+static void reloadViewCb(WebKitWebView* webView, GtkWidget* window)
+{
+    webkit_web_view_reload (webView);
+}
 
 static void destroyWindowCb(GtkWidget* widget, GtkWidget* window)
 {
     gtk_main_quit();
 }
 
-static gboolean closeWebViewCb(WebKitWebView* webView, GtkWidget* window)
+static void closeWebViewCb(WebKitWebView* webView, GtkWidget* window)
 {
     gtk_widget_destroy(window);
 }
