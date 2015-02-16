@@ -5,3 +5,5 @@ mkdir -p $HOME/rcarmedia
 cp ympd.conf $HOME/rcarmedia/
 sudo mkdir -p /media/storage/Music
 sudo chown -R $USER:$USER /media/storage
+sudo apt-get install mpd
+sudo touch /var/lib/mpd/tag_cache

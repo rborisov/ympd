@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sudo apt-get install libmpdclient-dev libglib2.0-dev libcurl-ocaml-dev libsqlite3-dev libmad0-dev libogg-dev libvorbis-dev libid3tag0-dev libwebkitgtk-dev

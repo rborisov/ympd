@@ -5,7 +5,11 @@ raspberry pi
 ============
 
 http://www.raspyfi.com/wi-fi-on-raspberry-pi-a-simple-guide/
-sudo apt-get install wicd-curses
+sudo apt-get install wicd-curses 
+
+development
+===========
+
 
 http://blogs.wcode.org/2013/09/howto-boot-your-raspberry-pi-into-a-fullscreen-browser-kiosk/
 
@@ -43,7 +47,10 @@ ympd
 ====
 
 sudo apt-get install libmpdclient-dev
-sudo apt-get install libmysqlclient-dev
+libglib2.0-dev
+libcurl-ocaml-dev
+libsqlite3-dev
+libmad0-dev libogg-dev libvorbis-dev libid3tag0-dev
 
 [![Build Status](http://ci.ympd.org/github.com/notandy/ympd/status.svg)](https://ci.ympd.org/github.com/notandy/ympd)
 
