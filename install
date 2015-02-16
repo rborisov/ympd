@@ -1,0 +1,7 @@
+#!/bin/sh
+mkdir -p $HOME/rcarmedia
+#REPLACEIT="\/home\/ruinrobo"
+#sed "s|$REPLACEIT|${HOME}|g" ympd.conf > $HOME/rcarmedia/ympd.conf
+cp ympd.conf $HOME/rcarmedia/
+sudo mkdir -p /media/storage/Music
+sudo chown -R $USER:$USER /media/storage

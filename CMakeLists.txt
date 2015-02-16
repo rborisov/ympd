@@ -16,6 +16,8 @@ option(WITH_MPD_HOST_CHANGE "Let users of the web frontend change the MPD Host" 
 find_package(LibMPDClient REQUIRED)
 find_package(Threads REQUIRED)
 find_package(GLIB2 REQUIRED)
+find_package(CURL REQUIRED)
+find_package(Sqlite3 REQUIRED)
 #find_package(GTK3 REQUIRED)
 #find_package(WebKit3 REQUIRED)
 #find_package(LibSoup2 REQUIRED)
