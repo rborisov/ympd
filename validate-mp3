@@ -1,0 +1,2 @@
+#!/bin/sh
+find /media/storage/Music/ -name "*.mp3" -exec mp3val -f -t -nb -l/media/storage/mp3val.log '{}' \;
