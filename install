@@ -3,7 +3,10 @@ mkdir -p $HOME/rcarmedia
 #REPLACEIT="\/home\/ruinrobo"
 #sed "s|$REPLACEIT|${HOME}|g" ympd.conf > $HOME/rcarmedia/ympd.conf
 cp ympd.conf $HOME/rcarmedia/
-sudo mkdir -p /media/storage/Music
-sudo chown -R $USER:$USER /media/storage
-sudo apt-get install mpd
-sudo touch /var/lib/mpd/tag_cache
+mkdir -p /media/storage/Music
+chown -R $USER:$USER /media/storage
+mkdir -p $HOME/mpd/playlists
+touch $HOME/mpd/tag_cache
+chown -R $USER:$USER $HOME/mpd
+apt-get install mpd
+sed "s|rborisov|${USER}|g" mpd.conf > /etc/mpd.conf
