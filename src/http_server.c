@@ -1,7 +1,7 @@
 /* ympd
    (c) 2013-2014 Andrew Karpow <andy@ndyk.de>
    This project's homepage is: http://www.ympd.org
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; version 2 of the License.
@@ -34,10 +34,8 @@ int callback_http(struct mg_connection *c)
 {
     const struct embedded_file *req_file;
     FILE *fd;
-    int i = 0;
-    unsigned char buf[500000];
-    char filename[256]; 
-    int tmp;
+    unsigned char *buf;
+    char filename[256];
     struct passwd *pw = getpwuid(getuid());
     char *images_dir, *homedir = pw->pw_dir;
 
@@ -52,12 +50,9 @@ int callback_http(struct mg_connection *c)
     {
         mg_send_header(c, "Content-Type", req_file->mimetype);
         mg_send_data(c, req_file->data, req_file->size);
-//        printf("%s %i\n", c->uri, req_file->size);    
         return MG_REQUEST_PROCESSED;
     }
 
-
-//    printf("%s ", c->uri);
     if (!config_lookup_string(&mpd.cfg, "application.images_path", &images_dir))
     {
         fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
@@ -69,20 +64,34 @@ int callback_http(struct mg_connection *c)
     fd = fopen(filename, "r");
     if(!fd)
         printf("Failed open file %s\n", filename);
-    else 
+    else
     {
-        while ((tmp = fgetc(fd)) != EOF)
+        unsigned int bufsize;
+        fseek(fd, 0, SEEK_END);
+        bufsize = ftell(fd);
+        fseek(fd, 0, SEEK_SET);
+        buf = (unsigned char*)malloc(bufsize+1);
+
+/*        while ((tmp = fgetc(fd)) != EOF)
         {
             buf[i] = (unsigned char)tmp;
             i++;
         }
-        buf[i] = 0;
-//        printf(" i %i\n", i);
-        fclose(fd);
-        mg_send_header(c, "Content-Type", "image/jpeg");
-        mg_send_data(c, buf, i);
+        buf[i] = 0;*/
 
-        return MG_REQUEST_PROCESSED;
+        if (buf) {
+            fread(buf, bufsize, 1, fd);
+            fclose(fd);
+
+            mg_send_header(c, "Content-Type", "image/jpeg");
+            mg_send_data(c, buf, bufsize);
+
+            free(buf);
+            return MG_REQUEST_PROCESSED;
+        } else {
+            fclose(fd);
+            printf("%s: memory error\n", __func__);
+        }
     }
 
     mg_send_status(c, 404);
