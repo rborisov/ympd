@@ -1,7 +1,7 @@
 /* ympd
    (c) 2013-2014 Andrew Karpow <andy@ndyk.de>
    This project's homepage is: http://www.ympd.org
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; version 2 of the License.
@@ -15,11 +15,10 @@
    with this program; if not, write to the Free Software Foundation, Inc.,
    Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-   
+
 #ifndef __MPD_CLIENT_H__
 #define __MPD_CLIENT_H__
 
-#include <libconfig.h>
 #include "mongoose.h"
 
 #define RETURN_ERROR_AND_RECOVER(X) do { \
@@ -105,22 +104,7 @@ struct t_mpd {
 
     int radio_status;
     int volume;
-
-    config_t cfg;
-    char config_file_name[512];
 } mpd;
-
-struct t_rcm {
-    char status_str[128];
-    char filesize_str[64];
-    char current_radio[128];
-    char file_path[128];
-
-    int radio_status; //0,1
-    int image_update; //0,1
-
-    unsigned int current_timer, last_timer;
-} rcm;
 
 struct t_mpd_client_session {
     int song_id;
@@ -140,4 +124,3 @@ void mpd_disconnect();
 
 void delete_file_forever(char *);
 #endif
-

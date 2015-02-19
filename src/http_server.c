@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-#include "mpd_client.h"
+#include "radio.h"
 #include "http_server.h"
 #include "config.h"
 
@@ -53,7 +53,7 @@ int callback_http(struct mg_connection *c)
         return MG_REQUEST_PROCESSED;
     }
 
-    if (!config_lookup_string(&mpd.cfg, "application.images_path", &images_dir))
+    if (!config_lookup_string(&rcm.cfg, "application.images_path", &images_dir))
     {
         fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
         sprintf(filename, "%s/%s/images/%s", homedir, RCM_DIR_STR, c->uri);

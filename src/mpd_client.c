@@ -2,7 +2,7 @@
    (c) 2013-2014 Andrew Karpow <andy@ndyk.de>
    This project's homepage is: http://www.ympd.org
    (c) 2014-2015 Roman Borisov <rborisoff@gmail.com>
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; version 2 of the License.
@@ -124,10 +124,10 @@ char* download_file(char* url, char* artist)
     CURLcode res;
     struct passwd *pw = getpwuid(getuid());
     char *out, *images_dir, *ext, *homedir = pw->pw_dir;
-    curl = curl_easy_init();                                                                                                                              
+    curl = curl_easy_init();
     if (curl)
     {
-        if (!config_lookup_string(&mpd.cfg, "application.images_path", &images_dir))
+        if (!config_lookup_string(&rcm.cfg, "application.images_path", &images_dir))
         {
             fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
             sprintf(outdir, "%s/%s/images%s", homedir, RCM_DIR_STR, artist);
@@ -170,11 +170,11 @@ void db_put_album(char* charbuf)
     char song[128] = "", album[128] = "", artist[128] = "", *art;
     char *token, *art_str;
     char *str_copy = strdup(charbuf);
-    
+
     token = strsep(&str_copy, "|");
     if (token)
         strncpy(song, token, strlen(token));
-    else return; 
+    else return;
     token = strsep(&str_copy, "|");
     if (token)
         strncpy(artist, token, strlen(token));
@@ -244,7 +244,7 @@ int callback_mpd(struct mg_connection *c)
             mpd_run_next(mpd.conn);
             break;
         case MPD_API_DB_ALBUM:
-            if(sscanf(c->content, "MPD_API_DB_ALBUM,%m[^\t\n]", 
+            if(sscanf(c->content, "MPD_API_DB_ALBUM,%m[^\t\n]",
                         &p_charbuf) && p_charbuf != NULL)
             {
                 db_put_album(p_charbuf);
@@ -404,7 +404,7 @@ int callback_mpd(struct mg_connection *c)
         /* Commands allowed when disconnected from MPD server */
         case MPD_API_SET_MPDHOST:
             int_buf = 0;
-            if(sscanf(c->content, "MPD_API_SET_MPDHOST,%d,%m[^\t\n ]", &int_buf, &p_charbuf) && 
+            if(sscanf(c->content, "MPD_API_SET_MPDHOST,%d,%m[^\t\n ]", &int_buf, &p_charbuf) &&
                 p_charbuf != NULL && int_buf > 0)
             {
                 strncpy(mpd.host, p_charbuf, sizeof(mpd.host));
@@ -435,7 +435,7 @@ int callback_mpd(struct mg_connection *c)
 
     if(mpd.conn_state == MPD_CONNECTED && mpd_connection_get_error(mpd.conn) != MPD_ERROR_SUCCESS)
     {
-        n = snprintf(mpd.buf, MAX_SIZE, "{\"type\":\"error\", \"data\": \"%s\"}", 
+        n = snprintf(mpd.buf, MAX_SIZE, "{\"type\":\"error\", \"data\": \"%s\"}",
             mpd_connection_get_error_message(mpd.conn));
 
         /* Try to recover error */
@@ -466,7 +466,7 @@ static int mpd_notify_callback(struct mg_connection *c) {
     if(c->callback_param)
     {
         /* error message? */
-        n = snprintf(mpd.buf, MAX_SIZE, "{\"type\":\"error\",\"data\":\"%s\"}", 
+        n = snprintf(mpd.buf, MAX_SIZE, "{\"type\":\"error\",\"data\":\"%s\"}",
             (const char *)c->callback_param);
 
         mg_websocket_write(c, 1, mpd.buf, n);
@@ -486,7 +486,7 @@ static int mpd_notify_callback(struct mg_connection *c) {
     {
         mg_websocket_write(c, 1, mpd.buf, mpd.buf_size);
 
-        if (mpd.song_id == -1) 
+        if (mpd.song_id == -1)
         {
             char str[128];
             printf("%s song_id == %i\n", __func__, mpd.song_id);
@@ -525,7 +525,7 @@ static int mpd_notify_callback(struct mg_connection *c) {
             if (n > 0)
                 mg_websocket_write(c, 1, mpd.buf, n);
             rcm.last_timer = (unsigned int)time(NULL);
-//            printf("%s %i\n", __func__, rcm.last_timer); 
+//            printf("%s %i\n", __func__, rcm.last_timer);
         }
     }
 
@@ -548,7 +548,7 @@ void mpd_poll(struct mg_server *s)
 
             if (mpd_connection_get_error(mpd.conn) != MPD_ERROR_SUCCESS) {
                 fprintf(stderr, "MPD connection: %s\n", mpd_connection_get_error_message(mpd.conn));
-                mg_iterate_over_connections(s, mpd_notify_callback, 
+                mg_iterate_over_connections(s, mpd_notify_callback,
                     (void *)mpd_connection_get_error_message(mpd.conn));
                 mpd.conn_state = MPD_FAILURE;
                 return;
@@ -557,7 +557,7 @@ void mpd_poll(struct mg_server *s)
             if(mpd.password && !mpd_run_password(mpd.conn, mpd.password))
             {
                 fprintf(stderr, "MPD connection: %s\n", mpd_connection_get_error_message(mpd.conn));
-                mg_iterate_over_connections(s, mpd_notify_callback, 
+                mg_iterate_over_connections(s, mpd_notify_callback,
                     (void *)mpd_connection_get_error_message(mpd.conn));
                 mpd.conn_state = MPD_FAILURE;
                 return;
@@ -624,7 +624,7 @@ int image_exists(char* name)
 {
     struct passwd *pw = getpwuid(getuid());
     char *images_dir, *homedir = pw->pw_dir;
-    if (!config_lookup_string(&mpd.cfg, "application.images_path", &images_dir))
+    if (!config_lookup_string(&rcm.cfg, "application.images_path", &images_dir))
     {
         fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
         sprintf(outdir, "%s/%s/images/", homedir, RCM_DIR_STR);
@@ -645,8 +645,8 @@ int image_exists(char* name)
 
 char* mpd_get_art(struct mpd_song const *song)
 {
-    char *str = db_get_album_art(mpd_song_get_tag(song, MPD_TAG_ARTIST, 0), 
-            db_get_song_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0), 
+    char *str = db_get_album_art(mpd_song_get_tag(song, MPD_TAG_ARTIST, 0),
+            db_get_song_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
                 mpd_song_get_tag(song, MPD_TAG_ARTIST, 0)));
     if (str) {
         ydebug_printf("%s: %s\n", __func__, str);
@@ -693,9 +693,9 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
         " \"elapsedTime\":%d, \"totalTime\":%d, "
         " \"currentsongid\":%d, \"radio_status\":%d, \"queue_len\":%d, "
         " \"songrating\":%d"
-        "}}", 
+        "}}",
         mpd_status_get_state(status),
-        mpd.volume, 
+        mpd.volume,
         mpd_status_get_repeat(status),
         mpd_status_get_single(status),
         mpd_status_get_consume(status),
@@ -705,7 +705,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
         mpd_status_get_total_time(status),
         mpd_status_get_song_id(status),
         radio_get_status(),
-        queue_len, 
+        queue_len,
         get_current_song_rating());
 
     *current_song_id = mpd_status_get_song_id(status);
@@ -795,8 +795,8 @@ int mpd_put_current_song(char *buffer)
 
     cur += json_emit_raw_str(cur, end - cur, "}}");
 
-    db_listen_song(mpd_get_title(song), 
-            mpd_song_get_tag(song, MPD_TAG_ARTIST, 0), 
+    db_listen_song(mpd_get_title(song),
+            mpd_song_get_tag(song, MPD_TAG_ARTIST, 0),
             mpd_get_album(song));
 
     mpd_song_free(song);
@@ -849,7 +849,7 @@ int mpd_put_current_radio(char *buffer)
     cur += json_emit_raw_str(cur, end - cur, ",\"size\":");
     cur += json_emit_quoted_str(cur, end - cur, rcm.filesize_str);
     if (rcm.image_update) {  
-        setting = config_lookup(&mpd.cfg, "radio.station");
+        setting = config_lookup(&rcm.cfg, "radio.station");
         if (setting != NULL) {
             int count = config_setting_length(setting);
             int i;
@@ -880,14 +880,14 @@ int mpd_put_radio(char *buffer, unsigned int offset)
     const char *end = buffer + MAX_SIZE;
     config_setting_t *setting;
 
-    setting = config_lookup(&mpd.cfg, "radio.station");
+    setting = config_lookup(&rcm.cfg, "radio.station");
     if(setting != NULL)
     {
         int count = config_setting_length(setting);
         int i;
-        
+
         cur += json_emit_raw_str(cur, end  - cur, "{\"type\":\"radio\",\"data\":[ ");
-        
+
         for(i = 0; i < count; ++i)
         {
             config_setting_t *station = config_setting_get_elem(setting, i);
