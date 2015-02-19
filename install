@@ -4,7 +4,7 @@ USER="pi"
 mkdir -p $HOME/rcarmedia
 #REPLACEIT="\/home\/ruinrobo"
 #sed "s|$REPLACEIT|${HOME}|g" ympd.conf > $HOME/rcarmedia/ympd.conf
-cp ympd.conf $HOME/rcarmedia/
+#cp ympd.conf $HOME/rcarmedia/
 mkdir -p /media/storage/Music
 chown -R $USER:$USER /media/storage
 mkdir -p $HOME/mpd/playlists
@@ -14,3 +14,5 @@ apt-get install mpd
 #sed "s|rborisov|${USER}|g" ./linux/etc/mpd.conf > /etc/mpd.conf
 #cp ./linux/etc/rc.local /etc/
 #cp ./linux/boot/xinitrc /boot/
+cd /
+tar -xvf update.tar.gz
