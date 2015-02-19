@@ -29,16 +29,16 @@ include_directories(${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR} ${STREAMRIPPER_L
 
 include(CheckCSourceCompiles)
 
-set(CMAKE_C_FLAGS "-std=gnu99 -Wall -D__UNIX__") 
+set(CMAKE_C_FLAGS "-std=gnu99 -Wall -D__UNIX__")
 set(CMAKE_C_FLAGS_DEBUG "-ggdb -pedantic")
 
-file(GLOB RESOURCES 
+file(GLOB RESOURCES
 	RELATIVE ${PROJECT_SOURCE_DIR}
 	htdocs/js/*
 	htdocs/assets/*
 	htdocs/css/*.min.css
 	htdocs/fonts/*
-	htdocs/index.html
+	htdocs/*.html
 )
 
 add_executable(mkdata htdocs/mkdata.c)
@@ -60,6 +60,7 @@ set(SOURCES
     src/sqlitedb.c
     src/sql.c
     src/mpd_utils.c
+	src/radio.c
     assets.c
 )
 

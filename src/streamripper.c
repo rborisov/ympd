@@ -10,6 +10,7 @@
 #include "streamripper.h"
 #include "mpd_client.h"
 #include "mpd_utils.h"
+#include "radio.h"
 
 //static void catch_sig (int code);
 static void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data);
@@ -33,12 +34,12 @@ void streamripper_set_url(char* url)
 
     if (url && strcmp(url, ""))
         goto done;
-    
-    if (!(&mpd.cfg)) {
+
+    if (!(&rcm.cfg)) {
         fprintf(stderr, "%s: mpd is NULL\n", __func__);
         return;
     }
-    if (!config_lookup_string(&mpd.cfg, "radio.url", &radio_url))
+    if (!config_lookup_string(&rcm.cfg, "radio.url", &radio_url))
     {
         fprintf(stderr, "%s: No 'radio.url' setting in configuration file.\n", __func__);
         return;
@@ -55,46 +56,46 @@ void streamripper_set_url_dest(char* dest)
          *radio_path = NULL;
     config_setting_t *root, *setting;
 
-    if (!(&mpd.cfg)) {
-        fprintf(stderr, "%s: mpd is NULL\n", __func__);
+    if (!(&rcm.cfg)) {
+        fprintf(stderr, "%s: rcm.cfg is NULL\n", __func__);
         return;
     }
-    
-    if (!config_lookup_string(&mpd.cfg, "application.music_path", &music_path))
+
+    if (!config_lookup_string(&rcm.cfg, "application.music_path", &music_path))
     {
         fprintf(stderr, "%s: No 'application.music_path' setting in configuration file.\n", __func__);
         return;
     }
-    if (!config_lookup_string(&mpd.cfg, "radio.path", &radio_path))
+    if (!config_lookup_string(&rcm.cfg, "radio.path", &radio_path))
     {
         fprintf(stderr, "%s: No 'radio.path' setting in configuration file.\n", __func__);
         return;
     }
     rcm.image_update = 1;
     if (!radio_dest || strcmp(radio_dest, "") == 0) {
-        if (!config_lookup_string(&mpd.cfg, "radio.current", &radio_dest))
+        if (!config_lookup_string(&rcm.cfg, "radio.current", &radio_dest))
         {
             fprintf(stderr, "%s: No 'radio.dest' setting in configuration file.\n", __func__);
             return;
         }
     }
     else {
-        root = config_root_setting(&mpd.cfg);
+        root = config_root_setting(&rcm.cfg);
         setting = config_setting_get_member(root, "radio");
         if (setting) {
             int ret = config_setting_remove(setting, "current");
             if (ret == CONFIG_TRUE) {
                 config_setting_t *current = config_setting_add(setting, "current", CONFIG_TYPE_STRING);
                 config_setting_set_string(current, radio_dest);
-                if(! config_write_file(&mpd.cfg, mpd.config_file_name))
+                if(! config_write_file(&rcm.cfg, rcm.config_file_name))
                 {
                     fprintf(stderr, "%s: Error while writing file.\n", __func__);
                 }
             }
         }
     }
-    
-    setting = config_lookup(&mpd.cfg, "radio.station");
+
+    setting = config_lookup(&rcm.cfg, "radio.station");
     if(setting != NULL)
     {
         int count = config_setting_length(setting);
@@ -140,11 +141,11 @@ void setpath_streamuri(char* outpath)
 void init_streamripper()
 {
     const char* incomplete;
-    
+
     sr_set_locale ();
     debug_set_filename("streamripper.log");
     debug_enable();
-    
+
     prefs_load ();
     prefs.overwrite = OVERWRITE_ALWAYS;
     OPT_FLAG_SET(prefs.flags, OPT_SEPARATE_DIRS, 0);
@@ -157,10 +158,10 @@ void init_streamripper()
     strncpy (prefs.cs_opt.codeset_relay, "UTF-8", MAX_CODESET_STRING);
 
 
-    if (!(&mpd.cfg)) {
+    if (!(&rcm.cfg)) {
         fprintf(stderr, "%s: mpd is NULL\n", __func__);
     } else {
-        if (!config_lookup_string(&mpd.cfg, "radio.incomplete", &incomplete))
+        if (!config_lookup_string(&rcm.cfg, "radio.incomplete", &incomplete))
         {
             fprintf(stderr, "%s: No 'radio.incomplete' setting in configuration file.\n", __func__);
         } else {
@@ -168,7 +169,7 @@ void init_streamripper()
         }
     }
     prefs_save ();
-    
+
     rip_manager_init();
 
     start_streamripper();
@@ -177,7 +178,7 @@ void init_streamripper()
 int start_streamripper()
 {
     int ret;
- 
+
     /* Launch the ripping thread */
     if ((ret = rip_manager_start (&rmi, &prefs, rip_callback)) != SR_SUCCESS) {
         fprintf(stderr, "%s: Couldn't connect to %s\n", __func__, prefs.url);
@@ -247,7 +248,7 @@ int poll_streamripper(char* newfilename)
         printf("%s: new track %s %lu\n", __func__, rmi->filename, rmi->filesize);
         m_new_track = FALSE;
     }
-    
+
     return 0;
 }
 
@@ -274,7 +275,7 @@ void delete_file_forever(char* uri)
     if (!uri) {
         char *music_path = NULL;
         char path[128], song[128];
-        if (!config_lookup_string(&mpd.cfg, "application.music_path", &music_path))
+        if (!config_lookup_string(&rcm.cfg, "application.music_path", &music_path))
         {
             fprintf(stderr, "%s: No 'application.music_path' setting in configuration file.\n", __func__);
             return;
@@ -303,7 +304,7 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
     switch(message)
     {
         case RM_UPDATE:
-            m_update = TRUE;            
+            m_update = TRUE;
             break;
         case RM_ERROR:
             err = (ERROR_INFO*)data;
@@ -323,7 +324,7 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
             m_alldone = TRUE;
             break;
         case RM_NEW_TRACK:
-            m_new_track = TRUE;            
+            m_new_track = TRUE;
             break;
         case RM_STARTED:
             m_started = TRUE;
@@ -335,4 +336,3 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
             break;
     }
 }
-

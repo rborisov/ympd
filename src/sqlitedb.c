@@ -2,8 +2,8 @@
 #include <string.h>
 #include <sqlite3.h>
 #include "sqlitedb.h"
-//#include "ydebug.h"
 #include "sql.h"
+#include "radio.h"
 
 #define ydebug_printf printf
 
@@ -28,6 +28,8 @@ void convert_str(char *instr)
 int db_init()
 {
     int rc;
+    char dbpath[128];
+    sprintf(dbpath, "%srcardb.sqlite", cfg_get_db_path());
 
     char create_Songs_table_query[] = "CREATE TABLE IF NOT EXISTS Songs \
                                 (id INTEGER PRIMARY KEY, song TEXT, \
@@ -46,8 +48,8 @@ int db_init()
     char create_RadioUrl_table_query[] = "CREATE TABLE IF NOT EXISTS RadioUrls \
                                        (id INTEGER PRIMARY KEY, radioid INTEGER, url TEXT, \
                                         time DATETIME, bitrate INTEGER)";
-    rc = sqlite3_open("rcardb.sqlite", &conn);
-    if (rc != SQLITE_OK) 
+    rc = sqlite3_open(dbpath, &conn);
+    if (rc != SQLITE_OK)
         goto error;
     rc = sqlite3_exec(conn, create_Songs_table_query, 0, 0, 0);
     if (rc != SQLITE_OK)
@@ -155,7 +157,7 @@ int db_update_song_album(char* song, char* artist, char* album)
         convert_str(song);
         convert_str(album);
         ydebug_printf("%s update %s album...\n", __func__, album);
-        if (sql_exec(conn, "UPDATE Songs SET album = '%s' WHERE song = '%s' AND artist = '%s'", 
+        if (sql_exec(conn, "UPDATE Songs SET album = '%s' WHERE song = '%s' AND artist = '%s'",
                     album, song, artist) == SQLITE_OK)
             rc = 1;
     }
@@ -222,14 +224,14 @@ int db_update_artist_art(char* artist, char* art)
 int db_listen_song(char* song, char* artist, char* album)
 {
     int rc, np;
- 
+
     if (!song||!artist)
         return 0;
 //    convert_str(song);
     convert_str(artist);
 //    convert_str(album);
-    np = db_get_song_numplayed(song, artist);   
-    if (np) 
+    np = db_get_song_numplayed(song, artist);
+    if (np)
     {
         np = np + 1;
         ydebug_printf("%s found %i updating...\n", __func__, np);
@@ -241,7 +243,7 @@ int db_listen_song(char* song, char* artist, char* album)
     } else {
         ydebug_printf("%s %s %s doesn't exist. adding...\n", __func__, song, artist);
         rc = sql_exec(conn, "INSERT INTO Songs (song, artist, added, played, numplayed, rating)"
-                " VALUES ('%s', '%s', DATETIME('NOW', 'LOCALTIME'), DATETIME('NOW', 'LOCALTIME'), 1, 0)", 
+                " VALUES ('%s', '%s', DATETIME('NOW', 'LOCALTIME'), DATETIME('NOW', 'LOCALTIME'), 1, 0)",
                 song, artist);
     }
     if (rc != SQLITE_OK)

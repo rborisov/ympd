@@ -1,7 +1,7 @@
 /* ympd
    (c) 2013-2014 Andrew Karpow <andy@ndyk.de>
    This project's homepage is: http://www.ympd.org
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; version 2 of the License.
@@ -32,6 +32,7 @@
 #include "streamripper.h"
 #include "sqlitedb.h"
 #include "mpd_utils.h"
+#include "radio.h"
 
 #include <mpd/client.h>
 
@@ -68,20 +69,20 @@ int main(int argc, char **argv)
 
     rcm.last_timer = 0;
 
-    sprintf(mpd.config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
-    printf("conf = %s\n", mpd.config_file_name);
+    sprintf(rcm.config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
+    printf("conf = %s\n", rcm.config_file_name);
 
     atexit(bye);
     mg_set_option(server, "listening_port", "8080");
     mpd.port = 6600;
     strcpy(mpd.host, "127.0.0.1");
 
-    config_init(&mpd.cfg);
-    if(! config_read_file(&mpd.cfg, mpd.config_file_name))
+    config_init(&rcm.cfg);
+    if(! config_read_file(&rcm.cfg, rcm.config_file_name))
     {
-        printf("config file error %s:%d - %s\n", config_error_file(&mpd.cfg),
-                config_error_line(&mpd.cfg), config_error_text(&mpd.cfg));
-        config_destroy(&mpd.cfg);
+        printf("config file error %s:%d - %s\n", config_error_file(&rcm.cfg),
+                config_error_line(&rcm.cfg), config_error_text(&rcm.cfg));
+        config_destroy(&rcm.cfg);
         return(EXIT_FAILURE);
     }
 
@@ -100,12 +101,12 @@ int main(int argc, char **argv)
     init_streamripper();
     mpd.radio_status = 1;
     printf("init_streamripper\n");
-    
+
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
 
 
-    
+
 
     while (!force_exit) {
         current_timer = mg_poll_server(server, 200);
@@ -129,7 +130,7 @@ int main(int argc, char **argv)
     mpd_disconnect();
     mg_destroy_server(&server);
 
-    config_destroy(&mpd.cfg);
+    config_destroy(&rcm.cfg);
 
     return EXIT_SUCCESS;
 }
