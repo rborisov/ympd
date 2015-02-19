@@ -1,4 +1,6 @@
 #!/bin/sh
+HOME="/home/pi"
+USER="pi"
 mkdir -p $HOME/rcarmedia
 #REPLACEIT="\/home\/ruinrobo"
 #sed "s|$REPLACEIT|${HOME}|g" ympd.conf > $HOME/rcarmedia/ympd.conf
@@ -9,4 +11,6 @@ mkdir -p $HOME/mpd/playlists
 touch $HOME/mpd/tag_cache
 chown -R $USER:$USER $HOME/mpd
 apt-get install mpd
-sed "s|rborisov|${USER}|g" mpd.conf > /etc/mpd.conf
+#sed "s|rborisov|${USER}|g" ./linux/etc/mpd.conf > /etc/mpd.conf
+#cp ./linux/etc/rc.local /etc/
+#cp ./linux/boot/xinitrc /boot/

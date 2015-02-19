@@ -1,0 +1,10 @@
+~!/bin/sh
+
+mkdir -p ./linux/usr/local/lib
+mkdir -p ./linux/usr/bin
+cp ./build/ympd ./linux/usr/bin/
+cp ./kiosk-browser/browser ./linux/usr/bin/
+cp ./libstreamripper/src/.libs/libstreamripper.* ./linux/usr/local/lib/
+cp ./libconfig-1.4.9/lib/.libs/libconfig.* ./linux/usr/local/lib/
+cp ./libconfig-1.4.9/lib/.libs/libconfig++.* ./linux/usr/local/lib/
+tar -zcvf linux.tar.gz ./linux
