@@ -42,7 +42,7 @@ int callback_http(struct mg_connection *c)
     printf("http: %s\n", c->uri);
 
     if(!strcmp(c->uri, "/"))
-        req_file = find_embedded_file("/index.html");
+        req_file = find_embedded_file("/index0.html");
     else
         req_file = find_embedded_file(c->uri);
 

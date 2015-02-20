@@ -46,39 +46,42 @@
     bottom: 4px;
     right: 50px;
 }
-
-
+.nopadding {
+    padding: 0px;
+}
 </style>
 <body>
 <div class="container-fluid">
-    <a href=index0.html><span class="label label-warning flt-topleft">Jeep-Pi</span></a>
-    <div class="panel panel-default bkblack">
-        <div class="panel-body" style="min-height: 150; max-height: 150">
+    <div class="flt-topleft">
+        <span id="counter" class="badge bkgreen"></span>
+        <span id="currentpos" class="badge bkorange"></span>
+    </div>
+    <!--a href=music_search.html><span class="label label-warning flt-topleft">Jeep-Pi</span></a-->
+    <!--div class="panel panel-default bkblack">
+        <div class="panel-body" style="min-height: 150; max-height: 150"-->
             <div class="row">
-                <div class="col-xs-4 nopadding">
-                    <img src="" width="150" height="150" id="artimage" class="img-rounded" data-toggle="modal" data-target="#jukebox"/>
-                    <span id="currentpos" class="badge bkorange pull-right"></span><br>
-                    <span id="nextpos" class="label label-default"></span>
-                    <span id="next_artist" class="label label-warning"></span>
+                <div class="col-xs-3 nopadding">
+                    <img src="" width="80" height="80" id="artimage" class="img-rounded" data-toggle="modal" data-target="#jukebox"/>
+                    <!--span id="nextpos" class="label label-default"></span>
+                    <span id="next_artist" class="label label-warning"></span-->
                 </div>
-                <div class="col-xs-7">
-                    <H4>
-                        <span id="counter" class="badge bkgreen"></span>
-                        <span id="songrating" class="badge"></span>
+                <div class="col-xs-8 nopadding">
+                    <!--H4-->
                         <button class="btn btn-success btn-circle-sm btn-lg" onclick="socket.send('MPD_API_LIKE');">
                             <span class="glyphicon glyphicon-thumbs-up"></span>
                         </button>
+                        <span id="songrating" class="badge"></span>
                         <button class="btn btn-default btn-circle-sm btn-lg" onclick="socket.send('MPD_API_DISLIKE');">
                             <span class="glyphicon glyphicon-thumbs-down"></span>
                         </button>
-                    </H4>
-                    <H3><span id="currenttrack"></span></H3>
-                    <H3><span id="artist" class="label label-warning"></span></H3>
-                    <H4><span id="album" ></span></H4>
+                    <!--/H4-->
+                    <span id="currenttrack" class="label label-success"></span>
+                    <span id="artist" class="label label-warning"></span>
+                    <span id="album" class="label label-info"></span>
                 </div>
             </div>
-        </div>
-    </div>
+        <!--/div>
+    </div-->
     <div class="flt-bottomleft">
         <span id="currentradio" class="label label-success"></span>
         <span id="currentradiostatus" class="label label-info"></span>
