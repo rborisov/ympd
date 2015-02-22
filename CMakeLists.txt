@@ -8,7 +8,7 @@ set(CPACK_PACKAGE_VERSION_PATCH "2")
 set(STREAMRIPPER_LIB_PATH "${PROJECT_SOURCE_DIR}/libstreamripper/")
 set(STREAMRIPPER_SRC_PATH "${PROJECT_SOURCE_DIR}/libstreamripper/src/")
 
-SET(CMAKE_BUILD_TYPE debug)
+#SET(CMAKE_BUILD_TYPE debug)
 #SET(USE_GTK3 "1")
 
 option(WITH_MPD_HOST_CHANGE "Let users of the web frontend change the MPD Host" ON)
