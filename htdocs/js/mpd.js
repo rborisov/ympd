@@ -1,7 +1,7 @@
 /* ympd
    (c) 2013-2014 Andrew Karpow <andy@ndyk.de>
    This project's homepage is: http://www.ympd.org
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; version 2 of the License.
@@ -168,9 +168,9 @@ function webSocketConnect() {
                     for (var song in obj.data) {
                         var minutes = Math.floor(obj.data[song].duration / 60);
                         var seconds = obj.data[song].duration - minutes * 60;
-                        
+
                         if (obj.data[song].pos == next_song_pos) {
-//                        if (obj.data[song].pos == current_song.position+1) {  
+//                        if (obj.data[song].pos == current_song.position+1) {
                             //console.log(obj.data[song].title);
                             $('#next_track').text(obj.data[song].title);
                             $('#next_artist').text(obj.data[song].artist);
@@ -178,7 +178,7 @@ function webSocketConnect() {
 
                         $('#cocacola > tbody').append(
                                 "<tr trackid=\"" + obj.data[song].id + "\"><td><span class=\"badge\">" + (obj.data[song].pos + 1) + "</span></td>" +
-                                "<td><span class=\"label label-success\">"+ obj.data[song].title +"</span></td>" + 
+                                "<td><span class=\"label label-success\">"+ obj.data[song].title +"</span></td>" +
                                 "<td><span class=\"badge\">"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
                                 "</span></td><td></td></tr>");
                     }
@@ -218,16 +218,16 @@ function webSocketConnect() {
                             case "directory":
                                 $('#salamisandwich > tbody').append(
                                     "<tr uri=\"" + obj.data[item].dir + "\" class=\"dir\">" +
-                                    "<td><span class=\"glyphicon glyphicon-folder-open\"></span></td>" + 
-                                    "<td><a><span class=\"label label-default\">" + basename(obj.data[item].dir) + "</span></a></td>" + 
+                                    "<td><span class=\"glyphicon glyphicon-folder-open\"></span></td>" +
+                                    "<td><a><span class=\"label label-default\">" + basename(obj.data[item].dir) + "</span></a></td>" +
                                     "<td></td><td></td></tr>"
                                 );
                                 break;
                             case "playlist":
                                 $('#salamisandwich > tbody').append(
                                     "<tr uri=\"" + obj.data[item].plist + "\" class=\"plist\">" +
-                                    "<td><span class=\"glyphicon glyphicon-list\"></span></td>" + 
-                                    "<td><a>" + basename(obj.data[item].plist) + "</a></td>" + 
+                                    "<td><span class=\"glyphicon glyphicon-list\"></span></td>" +
+                                    "<td><a>" + basename(obj.data[item].plist) + "</a></td>" +
                                     "<td></td><td></td></tr>"
                                 );
                                 break;
@@ -237,8 +237,8 @@ function webSocketConnect() {
 
                                 $('#salamisandwich > tbody').append(
                                     "<tr uri=\"" + obj.data[item].uri + "\" class=\"song\">" +
-                            //        "<td><span class=\"glyphicon glyphicon-music\"></span></td>" + 
-                                    "<td><span class=\"label label-success\">" + obj.data[item].title +"</span></td>" + 
+                            //        "<td><span class=\"glyphicon glyphicon-music\"></span></td>" +
+                                    "<td><span class=\"label label-success\">" + obj.data[item].title +"</span></td>" +
                                     "<td><span class=\"badge\">"+ minutes + ":" + (seconds < 10 ? '0' : '') + seconds +
                                     "</span></td><td></td></tr>"
                                 );
@@ -248,8 +248,8 @@ function webSocketConnect() {
                                     $('#next').removeClass('disabled');//('hide');
                                 } else {
                                     $('#salamisandwich > tbody').append(
-                                        "<tr><td><span class=\"glyphicon glyphicon-remove\"></span></td>" + 
-                                        "<td>Too many results, please refine your search!</td>" + 
+                                        "<tr><td><span class=\"glyphicon glyphicon-remove\"></span></td>" +
+                                        "<td>Too many results, please refine your search!</td>" +
                                         "<td></td><td></td></tr>"
                                     );
                                 }
@@ -277,7 +277,7 @@ function webSocketConnect() {
 
                     $('#salamisandwich > tbody > tr').on({
                         mouseenter: function() {
-                            if($(this).is(".dir")) 
+                            if($(this).is(".dir"))
                                 appendClickableIcon($(this), 'MPD_API_ADD_TRACK', 'plus');
                             else if($(this).is(".song"))
                                 appendClickableIcon($(this), 'MPD_API_ADD_PLAY_TRACK', 'play');
@@ -342,8 +342,8 @@ function webSocketConnect() {
 
 
                     $('#counter')
-                    .text(elapsed_minutes + ":" + 
-                        (elapsed_seconds < 10 ? '0' : '') + elapsed_seconds + " / " +
+                    .text(elapsed_minutes + ":" +
+                        (elapsed_seconds < 10 ? '0' : '') + elapsed_seconds + "/" +
                         total_minutes + ":" + (total_seconds < 10 ? '0' : '') + total_seconds);
 
                     $('#salamisandwich > tbody > tr').removeClass('active').css("font-weight", "");
@@ -445,7 +445,7 @@ function webSocketConnect() {
                                 })
                                 //.done (function ()   { console.log("done"  ); })
                                 .fail (function ()   { console.log("fail"  ); })
-                                .error (function()   { 
+                                .error (function()   {
                                     console.log("error" );
                                     socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
                                 })
@@ -456,12 +456,12 @@ function webSocketConnect() {
                     $('#currenttrack').text(" " + obj.data.title);
 //                    $('#currentpos').text(obj.data.pos);
                     //var notification = "<strong><h4>" + obj.data.title + "</h4></strong>";
-                    
+
                     if(obj.data.album) {
                         $('#album').text(obj.data.album);
                         //notification += obj.data.album + "<br />";
                     } else
-                       $('#album').text(""); 
+                       $('#album').text("");
 
                     if(obj.data.artist) {
                         $('#artist').text(obj.data.artist);
@@ -482,9 +482,9 @@ function webSocketConnect() {
                             message:{html: notification},
                             type: "info",
                         }).show();
-  */                  
+  */
                     socket.send('MPD_API_GET_QUEUE,'+queue_pagination);
-                        
+
                     break;
                 case "mpdhost":
                     $('#mpdhost').val(obj.data.host);
@@ -507,7 +507,7 @@ function webSocketConnect() {
             console.log("disconnected");
             $('.top-right').notify({
                 message:{text:"Connection to ympd lost, retrying in 3 seconds "},
-                type: "danger", 
+                type: "danger",
                 onClose: function () {
                     webSocketConnect();
                 }
@@ -702,7 +702,7 @@ function getBrowse() {
     console.log('get browse mpd database');
     app.setLocation('#/browse/'+pagination+'/'+browsepath);
 }
-        
+
 function getHost() {
     socket.send('MPD_API_GET_MPDHOST');
 
