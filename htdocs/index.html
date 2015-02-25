@@ -5,41 +5,81 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="css/carradio.min.css" rel="stylesheet">
+        <style>
+            body, html {
+                font-family: monospace; font-size: 14px;
+                background: black;
+            }
+            .btn{
+                border: 1px solid yellowgreen;
+                background-color: black;
+                padding: 4px 12px;
+                color: yellowgreen;
+                
+                -o-transition: background-color .2s ease-in; 
+                -moz-transition: background-color .2s ease-in;
+                -webkit-transition: background-color .2s ease-in; 
+                transition: background-color .2s ease-in; 
+            }
+            .btn:hover {
+                background-color: green;
+            }
+            .btn:active {
+                background-color: #ccc;
+            }
+        </style>
     </head>
     <body>
         <div style="position: absolute; top: 0; left: 0; right: 0; background: black">
             <table>
-                <tr style="font-family: monospace; font-size:14px">
-                    <td id="counter" style="text-align: center; width: 50%; color: yellowgreen"></td>
-                    <td id="currentpos" style="text-align: center; width: 50%; color: orange"></td>
+                <tr style="font-size:14px">
+                    <td id="track-icon" class="glyphicon glyphicon-pause" style="text-align: center; color: yellowgreen"> </td>
+                    <td id="counter" style="text-align: center; color: yellowgreen"> </td>
+                    <td id="random-icon" class="glyphicon glyphicon-random" style="text-align: center; color: yellowgreen"> </td>
+                    <td id="repeat-icon" class="glyphicon glyphicon-repeat" style="text-align: center; color: orange"> </td>
+                    <td id="cloud-icon" class="glyphicon glyphicon-cloud" style="text-align: center; color: yellow"> </td>
+                    <td id="currentpos" style="text-align: center; color: orange"> </td>
                 </tr>
             </table>
         </div>
-        <div style="position: absolute; top: 20px; left: 0; right: 0;">
+        <div style="position: absolute; top: 40px; left: 0; right: 0;">
             <table>
                 <tr style="height: 100px; background: black;">
                     <td style="width: 100px;">
                         <img src="" id="artimage" style="height: 100px; width: 100px;" alt="">
                     </td>
-                    <td style="width: 220px; font-family: monospace">
+                    <td>
                         <table>
-                            <tr><td id="currenttrack" style="color: yellowgreen; font-size:20px;"></td></tr>
+                            <tr><td id="currenttrack" style="text-align: center; color: yellowgreen; font-size:20px;"></td></tr>
                             <tr><td id="artist" style="color: orange; font-size:18px;"></td></tr>
-                            <tr><td id="album" style="color: yellow; font-size:14px;"></td></tr>
+                            <tr><td id="album" style="text-align: right; color: yellow; font-size:14px;"></td></tr>
                         </table>
                     </td>
                 </tr>
             </table>
-            <table>
-                <tr>
-                    <td>
-                        <button class="glyphicon glyphicon-play"></button>
-                    </td>
+            <table style="position: absolute; top: 160px; left: 0; right: 0; background: black">
+                <tr style="height: 40px;">
+                    <td class="btn glyphicon glyphicon-step-backward" 
+                        onclick="socket.send('MPD_API_SET_PREV');"></td>
+                    <td class="btn glyphicon glyphicon-pause" id="play-icon" 
+                        onclick="clickPlay();"></td>
+                    <td class="btn glyphicon glyphicon-step-forward" 
+                        onclick="socket.send('MPD_API_SET_NEXT');"></td>
+                    <td></td>
+                    <td class="btn glyphicon glyphicon-thumbs-up" 
+                        onclick="socket.send('MPD_API_LIKE');"></td>
+                    <td class="btn glyphicon glyphicon-thumbs-down" 
+                        onclick="socket.send('MPD_API_DISLIKE');"></td>
+                    <td></td>
+                    <td class="btn glyphicon glyphicon-minus" 
+                        onclick="socket.send('MPD_API_DECREASE_VOLUME');"></td>
+                    <td class="btn glyphicon glyphicon-plus" 
+                        onclick="socket.send('MPD_API_INCREASE_VOLUME');"></td>
                 </tr>
             </table>
         </div>
         <script src="js/jquery-1.10.2.min.js"></script>
         <script src="js/sammy.js"></script>
-        <script src="js/mpd.js"></script>
+        <script src="js/player.js"></script>
     </body>
 </html>
