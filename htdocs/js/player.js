@@ -68,10 +68,11 @@ function webSocketConnect() {
     try {
         socket.onopen = function() {
             console.log("connected");
-            $('.top-right').notify({
+            /*$('.top-right').notify({
                 message:{text:"Connected to ympd"},
                 fadeOut: { enabled: true, delay: 500 }
-            }).show();
+            }).show();*/
+            $('#notification').text("connected");
 
             app.run();
         }
@@ -114,12 +115,13 @@ function webSocketConnect() {
                     last_state = obj;
                     break;
                 case "disconnected":
-                    if($('.top-right').has('div').length == 0)
+                    /*if($('.top-right').has('div').length == 0)
                         $('.top-right').notify({
                             message:{text:"ympd lost connection to MPD "},
                             type: "danger",
                             fadeOut: { enabled: true, delay: 1000 },
-                        }).show();
+                        }).show();*/
+                        $('#notification').text("ympd lost connection to MPD");
                     break;
                 case "update_queue":
                     if(current_app === 'queue') {
@@ -229,10 +231,11 @@ function webSocketConnect() {
                         $('#mpd_password_set').removeClass('hide');
                     break;
                 case "error":
-                    $('.top-right').notify({
+                    /*$('.top-right').notify({
                         message:{text: obj.data},
                         type: "danger",
-                    }).show();
+                    }).show();*/
+                    $('#notification').text(obj.data);
                 default:
                     break;
             }
@@ -241,13 +244,14 @@ function webSocketConnect() {
         }
         socket.onclose = function(){
             console.log("disconnected");
-            $('.top-right').notify({
+            /*$('.top-right').notify({
                 message:{text:"Connection to ympd lost, retrying in 3 seconds "},
                 type: "danger",
                 onClose: function () {
                     webSocketConnect();
                 }
-            }).show();
+            }).show();*/
+            $('#notification').text("disconnected");
         }
 
     } catch(exception) {
@@ -377,9 +381,10 @@ var updateRepeatIcon = function(repeat)
 
 function updateDB() {
     socket.send('MPD_API_UPDATE_DB');
-    $('.top-right').notify({
+    /*$('.top-right').notify({
         message:{text:"Updating MPD Database... "}
-    }).show();
+    }).show();*/
+    $('#notification').text("Updating MPD Database...");
 }
 
 function clickPlay() {
@@ -396,42 +401,6 @@ function clickRandom() {
 function basename(path) {
     return path.split('/').reverse()[0];
 }
-
-$('#btnradio').on('click', function (e) {
-    socket.send("RADIO_TOGGLE_RADIO," + ($(this).hasClass('active') ? 0 : 1));
-
-});
-$('#btnrandom').on('click', function (e) {
-    socket.send("MPD_API_TOGGLE_RANDOM," + ($(this).hasClass('active') ? 0 : 1));
-
-});
-$('#btnconsume').on('click', function (e) {
-    socket.send("MPD_API_TOGGLE_CONSUME," + ($(this).hasClass('active') ? 0 : 1));
-
-});
-$('#btnsingle').on('click', function (e) {
-    socket.send("MPD_API_TOGGLE_SINGLE," + ($(this).hasClass('active') ? 0 : 1));
-});
-$('#btnrepeat').on('click', function (e) {
-    socket.send("MPD_API_TOGGLE_REPEAT," + ($(this).hasClass('active') ? 0 : 1));
-});
-
-$('#btnnotify').on('click', function (e) {
-    if($.cookie("notification") === "true") {
-        $.cookie("notification", false);
-    } else {
-        Notification.requestPermission(function (permission) {
-            if(!('permission' in Notification)) {
-                Notification.permission = permission;
-            }
-
-            if (permission === "granted") {
-                $.cookie("notification", true, { expires: 424242 });
-                $('btnnotify').addClass("active");
-            }
-        });
-    }
-});
 
 function notificationsSupported() {
     return "Notification" in window;

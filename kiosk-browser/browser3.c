@@ -97,6 +97,8 @@ int main(int argc, char* argv[])
     g_signal_connect(webView, "close-web-view", G_CALLBACK(closeWebViewCb), main_window);
     g_signal_connect(webView, "load-error", G_CALLBACK(reloadViewCb), NULL);
 
+//    g_signal_connect(webView, "load-changed", G_CALLBACK(web_view_load_changed), NULL);
+
 //    updateSettings(webView);
 
     // Load a web page into the browser instance
