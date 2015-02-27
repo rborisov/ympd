@@ -49,12 +49,6 @@ var app = $.sammy(function() {
 
 $(document).ready(function(){
     webSocketConnect();
-
-    if(!notificationsSupported())
-        $('#btnnotify').addClass("disabled");
-    else
-        if ($.cookie("notification") === "true")
-            $('#btnnotify').addClass("active")
 });
 
 
@@ -68,11 +62,7 @@ function webSocketConnect() {
     try {
         socket.onopen = function() {
             console.log("connected");
-            /*$('.top-right').notify({
-                message:{text:"Connected to ympd"},
-                fadeOut: { enabled: true, delay: 500 }
-            }).show();*/
-            $('#notification').text("connected");
+            updateNotificationIcon(0);
 
             app.run();
         }
@@ -115,13 +105,7 @@ function webSocketConnect() {
                     last_state = obj;
                     break;
                 case "disconnected":
-                    /*if($('.top-right').has('div').length == 0)
-                        $('.top-right').notify({
-                            message:{text:"ympd lost connection to MPD "},
-                            type: "danger",
-                            fadeOut: { enabled: true, delay: 1000 },
-                        }).show();*/
-                        $('#notification').text("ympd lost connection to MPD");
+                    updateNotificationIcon(2);
                     break;
                 case "update_queue":
                     if(current_app === 'queue') {
@@ -132,10 +116,6 @@ function webSocketConnect() {
                     $('#currentradio').text(obj.data.name);
                     $('#currentradiostatus').text(obj.data.status);
                     $('#currentradiosize').text(obj.data.size);
-                    if (obj.data.logo) {
-                        var logoimage = document.getElementById("radioimage");
-                        radioimage.src = obj.data.logo;
-                    }
                     break;
                 case "artist_info":
                     if (obj.data.artist && obj.data.art) {
@@ -193,17 +173,14 @@ function webSocketConnect() {
                     break;
                 case "song_change":
                     $('#currenttrack').text(" " + obj.data.title);
-                    //var notification = "<strong><h4>" + obj.data.title + "</h4></strong>";
 
                     if(obj.data.album) {
                         $('#album').text(obj.data.album);
-                        //notification += obj.data.album + "<br />";
                     } else
                        $('#album').text("");
 
                     if(obj.data.artist) {
                         $('#artist').text(obj.data.artist);
-                        //notification += obj.data.artist + "<br />";
                     } else
                         $('#artist').text("");
 
@@ -212,15 +189,7 @@ function webSocketConnect() {
                         var art_url = obj.data.art;
                         document.getElementById("artimage").src = art_url;
                     }
-/*
-                    if ($.cookie("notification") === "true")
-                        songNotify(obj.data.title, obj.data.artist, obj.data.album );
-                    else
-                        $('.top-right').notify({
-                            message:{html: notification},
-                            type: "info",
-                        }).show();
-  */
+
                     socket.send('MPD_API_GET_QUEUE,'+queue_pagination);
 
                     break;
@@ -231,11 +200,8 @@ function webSocketConnect() {
                         $('#mpd_password_set').removeClass('hide');
                     break;
                 case "error":
-                    /*$('.top-right').notify({
-                        message:{text: obj.data},
-                        type: "danger",
-                    }).show();*/
-                    $('#notification').text(obj.data);
+                    console.log(obj.data);
+                    updateNotificationIcon(1);
                 default:
                     break;
             }
@@ -244,14 +210,9 @@ function webSocketConnect() {
         }
         socket.onclose = function(){
             console.log("disconnected");
-            /*$('.top-right').notify({
-                message:{text:"Connection to ympd lost, retrying in 3 seconds "},
-                type: "danger",
-                onClose: function () {
-                    webSocketConnect();
-                }
-            }).show();*/
-            $('#notification').text("disconnected");
+            updateNotificationIcon(2);
+
+            webSocketConnect();
         }
 
     } catch(exception) {
@@ -301,13 +262,26 @@ var download_artist_info = function(artist)
                 socket.send('MPD_API_DB_ARTIST,'+artist+'|'+art_url);
             } else {
                 console.log("there is no artist image");
-                //artimage.src = "/images/art.png";
             }
         } else {
             console.log("there is no artist info");
-            //artimage.src = "/images/art.png";
         }
     });
+}
+
+var updateNotificationIcon = function(notify)
+{
+    $("#notification-icon").removeClass("glyphicon-ok")
+    .removeClass("glyphicon-flag")
+    .removeClass("glyphicon-remove");
+
+    if (notify == 0) { //connected
+        $("#notification-icon").addClass("glyphicon-ok");
+    } else if (notify == 1) { //error
+        $("#notification-icon").addClass("glyphicon-flag");
+    } else { //disconnected
+        $("#notification-icon").addClass("glyphicon-remove");
+    }
 }
 
 var updateVolumeIcon = function(volume)
@@ -381,10 +355,6 @@ var updateRepeatIcon = function(repeat)
 
 function updateDB() {
     socket.send('MPD_API_UPDATE_DB');
-    /*$('.top-right').notify({
-        message:{text:"Updating MPD Database... "}
-    }).show();*/
-    $('#notification').text("Updating MPD Database...");
 }
 
 function clickPlay() {
@@ -400,34 +370,4 @@ function clickRandom() {
 
 function basename(path) {
     return path.split('/').reverse()[0];
-}
-
-function notificationsSupported() {
-    return "Notification" in window;
-}
-
-function songNotify(title, artist, album) {
-    /*var opt = {
-        type: "list",
-        title: title,
-        message: title,
-        items: []
-    }
-    if(artist.length > 0)
-        opt.items.push({title: "Artist", message: artist});
-    if(album.length > 0)
-        opt.items.push({title: "Album", message: album});
-*/
-    //chrome.notifications.create(id, options, creationCallback);
-
-    var textNotification = "";
-    if(typeof artist != 'undefined' && artist.length > 0)
-        textNotification += " " + artist;
-    if(typeof album != 'undefined' && album.length > 0)
-        textNotification += "\n " + album;
-
-	var notification = new Notification(title, {icon: 'assets/favicon.ico', body: textNotification});
-    setTimeout(function(notification) {
-        notification.close();
-    }, 3000, notification);
 }

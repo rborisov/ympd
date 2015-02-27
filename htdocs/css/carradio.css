@@ -1,3 +1,33 @@
+html {
+    overflow: hidden;
+}
+body, html {
+    font-family: monospace; font-size: 14px;
+    background: black;
+    color: yellowgreen;
+}
+.btn{
+    border: 1px solid yellowgreen;
+    background-color: black;
+    padding: 4px 4px;
+    color: yellowgreen;
+
+    height: 30px;
+    width: 30px;
+    text-align: center;
+    vertical-align: middle;
+
+    -o-transition: background-color .2s ease-in;
+    -moz-transition: background-color .2s ease-in;
+    -webkit-transition: background-color .2s ease-in;
+    transition: background-color .2s ease-in;
+}
+.btn:hover {
+    background-color: green;
+}
+.btn:active {
+    background-color: #ccc;
+}
 @font-face {
   font-family: 'Glyphicons Halflings';
 
@@ -15,6 +45,15 @@
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+.glyphicon-remove:before {
+  content: "\e014";
+}
+.glyphicon-flag:before {
+  content: "\e034";
+}
+.glyphicon-ok:before {
+  content: "\e013";
 }
 .glyphicon-volume-off:before {
   content: "\e036";
@@ -100,13 +139,6 @@
     background: rgba(0,0,0,0.4);
 }
 
-html {
-    overflow: hidden;
-}
-body {
-    font-family: "Courier New";
-    background: #1F0F00;
-}
 .btn-flt-bottom2right
 {
     position: fixed;
