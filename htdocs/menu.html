@@ -8,36 +8,18 @@
         <script src="js/jquery-1.10.2.min.js"></script>
         <script src="js/sammy.js"></script>
         <script src="js/player.js"></script>
+        <script src="js/masonry.pkgd.min.js"></script>
         <style>
             body, html {
-                font-family: monospace; font-size: 14px;
+                font-family: monospace; font-size: 20px;
                 background: black;
             }
-            .btn{
-                border: 1px solid yellowgreen;
-                background-color: black;
-                padding: 4px 12px;
-                color: yellowgreen;
-
-                height: 30px;
-                text-align: center;
-                vertical-align: middle;
-
-                -o-transition: background-color .2s ease-in;
-                -moz-transition: background-color .2s ease-in;
-                -webkit-transition: background-color .2s ease-in;
-                transition: background-color .2s ease-in;
-            }
-            .btn:hover {
-                background-color: green;
-            }
-            .btn:active {
-                background-color: #ccc;
-            }
+            .item { width: 25%; }
+            .item.w2 { width: 50%; }
         </style>
     </head>
     <body>
-        <div style="position: absolute; top: 0; left: 0; right: 0; background: black">
+        <div style="position: absolute; top: 0; left: 0; right: 0;">
             <table>
                 <tr style="font-size:14px">
                     <td id="track-icon" class="glyphicon glyphicon-pause" style="color: yellowgreen"></td>
@@ -52,16 +34,37 @@
                     <td id="songrating" style="text-align: center; color: yellowgreen"></td>
                 </tr>
             </table>
-        </div>
-        <div style="position: absolute; top: 40px; left: 0; right: 0;">
-            <table>
+            <!--table>
                 <tr>
                     <td id="currentradio" style="font-size:10px; color: orange"></td>
                     <td id="currentradiostatus" style="font-size:10px; color: yellowgreen"></td>
                     <td id="currentradiosize" style="font-size:10px; color: yellow"></td>
                 </tr>
-            </table>
+            </table-->
+            <div id="container" class="js-masonry" data-masonry-options='{ "columnWidth": 200, "itemSelector": ".item" }'>
+                <div class="item" style="background: yellow;">...</div>
+                <div class="item w2">...</div>
+                <div class="item">...</div>
+            </div>
+            <!--div class="tiles tiles--4">
+                <div class="tiles__item" onclick="history.back();"
+                style="background: yellow;">Back</div>
+                <div class="tiles__item glyphicon glyphicon-random"
+                style="background: yellowgreen;"></div>
+                <div class="tiles__item glyphicon glyphicon-repeat"
+                style="background: orange;"></div>
+                <div class="tiles__item glyphicon glyphicon-cloud"
+                style="background: orange;"></div>
+            </div>
+            <div class="tiles tiles--3">
+                <div class="tiles__item glyphicon glyphicon-random"
+                style="background: yellowgreen;"></div>
+                <div class="tiles__item glyphicon glyphicon-repeat"
+                style="background: orange;"></div>
+                <div class="tiles__item glyphicon glyphicon-cloud"
+                style="background: orange;"></div>
+            </div-->
         </div>
-        <a href="javascript:history.back()">Back</a>
+
     </body>
 </html>
