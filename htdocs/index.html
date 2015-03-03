@@ -9,6 +9,44 @@
         <script src="js/sammy.js"></script>
         <script src="js/player.js"></script>
         <style>
+            * {
+                margin: 0;
+                padding: 0;
+            }
+            #container {
+                margin: 4px auto;
+                width: 320px;
+            }
+            #keyboard #keyboard-sm {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+            #keyboard li {
+                float: left;
+                margin: 0 5px 5px 0;
+                width: 40px;
+                height: 40px;
+                line-height: 40px;
+                text-align: center;
+                background: black;
+                border: 1px solid yellowgreen;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+            }
+            #keyboard-sm li {
+                float: left;
+                margin: 0 5px 5px 0;
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                text-align: center;
+                background: black;
+                border: 1px solid yellowgreen;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+            }
+
         </style>
     </head>
     <body>
@@ -40,7 +78,14 @@
                 <tr style="height: 100px; background: black;">
                     <td style="width: 100px;"><a href="menu.html">
                         <img src="" id="artimage" style="height: 100px; width: 100px;" alt="">
-                    </a></td>
+                    </a>
+                        <ul id="keyboard-sm">
+                            <li class="glyphicon glyphicon-thumbs-up"
+                            onclick="socket.send('MPD_API_LIKE');"></li>
+                            <li class="glyphicon glyphicon-thumbs-down"
+                            onclick="socket.send('MPD_API_DISLIKE');"></li>
+                        </ul>
+                    </td>
                     <td>
                         <table>
                             <tr><td id="currenttrack" style="text-align: center; color: yellowgreen; font-size:20px; width: 220px;"></td></tr>
@@ -50,26 +95,21 @@
                     </td>
                 </tr>
             </table>
-            <table style="position: absolute; top: 140px; left: 0; right: 0; background: black">
-                <tr style="height: 40px;">
-                    <td class="btn glyphicon glyphicon-step-backward"
-                        onclick="socket.send('MPD_API_SET_PREV');"></td>
-                    <td class="btn glyphicon glyphicon-pause" id="play-icon"
-                        onclick="clickPlay();"></td>
-                    <td class="btn glyphicon glyphicon-step-forward"
-                        onclick="socket.send('MPD_API_SET_NEXT');"></td>
-                    <td></td>
-                    <td class="btn glyphicon glyphicon-thumbs-up"
-                        onclick="socket.send('MPD_API_LIKE');"></td>
-                    <td class="btn glyphicon glyphicon-thumbs-down"
-                        onclick="socket.send('MPD_API_DISLIKE');"></td>
-                    <td></td>
-                    <td class="btn glyphicon glyphicon-minus"
-                        onclick="socket.send('MPD_API_DECREASE_VOLUME');"></td>
-                    <td class="btn glyphicon glyphicon-plus"
-                        onclick="socket.send('MPD_API_INCREASE_VOLUME');"></td>
-                </tr>
-            </table>
+            <div id="container" style="position: absolute; top: 140px; left: 0; right: 0;">
+                <ul id="keyboard">
+                    <li class="glyphicon glyphicon-step-backward"
+                    onclick="socket.send('MPD_API_SET_PREV');"></li>
+                    <li id="play-icon" class="glyphicon glyphicon-pause"
+                    onclick="clickPlay();"></li>
+                    <li class="glyphicon glyphicon-step-forward"
+                    onclick="socket.send('MPD_API_SET_NEXT');"></li>
+                    <li></li>
+                    <li class="glyphicon glyphicon-minus"
+                        onclick="socket.send('MPD_API_DECREASE_VOLUME');"></li>
+                    <li class="glyphicon glyphicon-plus"
+                        onclick="socket.send('MPD_API_INCREASE_VOLUME');"></li>
+                </ul>
+            </div>
         </div>
     </body>
 </html>

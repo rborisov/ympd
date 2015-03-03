@@ -1,0 +1,74 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+#container {
+	margin: 0 auto;
+	width: 320px;
+}
+#write {
+	margin: 0 0 1px;
+	padding: 1px;
+	width: 300px;
+	height: 30px;
+	font: 1em/1.5 Verdana, Sans-Serif;
+	background: #fff;
+	border: 1px solid #f9f9f9;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+#keyboard {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+#keyboard li {
+	float: left;
+	margin: 0 2px 2px 0;
+	width: auto;
+	min-width: 20px;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	background: dimgray;
+	border: 1px solid yellowgreen;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+.capslock, .tab, .left-shift {
+	clear: left;
+}
+#keyboard .tab{
+	width: 40px;
+}
+#keyboard .capslock {
+	width: 40px;
+}
+#keyboard .return {
+	width: 40px;
+}
+#keyboard .left-shift {
+	width: 40px;
+}
+#keyboard .right-shift {
+	width: 40px;
+}
+.lastitem {
+	margin-right: 0;
+}
+.uppercase {
+	text-transform: uppercase;
+}
+#keyboard .space {
+	width: 60px;
+}
+.on {
+	display: none;
+}
+#keyboard li:hover {
+	position: relative;
+	top: 1px;
+	left: 1px;
+	border-color: #e5e5e5;
+	cursor: pointer;
+}

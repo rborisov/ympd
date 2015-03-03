@@ -5,17 +5,20 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="css/carradio.min.css" rel="stylesheet">
+        <link href="css/keyboard.min.css" rel="stylesheet">
         <script src="js/jquery-1.10.2.min.js"></script>
         <script src="js/sammy.js"></script>
         <script src="js/player.js"></script>
-        <script src="js/masonry.pkgd.min.js"></script>
+        <script src="js/keyboard.js"></script>
         <style>
             body, html {
                 font-family: monospace; font-size: 20px;
                 background: black;
             }
-            .item { width: 25%; }
-            .item.w2 { width: 50%; }
+            #keyboard li {
+                width: auto;
+                min-width: 30px;
+            }
         </style>
     </head>
     <body>
@@ -34,37 +37,21 @@
                     <td id="songrating" style="text-align: center; color: yellowgreen"></td>
                 </tr>
             </table>
-            <!--table>
-                <tr>
-                    <td id="currentradio" style="font-size:10px; color: orange"></td>
-                    <td id="currentradiostatus" style="font-size:10px; color: yellowgreen"></td>
-                    <td id="currentradiosize" style="font-size:10px; color: yellow"></td>
-                </tr>
-            </table-->
-            <div id="container" class="js-masonry" data-masonry-options='{ "columnWidth": 200, "itemSelector": ".item" }'>
-                <div class="item" style="background: yellow;">...</div>
-                <div class="item w2">...</div>
-                <div class="item">...</div>
+            <div id="container">
+                <ul id="keyboard">
+                    <li onclick="history.back(-1);">back</li>
+                    <li class="glyphicon glyphicon-cloud-download"
+                    onclick="socket.send('MPD_API_TOGGLE_RADIO');"></li>
+                    <li class="glyphicon glyphicon-fast-forward"
+                    onclick="socket.send('MPD_API_SYNC_QUEUE');"></li>
+                    <li class="glyphicon glyphicon-remove-circle"
+                    onclick="socket.send('MPD_API_RM_ALL');"></li>
+                    <li class="glyphicon glyphicon-random"
+                    onclick="clickRandom();"></li>
+                    <li class="glyphicon glyphicon-search"
+                    onclick="location.href='music_search.html'"></li>
+                </ul>
             </div>
-            <!--div class="tiles tiles--4">
-                <div class="tiles__item" onclick="history.back();"
-                style="background: yellow;">Back</div>
-                <div class="tiles__item glyphicon glyphicon-random"
-                style="background: yellowgreen;"></div>
-                <div class="tiles__item glyphicon glyphicon-repeat"
-                style="background: orange;"></div>
-                <div class="tiles__item glyphicon glyphicon-cloud"
-                style="background: orange;"></div>
-            </div>
-            <div class="tiles tiles--3">
-                <div class="tiles__item glyphicon glyphicon-random"
-                style="background: yellowgreen;"></div>
-                <div class="tiles__item glyphicon glyphicon-repeat"
-                style="background: orange;"></div>
-                <div class="tiles__item glyphicon glyphicon-cloud"
-                style="background: orange;"></div>
-            </div-->
         </div>
-
     </body>
 </html>
