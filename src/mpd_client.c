@@ -848,7 +848,7 @@ int mpd_put_current_radio(char *buffer)
     cur += json_emit_quoted_str(cur, end - cur, rcm.status_str);
     cur += json_emit_raw_str(cur, end - cur, ",\"size\":");
     cur += json_emit_quoted_str(cur, end - cur, rcm.filesize_str);
-    if (rcm.image_update) {  
+    if (rcm.image_update) {
         setting = config_lookup(&rcm.cfg, "radio.station");
         if (setting != NULL) {
             int count = config_setting_length(setting);
@@ -1080,8 +1080,8 @@ int mpd_search(char *buffer, char *searchstr)
             cur += json_emit_raw_str(cur, end - cur, ",\"title\":");
             cur += json_emit_quoted_str(cur, end - cur, mpd_get_title(song));
             cur += json_emit_raw_str(cur, end - cur, "},");
+            printf("%s: %s\n", __func__, mpd_get_title(song));
             mpd_song_free(song);
-
             /* Maximum results */
             if(i++ >= 300)
             {
