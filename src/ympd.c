@@ -67,6 +67,7 @@ int main(int argc, char **argv)
     struct passwd *pw = getpwuid(getuid());
     char *homedir = pw->pw_dir;
 
+    rcm_init();
     rcm.last_timer = 0;
 
     sprintf(rcm.config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
@@ -127,6 +128,9 @@ int main(int argc, char **argv)
 
     stop_streamripper();
     db_close();
+
+    rcm_close();
+
     mpd_disconnect();
     mg_destroy_server(&server);
 
