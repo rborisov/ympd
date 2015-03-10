@@ -34,8 +34,6 @@
 #include "sqlitedb.h"
 #include "streamripper.h"
 
-#define ydebug_printf printf
-
 const char * mpd_cmd_strs[] = {
     MPD_CMDS(GEN_STR)
 };
@@ -56,11 +54,11 @@ int mpd_crop(struct mpd_connection *conn)
 
     if (length < 0) {
         mpd_status_free(status);
-        printf("%s: A playlist longer than 1 song in length is required to crop.\n", __func__);
+        syslog(LOG_INFO, "%s: A playlist longer than 1 song in length is required to crop.\n", __func__);
     } else if (mpd_status_get_state(status) == MPD_STATE_PLAY ||
             mpd_status_get_state(status) == MPD_STATE_PAUSE) {
         if (!mpd_command_list_begin(conn, false)) {
-            printf("%s: mpd_command_list_begin failed\n", __func__);
+            syslog(LOG_ERR, "%s: mpd_command_list_begin failed\n", __func__);
             return 0; //printErrorAndExit(conn);
         }
 
@@ -71,41 +69,17 @@ int mpd_crop(struct mpd_connection *conn)
         mpd_status_free(status);
 
         if (!mpd_command_list_end(conn) || !mpd_response_finish(conn)) {
-            printf("%s: mpd_command_list_end || mpd_response_finish failed\n", __func__);
+            syslog(LOG_ERR, "%s: mpd_command_list_end || mpd_response_finish failed\n", __func__);
             return 0; //printErrorAndExit(conn);
         }
 
         return 0;
     } else {
         mpd_status_free(status);
-        printf("%s: You need to be playing to crop the playlist\n", __func__);
+        syslog(LOG_INFO, "%s: You need to be playing to crop the playlist\n", __func__);
         return 0;
     }
     return 1;
-}
-
-void start_radio()
-{
-    mpd.radio_status = 1;
-}
-
-void stop_radio()
-{
-    mpd.radio_status = 0;
-}
-
-int radio_toggle()
-{
-    if (mpd.radio_status == 0)
-        start_radio();
-    else
-        stop_radio();
-    return mpd.radio_status;
-}
-
-int radio_get_status()
-{
-    return mpd.radio_status;
 }
 
 static inline enum mpd_cmd_ids get_cmd_id(char *cmd)
@@ -129,7 +103,7 @@ char* download_file(char* url, char* artist)
     {
         if (!config_lookup_string(&rcm.cfg, "application.images_path", &images_dir))
         {
-            fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
+            syslog(LOG_ERR, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
             sprintf(outdir, "%s/%s/images%s", homedir, RCM_DIR_STR, artist);
         } else {
             sprintf(outdir, "%s%s", images_dir, artist);
@@ -137,12 +111,12 @@ char* download_file(char* url, char* artist)
         sprintf(outfn, "%s%s", outdir, strrchr(url, '/' ));
         mkdir(images_dir, 0777);
         mkdir(outdir, 0777);
-        printf("%s\n", strrchr(outfn, '.'));
+        //syslog(LOG_INFO, "%s\n", strrchr(outfn, '.'));
         if (access(outfn, F_OK) != -1) {
-            printf("%s: file already exists %s\n", __func__, outfn);
+            syslog(LOG_INFO, "%s: file already exists %s\n", __func__, outfn);
             goto done;
         }
-        printf("%s out_filename: %s\n", __func__, outfn);
+        syslog(LOG_INFO, "%s out_filename: %s\n", __func__, outfn);
         fp = fopen(outfn,"wb");
         if (fp) {
             curl_easy_setopt(curl, CURLOPT_URL, url);
@@ -152,7 +126,7 @@ char* download_file(char* url, char* artist)
             fclose(fp);
             curl_easy_cleanup(curl);
             if (res != 0) {
-                ydebug_printf("%s error!\n", __func__);
+                syslog(LOG_DEBUG, "%s error!\n", __func__);
                 return NULL;
             }
         }
@@ -160,7 +134,7 @@ char* download_file(char* url, char* artist)
 done:
     //out = strrchr(outfn, '/' )+1;
     sprintf(outdir, "%s%s", artist, strrchr(outfn, '/'));
-    ydebug_printf("%s downloaded %s\n", __func__, outdir);
+    syslog(LOG_DEBUG, "%s downloaded %s\n", __func__, outdir);
 
     return outdir;
 }
@@ -209,7 +183,7 @@ void db_put_artist(char* charbuf)
         art_str = download_file(token, artist);
         db_update_artist_art(artist, art_str);
     } else {
-        printf("%s: no art for %s\n", __func__, artist);
+        syslog(LOG_INFO, "%s: no art for %s\n", __func__, artist);
     }
 
     free(str_copy);
@@ -255,7 +229,7 @@ int callback_mpd(struct mg_connection *c)
             if(sscanf(c->content, "MPD_API_DB_ARTIST,%m[^\t\n]",
                         &p_charbuf) && p_charbuf != NULL)
             {
-                printf("%s: MPD_API_DB_ARTIST: %s\n", __func__, p_charbuf);
+                syslog(LOG_INFO, "%s: MPD_API_DB_ARTIST: %s\n", __func__, p_charbuf);
                 db_put_artist(p_charbuf);
                 free(p_charbuf);
             }
@@ -264,14 +238,14 @@ int callback_mpd(struct mg_connection *c)
             if(sscanf(c->content, "MPD_API_DB_GET_ARTIST,%m[^\t\n]",
                         &p_charbuf) && p_charbuf != NULL)
             {
-                printf("%s: MPD_API_DB_GET_ARTIST: %s\n", __func__, p_charbuf);
+                syslog(LOG_INFO, "%s: MPD_API_DB_GET_ARTIST: %s\n", __func__, p_charbuf);
                 n = mpd_put_artist_art(mpd.buf, p_charbuf);
                 mg_websocket_write(c, 1, mpd.buf, n);
                 free(p_charbuf);
             }
             break;
         case MPD_API_TOGGLE_RADIO:
-            printf("%s: RADIO_TOGGLE_RADIO %i\n", __func__, radio_get_status());
+            syslog(LOG_INFO, "%s: RADIO_TOGGLE_RADIO %i\n", __func__, radio_get_status());
             radio_toggle();
             break;
         case MPD_API_UPDATE_DB:
@@ -304,7 +278,7 @@ int callback_mpd(struct mg_connection *c)
             break;
         case MPD_API_PLAY_TRACK:
             if(sscanf(c->content, "MPD_API_PLAY_TRACK,%u", &uint_buf)) {
-                printf("%s: PLAY_TRACK id %i\n", __func__, uint_buf);
+                syslog(LOG_INFO, "%s: PLAY_TRACK id %i\n", __func__, uint_buf);
                 mpd_run_play_id(mpd.conn, uint_buf);
             }
             break;
@@ -362,7 +336,7 @@ int callback_mpd(struct mg_connection *c)
         case MPD_API_SET_RADIO:
             if(sscanf(c->content, "MPD_API_SET_RADIO,%m[^\t\n]", &p_charbuf) && p_charbuf != NULL)
             {
-                printf("%s set radio: %s\n", __func__, p_charbuf);
+                syslog(LOG_INFO, "%s set radio: %s\n", __func__, p_charbuf);
                 stop_streamripper();
                 strcpy(rcm.current_radio, p_charbuf);
                 streamripper_set_url_dest(rcm.current_radio);
@@ -489,9 +463,9 @@ static int mpd_notify_callback(struct mg_connection *c) {
         if (mpd.song_id == -1)
         {
             char str[128];
-            printf("%s song_id == %i\n", __func__, mpd.song_id);
+            syslog(LOG_INFO, "%s song_id == %i\n", __func__, mpd.song_id);
             get_random_song(mpd.conn, str, rcm.file_path);
-            printf("%s: add random song %s and play\n", __func__, str);
+            syslog(LOG_INFO, "%s: add random song %s and play\n", __func__, str);
             mpd_run_add(mpd.conn, str);
             mpd_run_play(mpd.conn);
 
@@ -500,7 +474,7 @@ static int mpd_notify_callback(struct mg_connection *c) {
 
         if(s->song_id != mpd.song_id)
         {
-            printf("%s ssong = %i mpdsong = %i\n", __func__, s->song_id, mpd.song_id);
+            syslog(LOG_INFO, "%s ssong = %i mpdsong = %i\n", __func__, s->song_id, mpd.song_id);
             n = mpd_put_current_song(mpd.buf);
             mg_websocket_write(c, 1, mpd.buf, n);
             s->song_id = mpd.song_id;
@@ -525,7 +499,7 @@ static int mpd_notify_callback(struct mg_connection *c) {
             if (n > 0)
                 mg_websocket_write(c, 1, mpd.buf, n);
             rcm.last_timer = (unsigned int)time(NULL);
-//            printf("%s %i\n", __func__, rcm.last_timer);
+//            syslog(LOG_INFO, "%s %i\n", __func__, rcm.last_timer);
         }
     }
 
@@ -538,16 +512,16 @@ void mpd_poll(struct mg_server *s)
     switch (mpd.conn_state) {
         case MPD_DISCONNECTED:
             /* Try to connect */
-            fprintf(stdout, "MPD Connecting to %s:%d\n", mpd.host, mpd.port);
+            syslog(LOG_INFO, "MPD Connecting to %s:%d\n", mpd.host, mpd.port);
             mpd.conn = mpd_connection_new(mpd.host, mpd.port, 3000);
             if (mpd.conn == NULL) {
-                fprintf(stderr, "Out of memory.");
+                syslog(LOG_ERR, "Out of memory.");
                 mpd.conn_state = MPD_FAILURE;
                 return;
             }
 
             if (mpd_connection_get_error(mpd.conn) != MPD_ERROR_SUCCESS) {
-                fprintf(stderr, "MPD connection: %s\n", mpd_connection_get_error_message(mpd.conn));
+                syslog(LOG_ERR, "MPD connection: %s\n", mpd_connection_get_error_message(mpd.conn));
                 mg_iterate_over_connections(s, mpd_notify_callback,
                     (void *)mpd_connection_get_error_message(mpd.conn));
                 mpd.conn_state = MPD_FAILURE;
@@ -556,19 +530,19 @@ void mpd_poll(struct mg_server *s)
 
             if(mpd.password && !mpd_run_password(mpd.conn, mpd.password))
             {
-                fprintf(stderr, "MPD connection: %s\n", mpd_connection_get_error_message(mpd.conn));
+                syslog(LOG_ERR, "MPD connection: %s\n", mpd_connection_get_error_message(mpd.conn));
                 mg_iterate_over_connections(s, mpd_notify_callback,
                     (void *)mpd_connection_get_error_message(mpd.conn));
                 mpd.conn_state = MPD_FAILURE;
                 return;
             }
 
-            fprintf(stderr, "MPD connected.\n");
+            syslog(LOG_ERR, "MPD connected.\n");
             mpd.conn_state = MPD_CONNECTED;
             break;
 
         case MPD_FAILURE:
-            fprintf(stderr, "MPD connection failed.\n");
+            syslog(LOG_ERR, "MPD connection failed.\n");
 
         case MPD_DISCONNECT:
         case MPD_RECONNECT:
@@ -583,13 +557,13 @@ void mpd_poll(struct mg_server *s)
             mg_iterate_over_connections(s, mpd_notify_callback, NULL);
             if (queue_is_empty) {
                 get_random_song(mpd.conn, str, rcm.file_path);
-                ydebug_printf("%s: add random song %s\n", __func__, str);
+                syslog(LOG_DEBUG, "%s: add random song %s\n", __func__, str);
                 mpd_run_add(mpd.conn, str);
                 queue_is_empty = 0;
             }
             break;
         default:
-            fprintf(stderr, "mpd.conn_state %i\n", mpd.conn_state);
+            syslog(LOG_ERR, "mpd.conn_state %i\n", mpd.conn_state);
     }
 }
 
@@ -608,14 +582,14 @@ char* mpd_get_album(struct mpd_song const *song)
 
     str = (char *)mpd_song_get_tag(song, MPD_TAG_ALBUM, 0);
     if(str == NULL){
-/*        ydebug_printf("%s: song %s; artist %s\n", __func__,
+/*        syslog(LOG_DEBUG, "%s: song %s; artist %s\n", __func__,
                 mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
                 mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));*/
         str = db_get_song_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
                 mpd_song_get_tag(song, MPD_TAG_ARTIST, 0));
     }
     /*if (str)
-        ydebug_printf("%s: %s\n", __func__, str);
+        syslog(LOG_DEBUG, "%s: %s\n", __func__, str);
 */
     return str;
 }
@@ -626,19 +600,19 @@ int image_exists(char* name)
     char *images_dir, *homedir = pw->pw_dir;
     if (!config_lookup_string(&rcm.cfg, "application.images_path", &images_dir))
     {
-        fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
+        syslog(LOG_ERR, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
         sprintf(outdir, "%s/%s/images/", homedir, RCM_DIR_STR);
     } else {
         sprintf(outdir, "%s", images_dir);
     }
     sprintf(outfn, "%s/%s", outdir, name);
-    printf("%s looking for %s ", __func__, outfn);
+    syslog(LOG_INFO, "%s looking for %s ", __func__, outfn);
     if (access(outfn, F_OK) != -1) {
-        printf ("ok\n");
+        syslog(LOG_INFO, "ok\n");
         return 1;
     }
     else {
-        printf("no\n");
+        syslog(LOG_INFO, "no\n");
         return 0;
     }
 }
@@ -649,7 +623,7 @@ char* mpd_get_art(struct mpd_song const *song)
             db_get_song_album(mpd_song_get_tag(song, MPD_TAG_TITLE, 0),
                 mpd_song_get_tag(song, MPD_TAG_ARTIST, 0)));
     if (str) {
-        ydebug_printf("%s: %s\n", __func__, str);
+        syslog(LOG_DEBUG, "%s: %s\n", __func__, str);
         //check if file exists
         if (!image_exists(str))
             return NULL;
@@ -661,7 +635,7 @@ char* mpd_get_artist_art(char* artist)
 {
     char *str = db_get_artist_art(artist);
     if (str)
-        printf("%s: %s\n", __func__, str);
+        syslog(LOG_INFO, "%s: %s\n", __func__, str);
     if (!image_exists(str))
         return NULL;
     return str;
@@ -676,7 +650,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
 
     status = mpd_run_status(mpd.conn);
     if (!status) {
-        fprintf(stderr, "MPD mpd_run_status: %s\n", mpd_connection_get_error_message(mpd.conn));
+        syslog(LOG_ERR, "MPD mpd_run_status: %s\n", mpd_connection_get_error_message(mpd.conn));
         mpd.conn_state = MPD_FAILURE;
         return 0;
     }
@@ -714,7 +688,7 @@ int mpd_put_state(char *buffer, int *current_song_id, unsigned *queue_version)
     if (song_pos+1 >= queue_len)
     {
         queue_is_empty = 1;
-        ydebug_printf("%s: queue is empty\n", __func__);
+        syslog(LOG_DEBUG, "%s: queue is empty\n", __func__);
     }
 
     mpd.song_pos = song_pos;
@@ -788,7 +762,7 @@ int mpd_put_current_song(char *buffer)
 
     if (mpd_get_art(song) != NULL)
     {
-        printf("%s ART\n", __func__);
+        syslog(LOG_INFO, "%s ART\n", __func__);
         cur += json_emit_raw_str(cur, end - cur, ",\"art\":");
         cur += json_emit_quoted_str(cur, end - cur, mpd_get_art(song));
     }
@@ -815,10 +789,10 @@ int mpd_get_track_info(char *buffer)
     if(song == NULL)
         return 0;
     //TODO: find better criteria to get track info
-    ydebug_printf("get_track_info\n");
+    syslog(LOG_DEBUG, "get_track_info\n");
     if(mpd_get_album(song) != NULL)
         return 0;
-    ydebug_printf("do get_track_info\n");
+    syslog(LOG_DEBUG, "do get_track_info\n");
     cur += json_emit_raw_str(cur, end - cur, "{\"type\": \"track_info\", \"data\":{\"pos\":");
     cur += json_emit_int(cur, end - cur, mpd_song_get_pos(song));
     cur += json_emit_raw_str(cur, end - cur, ",\"title\":");
@@ -898,7 +872,7 @@ int mpd_put_radio(char *buffer, unsigned int offset)
             if(!(config_setting_lookup_string(station, "name", &name)
                 && config_setting_lookup_string(station, "url", &url)))
                     continue;
-            printf("%-30s  %-30s\n", name, url);
+            syslog(LOG_INFO, "%-30s  %-30s\n", name, url);
             cur += json_emit_raw_str(cur, end - cur, "{\"name\":");
             cur += json_emit_quoted_str(cur, end - cur, name);
             cur += json_emit_raw_str(cur, end - cur, ",\"url\":");
@@ -923,7 +897,7 @@ int mpd_put_queue(char *buffer, unsigned int offset)
     struct mpd_entity *entity;
 
     offset = mpd.song_pos; //TODO: +=
-    printf("%s %i\n", __func__, offset);
+    syslog(LOG_INFO, "%s %i\n", __func__, offset);
     if (!mpd_send_list_queue_range_meta(mpd.conn, offset, offset+MAX_ELEMENTS_PER_PAGE))
         RETURN_ERROR_AND_RECOVER("mpd_send_list_queue_meta");
 
@@ -1028,7 +1002,7 @@ int mpd_put_browse(char *buffer, char *path, unsigned int offset)
     }
 
     if (mpd_connection_get_error(mpd.conn) != MPD_ERROR_SUCCESS || !mpd_response_finish(mpd.conn)) {
-        fprintf(stderr, "MPD mpd_send_list_meta: %s\n", mpd_connection_get_error_message(mpd.conn));
+        syslog(LOG_ERR, "MPD mpd_send_list_meta: %s\n", mpd_connection_get_error_message(mpd.conn));
         mpd.conn_state = MPD_FAILURE;
         return 0;
     }
@@ -1049,7 +1023,7 @@ int mpd_random_song()
 
     num_songs = mpd_stats_get_number_of_songs(stats);
     rnd = (int)(rand() % num_songs);
-    ydebug_printf("num_songs = %i; add %i\n", num_songs, rnd);
+    syslog(LOG_DEBUG, "num_songs = %i; add %i\n", num_songs, rnd);
 
     mpd_stats_free(stats);
 
@@ -1080,7 +1054,7 @@ int mpd_search(char *buffer, char *searchstr)
             cur += json_emit_raw_str(cur, end - cur, ",\"title\":");
             cur += json_emit_quoted_str(cur, end - cur, mpd_get_title(song));
             cur += json_emit_raw_str(cur, end - cur, "},");
-            printf("%s: %s\n", __func__, mpd_get_title(song));
+            syslog(LOG_INFO, "%s: %s\n", __func__, mpd_get_title(song));
             mpd_song_free(song);
             /* Maximum results */
             if(i++ >= 300)

@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     rcm.last_timer = 0;
 
     sprintf(rcm.config_file_name, "%s/%s/%s", homedir, RCM_DIR_STR, RCM_CONF_FILE_STR);
-    printf("conf = %s\n", rcm.config_file_name);
+    syslog(LOG_INFO, "conf = %s\n", rcm.config_file_name);
 
     atexit(bye);
     mg_set_option(server, "listening_port", "8080");
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     config_init(&rcm.cfg);
     if(! config_read_file(&rcm.cfg, rcm.config_file_name))
     {
-        printf("config file error %s:%d - %s\n", config_error_file(&rcm.cfg),
+        syslog(LOG_INFO, "config file error %s:%d - %s\n", config_error_file(&rcm.cfg),
                 config_error_line(&rcm.cfg), config_error_text(&rcm.cfg));
         config_destroy(&rcm.cfg);
         return(EXIT_FAILURE);
@@ -99,14 +99,11 @@ int main(int argc, char **argv)
 
     streamripper_set_url_dest(NULL);
     init_streamripper();
-    mpd.radio_status = 1;
-    printf("init_streamripper\n");
+    rcm.radio_status = 1;
+    syslog(LOG_INFO, "init_streamripper\n");
 
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
-
-
-
 
     while (!force_exit) {
         current_timer = mg_poll_server(server, 200);
@@ -114,14 +111,17 @@ int main(int argc, char **argv)
         {
             last_timer = current_timer;
             mpd_poll(server);
-            if (mpd.radio_status == 1)
-                if (poll_streamripper(radio_song_name))
-                {
-                    mpd_run_update(mpd.conn, radio_song_name);
-                    sleep(1);
-                    mpd_run_add(mpd.conn, radio_song_name);
-                    //mpd_insert(mpd.conn, radio_song_name);
+            if (www_online()) {
+                if (rcm.radio_status == 1) {
+                    if (poll_streamripper(radio_song_name))
+                    {
+                        mpd_run_update(mpd.conn, radio_song_name);
+                        sleep(1);
+                        mpd_run_add(mpd.conn, radio_song_name);
+                        //mpd_insert(mpd.conn, radio_song_name);
+                    }
                 }
+            }
         }
     }
 

@@ -5,8 +5,6 @@
 #include "sql.h"
 #include "radio.h"
 
-#define ydebug_printf printf
-
 sqlite3 *conn;
 char *sqlchar0, *sqlchar1, *sqlchar2;
 
@@ -68,7 +66,7 @@ int db_init()
         goto error;
     return rc;
 error:
-    ydebug_printf("%s, %s\n", __func__, sqlite3_errmsg(conn));
+    syslog(LOG_DEBUG, "%s, %s\n", __func__, sqlite3_errmsg(conn));
     sqlite3_close(conn);
     return rc;
 }
@@ -156,7 +154,7 @@ int db_update_song_album(char* song, char* artist, char* album)
         convert_str(artist);
         convert_str(song);
         convert_str(album);
-        ydebug_printf("%s update %s album...\n", __func__, album);
+        syslog(LOG_DEBUG, "%s update %s album...\n", __func__, album);
         if (sql_exec(conn, "UPDATE Songs SET album = '%s' WHERE song = '%s' AND artist = '%s'",
                     album, song, artist) == SQLITE_OK)
             rc = 1;
@@ -234,14 +232,14 @@ int db_listen_song(char* song, char* artist, char* album)
     if (np)
     {
         np = np + 1;
-        ydebug_printf("%s found %i updating...\n", __func__, np);
+        syslog(LOG_DEBUG, "%s found %i updating...\n", __func__, np);
         rc = sql_exec(conn, "UPDATE Songs SET numplayed = '%i' "
                 "WHERE song = '%s' AND artist = '%s'", np, song, artist);
         if (rc == SQLITE_OK)
             rc = sql_exec(conn, "UPDATE Songs SET played = DATETIME('NOW', 'LOCALTIME') "
                     "WHERE song = '%s' AND artist = '%s'", song, artist);
     } else {
-        ydebug_printf("%s %s %s doesn't exist. adding...\n", __func__, song, artist);
+        syslog(LOG_DEBUG, "%s %s %s doesn't exist. adding...\n", __func__, song, artist);
         rc = sql_exec(conn, "INSERT INTO Songs (song, artist, added, played, numplayed, rating)"
                 " VALUES ('%s', '%s', DATETIME('NOW', 'LOCALTIME'), DATETIME('NOW', 'LOCALTIME'), 1, 0)",
                 song, artist);
@@ -252,7 +250,7 @@ int db_listen_song(char* song, char* artist, char* album)
     db_update_song_album(song, artist, album);
 /*    if (album)
     {
-        ydebug_printf("%s update %s album...\n", __func__, album);
+        syslog(LOG_DEBUG, "%s update %s album...\n", __func__, album);
         sql_exec(conn, "UPDATE Songs SET album = '%s' WHERE song = '%s' AND artist = '%s'", album, song, artist);
     }*/
 

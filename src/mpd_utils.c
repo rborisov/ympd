@@ -4,6 +4,7 @@
 
 #include "mpd_client.h"
 #include "mpd_utils.h"
+#include "radio.h"
 
 int mpd_list_artists(struct mpd_connection *conn)
 {
@@ -11,23 +12,23 @@ int mpd_list_artists(struct mpd_connection *conn)
 
     mpd_search_db_tags(conn, MPD_TAG_ARTIST);
     if (!mpd_search_commit(conn)) {
-        printf("%s: search_commit error\n", __func__);
+        syslog(LOG_DEBUG, "%s: search_commit error\n", __func__);
         return 0;
     }
 
     struct mpd_pair *pair;
     while ((pair = mpd_recv_pair_tag(conn, MPD_TAG_ARTIST)) != NULL) {
-        printf("%s: %s\n", __func__, pair->value);
+        syslog(LOG_DEBUG, "%s: %s\n", __func__, pair->value);
         mpd_return_pair(conn, pair);
         num++;
     }
 
     if (!mpd_response_finish(conn)) {
-        printf("%s: error\n", __func__);
+        syslog(LOG_DEBUG, "%s: error\n", __func__);
         return 0;
     }
 
-    printf("%s: found %i\n", __func__, num);
+    syslog(LOG_DEBUG, "%s: found %i\n", __func__, num);
     return num;
 }
 
@@ -82,7 +83,7 @@ void get_random_song(struct mpd_connection *conn, char *str, char *path)
 
     if (!mpd_send_list_meta(conn, path))
     {
-        printf("error: mpd_send_list_meta\n");
+        syslog(LOG_DEBUG, "error: mpd_send_list_meta\n");
         return;
     }
 
@@ -97,7 +98,7 @@ void get_random_song(struct mpd_connection *conn, char *str, char *path)
             song = mpd_entity_get_song(entity);
             listened = db_get_song_numplayed(mpd_get_title(song),
                     mpd_get_artist(song));
-            //printf("%i", listened);
+            //syslog(LOG_DEBUG, "%i", listened);
             if (listened < listened0) {
                 int probability = 50 + db_get_song_rating(mpd_get_title(song),
                         mpd_get_artist(song));
@@ -105,7 +106,7 @@ void get_random_song(struct mpd_connection *conn, char *str, char *path)
                 if (Yes) {
                     sprintf(str, "%s", mpd_song_get_uri(song));
                     listened0 = listened;
-                    printf("%s: li: %i pr: %i %s %s\n", __func__, listened, probability, 
+                    syslog(LOG_DEBUG, "%s: li: %i pr: %i %s %s\n", __func__, listened, probability,
                             mpd_get_title(song), mpd_get_artist(song));
                 }
             }
@@ -120,7 +121,7 @@ void get_worst_song(struct mpd_connection *conn, char *str)
     struct mpd_entity *entity;
     int rating0 = 65000;
     if (!mpd_send_list_meta(conn, "/")) {
-        printf("error: mpd_send_list_meta\n");
+        syslog(LOG_DEBUG, "error: mpd_send_list_meta\n");
         return;
     }
     while((entity = mpd_recv_entity(conn)) != NULL) {
@@ -145,9 +146,9 @@ int get_current_song_rating()
     song = mpd_run_current_song(mpd.conn);
     if(song == NULL)
         return 0;
-    
+
     rating = db_get_song_rating(mpd_get_title(song), mpd_get_artist(song));
-    
+
     mpd_song_free(song);
     return rating;
 }

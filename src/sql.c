@@ -20,11 +20,7 @@
 #include <unistd.h>
 
 #include "sql.h"
-//#include "upnpglobalvars.h"
-//#include "log.h"
-//#include "ydebug.h"
-
-#define ydebug_printf printf
+#include "radio.h"
 
 int
 sql_exec(sqlite3 *db, const char *fmt, ...)
@@ -38,13 +34,13 @@ sql_exec(sqlite3 *db, const char *fmt, ...)
 	va_start(ap, fmt);
 	sql = sqlite3_vmprintf(fmt, ap);
 	va_end(ap);
-//    ydebug_printf("%s SQL: %s\n", __func__, sql);
-	
+//    syslog(LOG_DEBUG, "%s SQL: %s\n", __func__, sql);
+
     ret = sqlite3_exec(db, sql, 0, 0, &errMsg);
 	if( ret != SQLITE_OK )
 	{
 		//DPRINTF(E_ERROR, L_DB_SQL, "SQL ERROR %d [%s]\n%s\n", ret, errMsg, sql);
-        ydebug_printf("%s SQL ERROR %d [%s]\n%s\n", __func__, ret, errMsg, sql);
+        syslog(LOG_DEBUG, "%s SQL ERROR %d [%s]\n%s\n", __func__, ret, errMsg, sql);
 		if (errMsg)
 			sqlite3_free(errMsg);
 	}
@@ -59,13 +55,13 @@ sql_get_table(sqlite3 *db, const char *sql, char ***pazResult, int *pnRow, int *
 	int ret;
 	char *errMsg = NULL;
 	//DPRINTF(E_DEBUG, L_DB_SQL, "SQL: %s\n", sql);
-//    ydebug_printf("%s SQL: %s\n", __func__, sql);
-	
+//    syslog(LOG_DEBUG, "%s SQL: %s\n", __func__, sql);
+
 	ret = sqlite3_get_table(db, sql, pazResult, pnRow, pnColumn, &errMsg);
 	if( ret != SQLITE_OK )
 	{
 		//DPRINTF(E_ERROR, L_DB_SQL, "SQL ERROR %d [%s]\n%s\n", ret, errMsg, sql);
-        ydebug_printf("%s SQL ERROR %d [%s]\n%s\n", __func__, ret, errMsg, sql);
+        syslog(LOG_DEBUG, "%s SQL ERROR %d [%s]\n%s\n", __func__, ret, errMsg, sql);
 		if (errMsg)
 			sqlite3_free(errMsg);
 	}
@@ -81,13 +77,13 @@ sql_get_int_field(sqlite3 *db, const char *fmt, ...)
     char		*sql;
 	int		ret;
 	sqlite3_stmt	*stmt;
-	
+
 	va_start(ap, fmt);
 	sql = sqlite3_vmprintf(fmt, ap);
 	va_end(ap);
 
 	//DPRINTF(E_DEBUG, L_DB_SQL, "sql: %s\n", sql);
-//    ydebug_printf("%s sql: %s\n", __func__, sql);
+//    syslog(LOG_DEBUG, "%s sql: %s\n", __func__, sql);
 
 	switch (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL))
 	{
@@ -95,7 +91,7 @@ sql_get_int_field(sqlite3 *db, const char *fmt, ...)
 			break;
 		default:
 			//DPRINTF(E_ERROR, L_DB_SQL, "prepare failed: %s\n%s\n", sqlite3_errmsg(db), sql);
-            ydebug_printf("%s prepare failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
+            syslog(LOG_DEBUG, "%s prepare failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
 			sqlite3_free(sql);
 			return -1;
 	}
@@ -125,7 +121,7 @@ sql_get_int_field(sqlite3 *db, const char *fmt, ...)
 			break;
 		default:
 			//DPRINTF(E_WARN, L_DB_SQL, "%s: step failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
-            ydebug_printf("%s: step failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
+            syslog(LOG_DEBUG, "%s: step failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
 			ret = -1;
 			break;
  	}
@@ -143,13 +139,13 @@ sql_get_int64_field(sqlite3 *db, const char *fmt, ...)
 	char		*sql;
 	int64_t		ret;
 	sqlite3_stmt	*stmt;
-	
+
 	va_start(ap, fmt);
 	sql = sqlite3_vmprintf(fmt, ap);
 	va_end(ap);
 
 	//DPRINTF(E_DEBUG, L_DB_SQL, "sql: %s\n", sql);
-//    ydebug_printf("%s sql: %s\n", __func__, sql);
+//    syslog(LOG_DEBUG, "%s sql: %s\n", __func__, sql);
 
 	switch (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL))
 	{
@@ -157,7 +153,7 @@ sql_get_int64_field(sqlite3 *db, const char *fmt, ...)
 			break;
 		default:
 			//DPRINTF(E_ERROR, L_DB_SQL, "prepare failed: %s\n%s\n", sqlite3_errmsg(db), sql);
-            ydebug_printf("%s prepare failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
+            syslog(LOG_DEBUG, "%s prepare failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
 			sqlite3_free(sql);
 			return -1;
 	}
@@ -187,7 +183,7 @@ sql_get_int64_field(sqlite3 *db, const char *fmt, ...)
 			break;
 		default:
 			//DPRINTF(E_WARN, L_DB_SQL, "%s: step failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
-            ydebug_printf("%s: step failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
+            syslog(LOG_DEBUG, "%s: step failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
 			ret = -1;
 			break;
  	}
@@ -209,7 +205,7 @@ sql_get_text_field(sqlite3 *db, const char *fmt, ...)
 	if (db == NULL)
 	{
 		//DPRINTF(E_WARN, L_DB_SQL, "db is NULL\n");
-        ydebug_printf("%s db is NULL\n", __func__);
+        syslog(LOG_DEBUG, "%s db is NULL\n", __func__);
 		return NULL;
 	}
 
@@ -218,7 +214,7 @@ sql_get_text_field(sqlite3 *db, const char *fmt, ...)
 	va_end(ap);
 
 	//DPRINTF(E_DEBUG, L_DB_SQL, "sql: %s\n", sql);
-//    ydebug_printf("%s sql: %s\n", __func__, sql);
+//    syslog(LOG_DEBUG, "%s sql: %s\n", __func__, sql);
 
 	switch (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL))
 	{
@@ -226,7 +222,7 @@ sql_get_text_field(sqlite3 *db, const char *fmt, ...)
 			break;
 		default:
 			//DPRINTF(E_ERROR, L_DB_SQL, "prepare failed: %s\n%s\n", sqlite3_errmsg(db), sql);
-            ydebug_printf("%s prepare failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
+            syslog(LOG_DEBUG, "%s prepare failed: %s\n%s\n", __func__, sqlite3_errmsg(db), sql);
 			sqlite3_free(sql);
 			return NULL;
 	}
@@ -260,7 +256,7 @@ sql_get_text_field(sqlite3 *db, const char *fmt, ...)
 			if ((str = sqlite3_malloc(len + 1)) == NULL)
 			{
 				//DPRINTF(E_ERROR, L_DB_SQL, "malloc failed\n");
-                ydebug_printf("%s malloc failed\n", __func__);
+                syslog(LOG_DEBUG, "%s malloc failed\n", __func__);
 				break;
 			}
 
@@ -269,7 +265,7 @@ sql_get_text_field(sqlite3 *db, const char *fmt, ...)
 
 		default:
 			//DPRINTF(E_WARN, L_DB_SQL, "SQL step failed: %s\n", sqlite3_errmsg(db));
-            ydebug_printf("%s SQL step failed: %s\n", __func__, sqlite3_errmsg(db));
+            syslog(LOG_DEBUG, "%s SQL step failed: %s\n", __func__, sqlite3_errmsg(db));
 			str = NULL;
 			break;
 	}

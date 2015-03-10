@@ -102,7 +102,7 @@ struct t_mpd {
     int song_id;
     unsigned queue_version;
 
-    int radio_status;
+//    int radio_status;
     int volume;
 } mpd;
 

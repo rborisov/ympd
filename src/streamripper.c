@@ -36,17 +36,17 @@ void streamripper_set_url(char* url)
         goto done;
 
     if (!(&rcm.cfg)) {
-        fprintf(stderr, "%s: mpd is NULL\n", __func__);
+        syslog(LOG_ERR, "%s: mpd is NULL\n", __func__);
         return;
     }
     if (!config_lookup_string(&rcm.cfg, "radio.url", &radio_url))
     {
-        fprintf(stderr, "%s: No 'radio.url' setting in configuration file.\n", __func__);
+        syslog(LOG_ERR, "%s: No 'radio.url' setting in configuration file.\n", __func__);
         return;
     }
 done:
     setstream_streamripper(radio_url);
-    printf("%s: url: %s\n", __func__, radio_url);
+    syslog(LOG_INFO, "%s: url: %s\n", __func__, radio_url);
 }
 
 void streamripper_set_url_dest(char* dest)
@@ -57,25 +57,25 @@ void streamripper_set_url_dest(char* dest)
     config_setting_t *root, *setting;
 
     if (!(&rcm.cfg)) {
-        fprintf(stderr, "%s: rcm.cfg is NULL\n", __func__);
+        syslog(LOG_ERR, "%s: rcm.cfg is NULL\n", __func__);
         return;
     }
 
     if (!config_lookup_string(&rcm.cfg, "application.music_path", &music_path))
     {
-        fprintf(stderr, "%s: No 'application.music_path' setting in configuration file.\n", __func__);
+        syslog(LOG_ERR, "%s: No 'application.music_path' setting in configuration file.\n", __func__);
         return;
     }
     if (!config_lookup_string(&rcm.cfg, "radio.path", &radio_path))
     {
-        fprintf(stderr, "%s: No 'radio.path' setting in configuration file.\n", __func__);
+        syslog(LOG_ERR, "%s: No 'radio.path' setting in configuration file.\n", __func__);
         return;
     }
     rcm.image_update = 1;
     if (!radio_dest || strcmp(radio_dest, "") == 0) {
         if (!config_lookup_string(&rcm.cfg, "radio.current", &radio_dest))
         {
-            fprintf(stderr, "%s: No 'radio.dest' setting in configuration file.\n", __func__);
+            syslog(LOG_ERR, "%s: No 'radio.dest' setting in configuration file.\n", __func__);
             return;
         }
     }
@@ -89,7 +89,7 @@ void streamripper_set_url_dest(char* dest)
                 config_setting_set_string(current, radio_dest);
                 if(! config_write_file(&rcm.cfg, rcm.config_file_name))
                 {
-                    fprintf(stderr, "%s: Error while writing file.\n", __func__);
+                    syslog(LOG_ERR, "%s: Error while writing file.\n", __func__);
                 }
             }
         }
@@ -108,7 +108,7 @@ void streamripper_set_url_dest(char* dest)
                         && config_setting_lookup_string(station, "url", &url)))
                 continue;
             if (strcmp(name, radio_dest) == 0) {
-                printf("%s: url = %s\n", __func__, url);
+                syslog(LOG_INFO, "%s: url = %s\n", __func__, url);
                 setstream_streamripper(url);
                 break;
             }
@@ -118,10 +118,10 @@ void streamripper_set_url_dest(char* dest)
     strcpy(rcm.current_radio, radio_dest);
 
     sprintf(rcm.file_path, "%s%s", radio_path, radio_dest);
-    printf("%s: rcm.file_path = %s\n", __func__, rcm.file_path);
+    syslog(LOG_INFO, "%s: rcm.file_path = %s\n", __func__, rcm.file_path);
     sprintf(chrbuff, "%s%s", music_path, rcm.file_path);
     setpath_streamuri(chrbuff);
-    printf("%s: path: %s\n", __func__, chrbuff);
+    syslog(LOG_INFO, "%s: path: %s\n", __func__, chrbuff);
 }
 
 void setstream_streamripper(const char* streamuri)
@@ -159,11 +159,11 @@ void init_streamripper()
 
 
     if (!(&rcm.cfg)) {
-        fprintf(stderr, "%s: mpd is NULL\n", __func__);
+        syslog(LOG_ERR, "%s: mpd is NULL\n", __func__);
     } else {
         if (!config_lookup_string(&rcm.cfg, "radio.incomplete", &incomplete))
         {
-            fprintf(stderr, "%s: No 'radio.incomplete' setting in configuration file.\n", __func__);
+            syslog(LOG_ERR, "%s: No 'radio.incomplete' setting in configuration file.\n", __func__);
         } else {
             strncpy(prefs.incomplete_directory, incomplete, SR_MAX_PATH);
         }
@@ -181,11 +181,11 @@ int start_streamripper()
 
     /* Launch the ripping thread */
     if ((ret = rip_manager_start (&rmi, &prefs, rip_callback)) != SR_SUCCESS) {
-        fprintf(stderr, "%s: Couldn't connect to %s\n", __func__, prefs.url);
+        syslog(LOG_ERR, "%s: Couldn't connect to %s\n", __func__, prefs.url);
         rip_manager_stop(rmi);
     }
     sleep(1);
-    printf("%s: rmi %d\n", __func__, rmi->started);
+    syslog(LOG_INFO, "%s: rmi %d\n", __func__, rmi->started);
 
     return ret;
 }
@@ -214,7 +214,7 @@ int poll_streamripper(char* newfilename)
         {
             case RM_STATUS_BUFFERING:
                 strcpy(rcm.status_str, "buffering");
-                //printf("%s: stream ripper: buffering... %s\n", __func__, rmi->filename);
+                //syslog(LOG_INFO, "%s: stream ripper: buffering... %s\n", __func__, rmi->filename);
                 break;
             case RM_STATUS_RIPPING:
                 if (rmi->track_count < rmi->prefs->dropcount) {
@@ -227,7 +227,7 @@ int poll_streamripper(char* newfilename)
                 break;
             case RM_STATUS_RECONNECTING:
                 strcpy(rcm.status_str, "reconnecting");
-                //printf("%s: reconnecting...\n", __func__);
+                //syslog(LOG_INFO, "%s: reconnecting...\n", __func__);
                 break;
 
         }
@@ -236,16 +236,16 @@ int poll_streamripper(char* newfilename)
     if (m_track_done) {
         if (newfilename == NULL)
         {
-            fprintf(stderr, "%s: BUG!\n", __func__);
+            syslog(LOG_ERR, "%s: BUG!\n", __func__);
             return 0;
         }
         mstrncpy(newfilename, newsongname, MAX_TRACK_LEN);
-        printf("%s: track done %s\n", __func__, newfilename);
+        syslog(LOG_INFO, "%s: track done %s\n", __func__, newfilename);
         m_track_done = FALSE;
         return 1;
     }
     if (m_new_track) {
-        printf("%s: new track %s %lu\n", __func__, rmi->filename, rmi->filesize);
+        syslog(LOG_INFO, "%s: new track %s %lu\n", __func__, rmi->filename, rmi->filesize);
         m_new_track = FALSE;
     }
 
@@ -254,7 +254,7 @@ int poll_streamripper(char* newfilename)
 
 int stop_streamripper()
 {
-    printf("%s: stop_streamripper\n", __func__);
+    syslog(LOG_INFO, "%s: stop_streamripper\n", __func__);
     rip_manager_stop (rmi);
     rip_manager_cleanup ();
 
@@ -277,12 +277,12 @@ void delete_file_forever(char* uri)
         char path[128], song[128];
         if (!config_lookup_string(&rcm.cfg, "application.music_path", &music_path))
         {
-            fprintf(stderr, "%s: No 'application.music_path' setting in configuration file.\n", __func__);
+            syslog(LOG_ERR, "%s: No 'application.music_path' setting in configuration file.\n", __func__);
             return;
         }
         get_worst_song(&mpd.conn, song);
         sprintf(path, "%s%s", music_path, song);
-        printf("%s: %s\n", __func__, path);
+        syslog(LOG_INFO, "%s: %s\n", __func__, path);
         remove(path);
     } else {
         remove(uri);
@@ -308,14 +308,14 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
             break;
         case RM_ERROR:
             err = (ERROR_INFO*)data;
-            fprintf(stderr, "\n%s: error %d [%s]\n", __func__, err->error_code, err->error_str);
+            syslog(LOG_ERR, "\n%s: error %d [%s]\n", __func__, err->error_code, err->error_str);
             sprintf(rcm.status_str, "error [%s]", err->error_str);
             m_alldone = TRUE;
             switch (err->error_code)
             {
                 case 0x24:
                 case 0x25:
-                    printf("%s: %s - lets free file storage\n", __func__, err->error_str);
+                    syslog(LOG_INFO, "%s: %s - lets free file storage\n", __func__, err->error_str);
                     delete_file_forever(NULL);
                     break;
             }
@@ -332,7 +332,7 @@ void rip_callback (RIP_MANAGER_INFO* rmi, int message, void *data)
         case RM_TRACK_DONE:
             m_track_done = TRUE;
             sprintf(newsongname, "%s/%s", rcm.file_path, strrchr(data, '/' )+1);
-            printf("%s: RM_TRACK_DONE: (%s)%s\n", __func__, (char*)data, newsongname);
+            syslog(LOG_INFO, "%s: RM_TRACK_DONE: (%s)%s\n", __func__, (char*)data, newsongname);
             break;
     }
 }

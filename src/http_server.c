@@ -35,11 +35,11 @@ int callback_http(struct mg_connection *c)
     const struct embedded_file *req_file;
     FILE *fd;
     unsigned char *buf;
-    char filename[256];
+    char filename[MAX_LINE];
     struct passwd *pw = getpwuid(getuid());
     char *images_dir, *homedir = pw->pw_dir;
 
-    printf("http: %s\n", c->uri);
+    syslog(LOG_INFO, "http: %s\n", c->uri);
 
     if(!strcmp(c->uri, "/"))
         req_file = find_embedded_file("/index.html");
@@ -55,7 +55,7 @@ int callback_http(struct mg_connection *c)
 
     if (!config_lookup_string(&rcm.cfg, "application.images_path", &images_dir))
     {
-        fprintf(stderr, "%s: No 'application.images_path' setting in configuration file.\n", __func__);
+        syslog(LOG_ERR,  "%s: No 'application.images_path' setting in configuration file.\n", __func__);
         sprintf(filename, "%s/%s/images/%s", homedir, RCM_DIR_STR, c->uri);
     } else {
         sprintf(filename, "%s/%s", images_dir, c->uri);
@@ -63,7 +63,7 @@ int callback_http(struct mg_connection *c)
 
     fd = fopen(filename, "r");
     if(!fd)
-        printf("Failed open file %s\n", filename);
+        syslog(LOG_ERR, "Failed open file %s\n", filename);
     else
     {
         unsigned int bufsize;
@@ -90,7 +90,7 @@ int callback_http(struct mg_connection *c)
             return MG_REQUEST_PROCESSED;
         } else {
             fclose(fd);
-            printf("%s: memory error\n", __func__);
+            syslog(LOG_ERR, "%s: memory error\n", __func__);
         }
     }
 
