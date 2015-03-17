@@ -44,6 +44,8 @@ char outdir[128];
 
 int mpd_get_track_info(char *buffer);
 int mpd_put_current_radio(char *buffer);
+int mpd_db_update_current_song_rating(int increase);
+int mpd_put_artist_art(char *buffer, char *artist);
 
 int mpd_crop(struct mpd_connection *conn)
 {
@@ -565,15 +567,6 @@ void mpd_poll(struct mg_server *s)
         default:
             syslog(LOG_ERR, "mpd.conn_state %i\n", mpd.conn_state);
     }
-}
-
-char* mpd_get_artist(struct mpd_song const *song)
-{
-    char *str;
-    str = (char *)mpd_song_get_tag(song, MPD_TAG_ARTIST, 0);
-    if(str == NULL)
-        str = basename((char *)mpd_song_get_uri(song));
-    return str;
 }
 
 char* mpd_get_album(struct mpd_song const *song)

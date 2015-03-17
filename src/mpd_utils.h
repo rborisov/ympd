@@ -10,5 +10,7 @@ void get_random_song(struct mpd_connection *, char *, char *);
 int get_current_song_rating();
 char* mpd_get_title(struct mpd_song const *song);
 int mpd_list_artists(struct mpd_connection *conn);
+char* mpd_get_artist(struct mpd_song const *song);
+void get_worst_song(struct mpd_connection *conn, char *str);
 
 #endif

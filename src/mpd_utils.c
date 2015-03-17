@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <libgen.h>
 
 #include "mpd_client.h"
 #include "mpd_utils.h"
+#include "sqlitedb.h"
 #include "radio.h"
 
 int mpd_list_artists(struct mpd_connection *conn)
@@ -32,6 +34,16 @@ int mpd_list_artists(struct mpd_connection *conn)
     return num;
 }
 
+char* mpd_get_artist(struct mpd_song const *song)
+{
+    char *str;
+    str = (char *)mpd_song_get_tag(song, MPD_TAG_ARTIST, 0);
+    if(str == NULL)
+        str = basename((char *)mpd_song_get_uri(song));
+//printf("%i %s\n", &str, str);
+    return str;
+}
+
 char* mpd_get_title(struct mpd_song const *song)
 {
     char *str;
@@ -40,7 +52,7 @@ char* mpd_get_title(struct mpd_song const *song)
     if(str == NULL){
         str = basename((char *)mpd_song_get_uri(song));
     }
-
+//	printf("%i %s\n", &str, str);
     return str;
 }
 
@@ -106,8 +118,13 @@ void get_random_song(struct mpd_connection *conn, char *str, char *path)
                 if (Yes) {
                     sprintf(str, "%s", mpd_song_get_uri(song));
                     listened0 = listened;
-                    syslog(LOG_DEBUG, "%s: li: %i pr: %i %s %s\n", __func__, listened, probability,
-                            mpd_get_title(song), mpd_get_artist(song));
+		      syslog(LOG_DEBUG, "listened: %i ", listened);
+		      syslog(LOG_DEBUG, "probability: %i ", probability);
+		      syslog(LOG_DEBUG, "title: %s ", mpd_get_title(song));
+		      syslog(LOG_DEBUG, "artist: %s", mpd_get_artist(song));
+//			printf("\n");
+/*                    syslog(LOG_DEBUG, "%s: li: %i pr: %i %s %s\n", __func__, listened, probability,
+                            mpd_get_title(song), mpd_get_artist(song));*/
                 }
             }
         }
