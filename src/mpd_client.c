@@ -464,9 +464,11 @@ static int mpd_notify_callback(struct mg_connection *c) {
 
         if (mpd.song_id == -1)
         {
-            char str[128];
+            char str[128] = "";
             syslog(LOG_INFO, "%s song_id == %i\n", __func__, mpd.song_id);
             get_random_song(mpd.conn, str, rcm.file_path);
+            if (strcmp(str, "") == 0)
+               get_random_song(mpd.conn, str, "radio");
             syslog(LOG_INFO, "%s: add random song %s and play\n", __func__, str);
             mpd_run_add(mpd.conn, str);
             mpd_run_play(mpd.conn);
@@ -510,7 +512,7 @@ static int mpd_notify_callback(struct mg_connection *c) {
 
 void mpd_poll(struct mg_server *s)
 {
-    char str[256];
+    char str[256] = "";
     switch (mpd.conn_state) {
         case MPD_DISCONNECTED:
             /* Try to connect */
@@ -559,6 +561,8 @@ void mpd_poll(struct mg_server *s)
             mg_iterate_over_connections(s, mpd_notify_callback, NULL);
             if (queue_is_empty) {
                 get_random_song(mpd.conn, str, rcm.file_path);
+                if (strcmp(str, "") == 0)
+                    get_random_song(mpd.conn, str, "radio");
                 syslog(LOG_DEBUG, "%s: add random song %s\n", __func__, str);
                 mpd_run_add(mpd.conn, str);
                 queue_is_empty = 0;
@@ -846,6 +850,7 @@ int mpd_put_radio(char *buffer, unsigned int offset)
     char *cur = buffer;
     const char *end = buffer + MAX_SIZE;
     config_setting_t *setting;
+    int numelements = 0;
 
     setting = config_lookup(&rcm.cfg, "radio.station");
     if(setting != NULL)
@@ -865,12 +870,17 @@ int mpd_put_radio(char *buffer, unsigned int offset)
             if(!(config_setting_lookup_string(station, "name", &name)
                 && config_setting_lookup_string(station, "url", &url)))
                     continue;
-            syslog(LOG_INFO, "%-30s  %-30s\n", name, url);
-            cur += json_emit_raw_str(cur, end - cur, "{\"name\":");
-            cur += json_emit_quoted_str(cur, end - cur, name);
-            cur += json_emit_raw_str(cur, end - cur, ",\"url\":");
-            cur += json_emit_quoted_str(cur, end - cur, url);
-            cur += json_emit_raw_str(cur, end - cur, "},");
+			numelements++;
+			if (numelements > offset) {
+                syslog(LOG_INFO, "%s: %i %-30s  %-30s\n", __func__, numelements, name, url);
+                cur += json_emit_raw_str(cur, end - cur, "{\"name\":");
+                cur += json_emit_quoted_str(cur, end - cur, name);
+                cur += json_emit_raw_str(cur, end - cur, ",\"url\":");
+                cur += json_emit_quoted_str(cur, end - cur, url);
+                cur += json_emit_raw_str(cur, end - cur, "},");
+            }
+            if (numelements > offset+MAX_ELEMENTS_PER_PAGE)
+                break;
         }
 
         putchar('\n');

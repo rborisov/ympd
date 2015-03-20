@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>LIST</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="css/carradio.min.css" rel="stylesheet">
+        <link href="css/keyboard.min.css" rel="stylesheet">
+        <script src="js/jquery-1.10.2.min.js"></script>
+        <script src="js/sammy.js"></script>
+        <script src="js/player.js"></script>
+        <script src="js/keyboard.js"></script>
+        <style>
+            body, html {
+                font-family: monospace; font-size: 20px;
+                background: black;
+            }
+            #keyboard li {
+                width: auto;
+                min-width: 30px;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="position: absolute; top: 0; left: 0; right: 0;">
+            <table>
+                <tr style="font-size:14px">
+                    <td id="track-icon" class="glyphicon glyphicon-pause" style="color: yellowgreen"></td>
+                    <td id="counter" style="text-align: center; color: yellowgreen"></td>
+                    <td id="volume-icon" class="glyphicon glyphicon-volume-up" style="color: yellow"></td>
+                    <td id="volume" style="text-align: center; color: yellow"></td>
+                    <td id="random-icon" class="glyphicon glyphicon-random" style="color: yellowgreen"></td>
+                    <td id="repeat-icon" class="glyphicon glyphicon-repeat" style="color: orange"></td>
+                    <td id="cloud-icon" class="glyphicon glyphicon-cloud" style="color: yellow"></td>
+                    <td id="currentpos" style="text-align: center; color: orange"></td>
+                    <td id="notification-icon" class="glyphicon glyphicon-ok" style="color: yellow"></td>
+                    <td id="songrating" style="text-align: center; color: yellowgreen"></td>
+                </tr>
+            </table>
+            <div id="container">
+                <ul id="keyboard">
+                    <li onclick="history.back(-1);">back</li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>

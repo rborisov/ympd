@@ -93,9 +93,10 @@ void get_random_song(struct mpd_connection *conn, char *str, char *path)
     struct mpd_entity *entity;
     int listened0 = 65000;
 
+    syslog(LOG_DEBUG, "%s: path %s\n", __func__, path);
     if (!mpd_send_list_meta(conn, path))
     {
-        syslog(LOG_DEBUG, "error: mpd_send_list_meta\n");
+        syslog(LOG_ERR, "%s: error: mpd_send_list_meta %s\n", __func__, path);
         return;
     }
 
@@ -130,7 +131,6 @@ void get_random_song(struct mpd_connection *conn, char *str, char *path)
         }
         mpd_entity_free(entity);
     }
-    //TODO: look in / path if not found
 }
 
 void get_worst_song(struct mpd_connection *conn, char *str)
