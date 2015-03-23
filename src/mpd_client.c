@@ -325,8 +325,10 @@ int callback_mpd(struct mg_connection *c)
                 n = mpd_put_queue(mpd.buf, uint_buf);
             break;
         case MPD_API_GET_RADIO:
-            if(sscanf(c->content, "MPD_API_GET_RADIO,%u", &uint_buf))
+            if(sscanf(c->content, "MPD_API_GET_RADIO,%u", &uint_buf)) {
+                printf("%s: offset %i\n", __func__, uint_buf);
                 n = mpd_put_radio(mpd.buf, uint_buf);
+            }
             break;
         case MPD_API_GET_BROWSE:
             if(sscanf(c->content, "MPD_API_GET_BROWSE,%u,%m[^\t\n]", &uint_buf, &p_charbuf) && p_charbuf != NULL)
@@ -859,6 +861,8 @@ int mpd_put_radio(char *buffer, unsigned int offset)
         int i;
 
         cur += json_emit_raw_str(cur, end  - cur, "{\"type\":\"radio\",\"data\":[ ");
+
+        syslog(LOG_INFO, "%s: %i %i\n", __func__, offset, count);
 
         for(i = 0; i < count; ++i)
         {
