@@ -101,11 +101,11 @@ function webSocketConnect() {
     try {
         socket.onopen = function() {
             console.log("connected");
-            $('.top-right').notify({
+            /*$('.top-right').notify({
                 message:{text:"Connected to ympd"},
                 fadeOut: { enabled: true, delay: 500 }
             }).show();
-
+*/
             app.run();
         }
 

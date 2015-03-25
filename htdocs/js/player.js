@@ -30,7 +30,7 @@ var current_song_pos = 0;
 var next_song_pos = 0;
 
 var app = $.sammy(function() {
-/*    function prepare() {
+    function prepare() {
         $('#nav_links > li').removeClass('active');
         $('.page-btn').addClass('disabled');//.addClass('hide');
         browsepath = '';
@@ -44,7 +44,11 @@ var app = $.sammy(function() {
 
     this.get("/", function(context) {
         context.redirect("#/0");
+    });
+/*    this.get("/menu.html", function(context) {
+        context.redirect("/menu.html");
     });*/
+
 });
 
 $(document).ready(function(){
