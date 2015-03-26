@@ -30,57 +30,6 @@ var current_song_pos = 0;
 var next_song_pos = 0;
 
 var app = $.sammy(function() {
-    function runBrowse() {
-        current_app = 'queue';
-
-        $('#breadcrump').addClass('hide');
-        $('#cocacola').find("tr:gt(0)").remove();
-        socket.send('MPD_API_GET_QUEUE,'+pagination);
-
-        $('#panel-heading').text("Queue");
-        $('#queue').addClass('active');
-    }
-
-    function prepare() {
-        $('#nav_links > li').removeClass('active');
-        $('.page-btn').addClass('disabled');//.addClass('hide');
-        //pagination = 0;
-        browsepath = '';
-    }
-
-    this.get(/\#\/(\d+)/, function() {
-        prepare();
-        queue_pagination = 0;
-        queue_pagination = parseInt(this.params['splat'][0]);
-        runBrowse();
-    });
-
-    this.get(/\#\/browse\/(\d+)\/(.*)/, function() {
-        prepare();
-        pagination = 0;
-        browsepath = this.params['splat'][1];
-        pagination = parseInt(this.params['splat'][0]);
-        current_app = 'browse';
-        $('#breadcrump').removeClass('hide').empty().append("<li><a href=\"#/browse/0/\">root</a></li>");
-        $('#salamisandwich').find("tr:gt(0)").remove();
-        socket.send('MPD_API_GET_BROWSE,'+pagination+','+(browsepath ? browsepath : "/"));
-
-        $('#panel-heading').text("Browse database: "+browsepath);
-        var path_array = browsepath.split('/');
-        var full_path = "";
-        $.each(path_array, function(index, chunk) {
-            if(path_array.length - 1 == index) {
-                $('#breadcrump').append("<li class=\"active\">"+ chunk + "</li>");
-                return;
-            }
-
-            full_path = full_path + chunk;
-            $('#breadcrump').append("<li><a href=\"#/browse/0/" + full_path + "\">"+chunk+"</a></li>");
-            full_path += "/";
-        });
-        $('#browse').addClass('active');
-    });
-
     this.get("/", function(context) {
         context.redirect("#/0");
     });
@@ -106,6 +55,7 @@ function webSocketConnect() {
                 fadeOut: { enabled: true, delay: 500 }
             }).show();
 */
+            socket.send("MPD_API_GET_RADIO," + 0);
             app.run();
         }
 
@@ -116,10 +66,17 @@ function webSocketConnect() {
             var obj = JSON.parse(msg.data);
             switch (obj.type) {
                 case "radio":
+                    $('#radiolist').empty();
                     for(var ii in obj.data) {
-                    $('#keyboard')
-                        .append("<li>"+obj.data[ii].name+"</li>");
+                    $('#radiolist')
+                        .append("<li title=\""+obj.data[ii].name+"\">"+obj.data[ii].name+"</li>");
                     }
+                    $('#radiolist > li').on({
+                        click: function() {
+                            console.log($(this).attr("title"));
+                            socket.send("MPD_API_SET_RADIO," + $(this).attr("title"));
+                        },
+                    });
 /*                    $('#crabsalad > tbody').empty();
                     for(var ii in obj.data) {
                         console.log(obj.data[ii].name);
@@ -201,15 +158,6 @@ function webSocketConnect() {
                             type: "danger",
                             fadeOut: { enabled: true, delay: 1000 },
                         }).show();
-                    break;
-                case "update_queue":
-                    if(current_app === 'queue') {
-                        socket.send('MPD_API_GET_QUEUE,'+queue_pagination);
-                        /*$('.top-right').notify({
-                            message:{html: "Update Queue"},
-                            type: "info",
-                        }).show();*/
-                    }
                     break;
                 case "current_radio":
                     //console.log(obj.data.name+" "+obj.data.logo);

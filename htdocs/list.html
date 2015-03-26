@@ -21,7 +21,7 @@
             }
         </style>
     </head>
-    <body onload="socket.send('MPD_API_GET_RADIO,'+0);">
+    <body>
         <div style="position: absolute; top: 0; left: 0; right: 0;">
             <table>
                 <tr style="font-size:14px">
@@ -40,6 +40,9 @@
             <div id="container">
                 <ul id="keyboard">
                     <li onclick="history.back(-1);">back</li>
+                    <ul id="radiolist">
+                    </ul>
+                    <li onclick="clickRadioMore();">more</li>
                 </ul>
             </div>
         </div>

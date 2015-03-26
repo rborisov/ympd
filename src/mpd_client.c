@@ -341,10 +341,11 @@ int callback_mpd(struct mg_connection *c)
             if(sscanf(c->content, "MPD_API_SET_RADIO,%m[^\t\n]", &p_charbuf) && p_charbuf != NULL)
             {
                 syslog(LOG_INFO, "%s set radio: %s\n", __func__, p_charbuf);
-                stop_streamripper();
+                printf("%s set radio: %s\n", __func__, p_charbuf);
+/*                stop_streamripper();
                 strcpy(rcm.current_radio, p_charbuf);
                 streamripper_set_url_dest(rcm.current_radio);
-                init_streamripper();
+                init_streamripper();*/
                 free(p_charbuf);
             }
             break;
