@@ -119,11 +119,14 @@ void *www_online()
 
 void radio_start()
 {
+    streamripper_set_url_dest(NULL);
+    init_streamripper();
     rcm.radio_status = 1;
 }
 
 void radio_stop()
 {
+    stop_streamripper();
     rcm.radio_status = 0;
 }
 

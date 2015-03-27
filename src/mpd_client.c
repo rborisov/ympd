@@ -379,6 +379,9 @@ int callback_mpd(struct mg_connection *c)
                 free(p_charbuf);
             }
             break;
+        case TEST_DELETE_FILE:
+            delete_file_forever(NULL);
+            break;
 #ifdef WITH_MPD_HOST_CHANGE
         /* Commands allowed when disconnected from MPD server */
         case MPD_API_SET_MPDHOST:

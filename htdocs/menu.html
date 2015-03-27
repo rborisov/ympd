@@ -37,7 +37,7 @@
                     <td id="songrating" style="text-align: center; color: yellowgreen"></td>
                 </tr>
             </table>
-            <div id="container">
+            <div id="container" style="position: absolute; left: 0;">
                 <ul id="keyboard">
                     <li onclick="history.back(-1);">back</li>
                     <li class="glyphicon glyphicon-cloud-download"
@@ -52,6 +52,8 @@
                     onclick="location.href='music_search.html'"></li>
                     <li class="glyphicon glyphicon-globe"
                     onclick="location.href='list.html'"></li>
+                    <li class="glyphicon glyphicon-floppy-remove"
+                    onclick="socket.send('TEST_DELETE_FILE');"></li>
                 </ul>
             </div>
         </div>

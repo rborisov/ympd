@@ -12,12 +12,13 @@
         <script src="js/keyboard.js"></script>
         <style>
             body, html {
-                font-family: monospace; font-size: 20px;
+                font-family: monospace; 
+                font-size: 20px;
                 background: black;
             }
             #keyboard li {
-                width: auto;
-                min-width: 30px;
+                width: auto; height: auto;
+                min-width: 30px; min-height: 30px;
             }
         </style>
     </head>
@@ -37,7 +38,7 @@
                     <td id="songrating" style="text-align: center; color: yellowgreen"></td>
                 </tr>
             </table>
-            <div id="container">
+            <div id="container" style="position: absolute; left: 0;">
                 <ul id="keyboard">
                     <li onclick="history.back(-1);">back</li>
                     <ul id="radiolist">
