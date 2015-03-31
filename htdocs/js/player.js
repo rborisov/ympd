@@ -143,7 +143,8 @@ function webSocketConnect() {
                                     var art_url;
                                     //var artimage = document.getElementById("artimage");
                                     if (lastfm && lastfm.track && lastfm.track.album) {
-                                        if (lastfm.track.album.image) {
+                                        if (lastfm.track.album.image &&
+                                            lastfm.track.album.image[1]['#text'].indexOf("default_album") == -1) {
                                             art_url = lastfm.track.album.image[1]['#text'];
                                             console.log(art_url);
                                             artimage.src = art_url;
@@ -188,10 +189,13 @@ function webSocketConnect() {
                     } else
                         $('#artist').text("");
 
-                    if(obj.data.art) {
+                    if(obj.data.art && obj.data.art.indexOf("default_album") == -1) {
                         console.log(obj.data.art);
                         var art_url = obj.data.art;
                         document.getElementById("artimage").src = art_url;
+                    } else {
+                        console.log("no art" );
+                        //socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
                     }
 
                     socket.send('MPD_API_GET_QUEUE,'+queue_pagination);

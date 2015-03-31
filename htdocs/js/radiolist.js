@@ -68,8 +68,16 @@ function webSocketConnect() {
                 case "radio":
                     $('#radiolist').empty();
                     for(var ii in obj.data) {
-                    $('#radiolist')
-                        .append("<li title=\""+obj.data[ii].name+"\">"+obj.data[ii].name+"</li>");
+                        var namestring;
+                        var stringlength = obj.data[ii].name.length;
+                        if (stringlength > 14) {
+                            namestring = obj.data[ii].name.substr(0, 11)+"-"
+                                +obj.data[ii].name.substr(stringlength-2, stringlength);
+                        } else
+                            namestring = obj.data[ii].name;
+                        console.log(namestring);
+                        $('#radiolist')
+                            .append("<li title=\""+obj.data[ii].name+"\">"+namestring+"</li>");
                     }
                     $('#radiolist > li').on({
                         click: function() {

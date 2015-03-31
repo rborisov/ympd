@@ -611,11 +611,11 @@ int image_exists(char* name)
     sprintf(outfn, "%s/%s", outdir, name);
     syslog(LOG_INFO, "%s looking for %s ", __func__, outfn);
     if (access(outfn, F_OK) != -1) {
-        syslog(LOG_INFO, "ok\n");
+        syslog(LOG_INFO, "%s: ok", __func__);
         return 1;
     }
     else {
-        syslog(LOG_INFO, "no\n");
+        syslog(LOG_INFO, "%s: no", __func__);
         return 0;
     }
 }
