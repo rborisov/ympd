@@ -27,6 +27,7 @@ void rcm_close();
 
 char* cfg_get_db_path();
 int cfg_get_radio_status();
+void cfg_set_radio_status(int status);
 
 //check internet connection
 void *www_online();

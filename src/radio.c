@@ -53,6 +53,26 @@ int cfg_get_radio_status()
     return status;
 }
 
+void cfg_set_radio_status(int status)
+{
+    if (cfg_get_radio_status() != status) {
+        config_setting_t *root, *setting;
+        root = config_root_setting(&rcm.cfg);
+        setting = config_setting_get_member(root, "radio");
+        if (setting) {
+            int ret = config_setting_remove(setting, "on");
+            if (ret == CONFIG_TRUE) {
+                config_setting_t *current = config_setting_add(setting, "on", CONFIG_TYPE_INT);
+                config_setting_set_int(current, status);
+                if(! config_write_file(&rcm.cfg, rcm.config_file_name))
+                {
+                    syslog(LOG_ERR, "%s: Error while writing file.\n", __func__);
+                }
+            }
+        }
+    }
+}
+
 /*
 * http://stackoverflow.com/questions/10535255/check-internet-connection-with-sockets
 */
@@ -122,12 +142,14 @@ void radio_start()
     streamripper_set_url_dest(NULL);
     init_streamripper();
     rcm.radio_status = 1;
+    cfg_set_radio_status(1);
 }
 
 void radio_stop()
 {
     stop_streamripper();
     rcm.radio_status = 0;
+    cfg_set_radio_status(0);
 }
 
 int radio_toggle()

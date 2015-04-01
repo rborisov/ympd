@@ -98,10 +98,13 @@ int main(int argc, char **argv)
 
     db_init();
 
-    streamripper_set_url_dest(NULL);
-    init_streamripper();
-    rcm.radio_status = 1;
-    syslog(LOG_INFO, "init_streamripper\n");
+    rcm.radio_status = 0;
+    if (cfg_get_radio_status() == 1) {
+        streamripper_set_url_dest(NULL);
+        init_streamripper();
+        rcm.radio_status = 1;
+        syslog(LOG_INFO, "init_streamripper\n");
+    }
 
     mg_set_http_close_handler(server, mpd_close_handler);
     mg_set_request_handler(server, server_callback);
@@ -126,7 +129,8 @@ int main(int argc, char **argv)
         }
     }
 
-    stop_streamripper();
+    if (rcm.radio_status == 1)
+        stop_streamripper();
     db_close();
 
     rcm_close();
