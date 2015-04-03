@@ -20,7 +20,7 @@ var socket;
 var last_state;
 var current_app;
 var pagination = 0;
-var queue_pagination = 0;
+//var queue_pagination = 0;
 var radio_pagination = 0;
 var browsepath;
 var lastSongTitle = "";
@@ -38,8 +38,8 @@ var app = $.sammy(function() {
 
     this.get(/\#\/(\d+)/, function() {
         prepare();
-        queue_pagination = 0;
-        queue_pagination = parseInt(this.params['splat'][0]);
+//        queue_pagination = 0;
+//        queue_pagination = parseInt(this.params['splat'][0]);
     });
 
     this.get("/", function(context) {
@@ -111,11 +111,11 @@ function webSocketConnect() {
                 case "disconnected":
                     updateNotificationIcon(2);
                     break;
-                case "update_queue":
+/*                case "update_queue":
                     if(current_app === 'queue') {
                         socket.send('MPD_API_GET_QUEUE,'+queue_pagination);
                     }
-                    break;
+                    break;*/
                 case "current_radio":
                     $('#currentradio').text(obj.data.name);
                     $('#currentradiostatus').text(obj.data.status);
@@ -151,6 +151,7 @@ function webSocketConnect() {
                                         } else {
                                             //artimage.src = "/images/art.jpg";
                                             console.log("there is no track.album.image");
+                                            //socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
                                         }
                                         if (lastfm.track.album.title) {
                                             $('#album').text(lastfm.track.album.title);
@@ -195,10 +196,10 @@ function webSocketConnect() {
                         document.getElementById("artimage").src = art_url;
                     } else {
                         console.log("no art" );
-                        //socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
+                        socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
                     }
 
-                    socket.send('MPD_API_GET_QUEUE,'+queue_pagination);
+//                    socket.send('MPD_API_GET_QUEUE,'+queue_pagination);
 
                     break;
                 case "mpdhost":
