@@ -196,7 +196,8 @@ function webSocketConnect() {
                         document.getElementById("artimage").src = art_url;
                     } else {
                         console.log("no art" );
-                        socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
+                        if(obj.data.artist)
+                            socket.send('MPD_API_DB_GET_ARTIST,'+obj.data.artist);
                     }
 
 //                    socket.send('MPD_API_GET_QUEUE,'+queue_pagination);
